@@ -1,0 +1,10 @@
+fastapi==0.141.1
+uvicorn==0.52.1
+SQLAlchemy==2.0.51
+alembic==1.19.1
+pydantic==2.13.4
+PyJWT==2.13.0
+slowapi==0.1.10
+python-multipart==0.0.32
+pytest==9.1.1
+httpx==0.28.1

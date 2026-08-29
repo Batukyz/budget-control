@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bütçe Takip</title>
+<script>
+  (function () {
+    if (localStorage.getItem("theme") === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  })();
+</script>
+<style>
+  :root {
+    --bg: #eef0f7;
+    --card: #ffffff;
+    --input-bg: #f1f2f8;
+    --border: #e1e3ed;
+    --text: #23252b;
+    --muted: #7b7e8c;
+    --accent: #2f8f6f;
+    --accent-hover: #267a5e;
+    --on-accent: #ffffff;
+    --secondary: #e8114a;
+    --secondary-hover: #c90f3f;
+    --danger: #e8114a;
+    --danger-hover: #c90f3f;
+    --success: #4ade80;
+    --on-success: #0f3d22;
+    --gradient: linear-gradient(135deg, var(--accent), #3fae8a);
+  }
+  [data-theme="dark"] {
+    --bg: #16171d;
+    --card: #21222c;
+    --input-bg: #1c1d26;
+    --border: #33343f;
+    --text: #ededf2;
+    --muted: #9294a3;
+    --accent: #4bbf98;
+    --accent-hover: #5ecca7;
+    --on-accent: #0f1712;
+    --secondary: #ff6b85;
+    --secondary-hover: #ff8299;
+    --danger: #ff6b85;
+    --danger-hover: #ff8299;
+    --success: #34d399;
+    --on-success: #0f3d22;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 32px 20px 80px; }
+  h1 { font-size: 22px; font-weight: 700; margin: 0 0 24px; letter-spacing: -0.01em; }
+  .brand-title {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 16px rgba(0, 0, 0, 0.04);
+  }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  input, select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 14px;
+    margin-bottom: 14px;
+    font-family: inherit;
+    transition: border-color 0.15s ease;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 50px; }
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, filter 0.15s ease;
+  }
+  .btn-primary { background: var(--gradient); color: var(--on-accent); width: 100%; }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-ghost { background: transparent; color: var(--muted); font-weight: 400; font-size: 13px; }
+  .btn-ghost:hover { color: var(--text); }
+  .btn-small { padding: 6px 10px; font-size: 13px; }
+  .btn-archive { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-archive:hover { color: var(--danger-hover); border-color: var(--danger); }
+  .btn-income { background: var(--success); color: var(--on-success); }
+  .btn-expense { background: var(--danger); color: #fff; }
+  .type-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+  .type-toggle button { flex: 1; background: var(--input-bg); color: var(--muted); border: 1px solid var(--border); }
+  .type-toggle button.active.expense { background: var(--danger); color: #fff; border-color: transparent; }
+  .type-toggle button.active.income { background: var(--success); color: var(--on-success); border-color: transparent; }
+  .row { display: flex; gap: 8px; }
+  .row input, .row select { margin-bottom: 0; }
+  .error { color: var(--danger); font-size: 13px; margin: -6px 0 14px; min-height: 1em; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .empty { color: var(--muted); font-size: 14px; text-align: center; padding: 24px 0; }
+  #login-view, #app-view { display: none; }
+  .stat-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
+  .stat-row:last-child { margin-bottom: 0; }
+  .stat-label { color: var(--muted); font-size: 13px; }
+  .stat-value { font-weight: 700; font-size: 13px; }
+  .section-title { font-weight: 700; font-size: 14px; margin-bottom: 12px; }
+  .overview-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: center; }
+  .overview-stat { padding: 10px 4px; border-radius: 12px; background: var(--input-bg); }
+  .overview-value { font-size: 19px; font-weight: 700; }
+  .overview-value.positive { color: var(--success); }
+  .overview-value.negative { color: var(--danger); }
+  .overview-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .entry-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+  .entry-row:last-child { border-bottom: none; }
+  .entry-title { font-size: 14px; font-weight: 600; }
+  .entry-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .entry-amount { font-weight: 700; font-size: 14px; white-space: nowrap; }
+  .entry-amount.income { color: var(--success); }
+  .entry-amount.expense { color: var(--danger); }
+  .entry-amount.due-soon { color: var(--danger); }
+  .actions { display: flex; gap: 6px; flex: none; }
+  .theme-toggle-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 50;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+</style>
+</head>
+<body>
+<button type="button" class="theme-toggle-btn" id="theme-toggle-btn" title="Temayı değiştir">🌙</button>
+<div class="wrap">
+
+  <div id="login-view">
+    <h1 class="brand-title">Bütçe Takip</h1>
+    <div class="card">
+      <form id="login-form">
+        <label>E-posta</label>
+        <input type="email" id="login-email" required autocomplete="username">
+        <label>Şifre</label>
+        <input type="password" id="login-password" required autocomplete="current-password">
+        <div class="error" id="login-error"></div>
+        <button type="submit" class="btn-primary">Giriş yap</button>
+      </form>
+      <div class="toggle" style="text-align:center; margin-top:12px;">
+        <button type="button" class="btn-ghost" id="show-register">Hesabın yok mu? Kayıt ol</button>
+      </div>
+    </div>
+
+    <div class="card" id="register-card" style="display:none">
+      <form id="register-form">
+        <label>E-posta</label>
+        <input type="email" id="register-email" required autocomplete="username">
+        <label>Şifre (en az 8 karakter)</label>
+        <input type="password" id="register-password" required minlength="8" autocomplete="new-password">
+        <div class="error" id="register-error"></div>
+        <button type="submit" class="btn-primary">Kayıt ol ve giriş yap</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="app-view">
+    <div class="topbar">
+      <h1>Bütçe Takip</h1>
+      <button class="btn-ghost" id="logout-btn">Çıkış yap</button>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Bu ay</div>
+      <div class="overview-grid">
+        <div class="overview-stat">
+          <div class="overview-value positive" id="overview-income">–</div>
+          <div class="overview-label">💰 Gelir</div>
+        </div>
+        <div class="overview-stat">
+          <div class="overview-value negative" id="overview-expense">–</div>
+          <div class="overview-label">💸 Gider</div>
+        </div>
+        <div class="overview-stat">
+          <div class="overview-value" id="overview-balance">–</div>
+          <div class="overview-label">⚖️ Net bakiye</div>
+        </div>
+        <div class="overview-stat">
+          <div class="overview-value" id="overview-subs">–</div>
+          <div class="overview-label">🔁 Aylık abonelik</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="upcoming-subs-card" style="display:none">
+      <div class="section-title">⏰ Yaklaşan abonelik ödemeleri</div>
+      <div id="upcoming-subs-note" class="empty" style="padding:0; text-align:left; margin-bottom:0;"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">İşlem ekle</div>
+      <form id="add-transaction-form">
+        <div class="type-toggle">
+          <button type="button" class="expense active" id="type-expense-btn">Gider</button>
+          <button type="button" class="income" id="type-income-btn">Gelir</button>
+        </div>
+        <div class="row">
+          <input type="number" step="0.01" min="0.01" id="tx-amount" placeholder="Tutar" required>
+          <input type="date" id="tx-date" style="flex:none; width:150px;">
+        </div>
+        <input type="text" id="tx-category" placeholder="Kategori (örn. Market, Ulaşım)">
+        <textarea id="tx-note" placeholder="Not (opsiyonel)"></textarea>
+        <button type="submit" class="btn-primary">Ekle</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Son işlemler</div>
+      <div id="transactions-list"></div>
+      <div class="empty" id="transactions-empty" style="display:none">Henüz işlem yok.</div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Abonelik ekle</div>
+      <form id="add-subscription-form">
+        <input type="text" id="sub-name" placeholder="Abonelik adı (örn. Netflix)" required>
+        <div class="row">
+          <input type="number" step="0.01" min="0.01" id="sub-amount" placeholder="Tutar" required>
+          <select id="sub-cycle" style="flex:none; width:130px;">
+            <option value="monthly">Aylık</option>
+            <option value="yearly">Yıllık</option>
+            <option value="weekly">Haftalık</option>
+          </select>
+        </div>
+        <label>Sonraki ödeme tarihi</label>
+        <input type="date" id="sub-due-date" required>
+        <input type="text" id="sub-category" placeholder="Kategori (opsiyonel)">
+        <button type="submit" class="btn-primary">Ekle</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Abonelikler</div>
+      <div id="subscriptions-list"></div>
+      <div class="empty" id="subscriptions-empty" style="display:none">Henüz abonelik yok.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = "";
+
+function getTokens() {
+  return {
+    access: localStorage.getItem("access_token"),
+    refresh: localStorage.getItem("refresh_token"),
+  };
+}
+function setTokens(access, refresh) {
+  localStorage.setItem("access_token", access);
+  localStorage.setItem("refresh_token", refresh);
+}
+function clearTokens() {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+}
+
+async function tryRefresh() {
+  const { refresh } = getTokens();
+  if (!refresh) return false;
+  const response = await fetch(API + "/auth/refresh", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh_token: refresh }),
+  });
+  if (!response.ok) {
+    clearTokens();
+    return false;
+  }
+  const data = await response.json();
+  setTokens(data.access_token, data.refresh_token);
+  return true;
+}
+
+async function apiFetch(path, options = {}) {
+  const { access } = getTokens();
+  options.headers = Object.assign({}, options.headers, {
+    Authorization: `Bearer ${access}`,
+  });
+  let response = await fetch(API + path, options);
+  if (response.status === 401) {
+    const refreshed = await tryRefresh();
+    if (refreshed) {
+      const { access: newAccess } = getTokens();
+      options.headers.Authorization = `Bearer ${newAccess}`;
+      response = await fetch(API + path, options);
+    } else {
+      showLogin();
+      throw new Error("Oturum süresi doldu");
+    }
+  }
+  return response;
+}
+
+const themeToggleBtn = document.getElementById("theme-toggle-btn");
+function applyTheme(theme) {
+  if (theme === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+    themeToggleBtn.textContent = "☀️";
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+    themeToggleBtn.textContent = "🌙";
+  }
+  localStorage.setItem("theme", theme);
+}
+applyTheme(localStorage.getItem("theme") === "dark" ? "dark" : "soft");
+themeToggleBtn.addEventListener("click", () => {
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  applyTheme(isDark ? "soft" : "dark");
+});
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str == null ? "" : String(str);
+  return div.innerHTML;
+}
+function formatMoney(n) {
+  return new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+}
+function todayIsoDate() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function formatDateTr(iso) {
+  const [y, m, d] = iso.split("-");
+  return `${d}.${m}.${y}`;
+}
+
+function showLogin() {
+  clearTokens();
+  document.getElementById("app-view").style.display = "none";
+  document.getElementById("login-view").style.display = "block";
+}
+
+function showApp() {
+  document.getElementById("login-view").style.display = "none";
+  document.getElementById("app-view").style.display = "block";
+  document.getElementById("tx-date").value = todayIsoDate();
+  document.getElementById("sub-due-date").value = todayIsoDate();
+  loadOverview();
+  loadTransactions();
+  loadSubscriptions();
+}
+
+async function loadOverview() {
+  const response = await apiFetch("/overview");
+  const data = await response.json();
+  document.getElementById("overview-income").textContent = formatMoney(data.month_income);
+  document.getElementById("overview-expense").textContent = formatMoney(data.month_expense);
+  const balanceEl = document.getElementById("overview-balance");
+  balanceEl.textContent = formatMoney(data.net_balance);
+  balanceEl.className = "overview-value " + (data.net_balance >= 0 ? "positive" : "negative");
+  document.getElementById("overview-subs").textContent = formatMoney(data.monthly_subscription_cost);
+
+  const card = document.getElementById("upcoming-subs-card");
+  const note = document.getElementById("upcoming-subs-note");
+  if (data.upcoming_subscriptions > 0) {
+    card.style.display = "block";
+    note.textContent = `Önümüzdeki 7 gün içinde ${data.upcoming_subscriptions} abonelik ödemen var.`;
+  } else {
+    card.style.display = "none";
+  }
+}
+
+let currentTxType = "expense";
+document.getElementById("type-expense-btn").addEventListener("click", () => setTxType("expense"));
+document.getElementById("type-income-btn").addEventListener("click", () => setTxType("income"));
+function setTxType(type) {
+  currentTxType = type;
+  document.getElementById("type-expense-btn").classList.toggle("active", type === "expense");
+  document.getElementById("type-income-btn").classList.toggle("active", type === "income");
+}
+
+document.getElementById("add-transaction-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const amount = parseFloat(document.getElementById("tx-amount").value);
+  const occurred_on = document.getElementById("tx-date").value || todayIsoDate();
+  const category = document.getElementById("tx-category").value.trim() || null;
+  const note = document.getElementById("tx-note").value.trim() || null;
+  await apiFetch("/transactions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount, type: currentTxType, category, note, occurred_on }),
+  });
+  document.getElementById("add-transaction-form").reset();
+  document.getElementById("tx-date").value = todayIsoDate();
+  setTxType("expense");
+  loadTransactions();
+  loadOverview();
+});
+
+async function loadTransactions() {
+  const response = await apiFetch("/transactions");
+  const transactions = await response.json();
+  const list = document.getElementById("transactions-list");
+  const empty = document.getElementById("transactions-empty");
+  list.innerHTML = "";
+  empty.style.display = transactions.length ? "none" : "block";
+  for (const tx of transactions.slice(0, 30)) {
+    const row = document.createElement("div");
+    row.className = "entry-row";
+    const metaParts = [formatDateTr(tx.occurred_on)];
+    if (tx.category) metaParts.push(escapeHtml(tx.category));
+    row.innerHTML = `
+      <div>
+        <div class="entry-title">${tx.note ? escapeHtml(tx.note) : (tx.category ? escapeHtml(tx.category) : (tx.type === "income" ? "Gelir" : "Gider"))}</div>
+        <div class="entry-meta">${metaParts.join(" · ")}</div>
+      </div>
+      <div class="actions">
+        <div class="entry-amount ${tx.type}">${tx.type === "income" ? "+" : "-"}${formatMoney(tx.amount)}</div>
+        <button class="btn-archive btn-small">Sil</button>
+      </div>
+    `;
+    row.querySelector(".btn-archive").addEventListener("click", async () => {
+      await apiFetch(`/transactions/${tx.id}`, { method: "DELETE" });
+      loadTransactions();
+      loadOverview();
+    });
+    list.appendChild(row);
+  }
+}
+
+const CYCLE_LABELS = { monthly: "aylık", yearly: "yıllık", weekly: "haftalık" };
+
+document.getElementById("add-subscription-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("sub-name").value.trim();
+  const amount = parseFloat(document.getElementById("sub-amount").value);
+  const billing_cycle = document.getElementById("sub-cycle").value;
+  const next_due_date = document.getElementById("sub-due-date").value;
+  const category = document.getElementById("sub-category").value.trim() || null;
+  await apiFetch("/subscriptions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, amount, billing_cycle, next_due_date, category }),
+  });
+  document.getElementById("add-subscription-form").reset();
+  document.getElementById("sub-due-date").value = todayIsoDate();
+  loadSubscriptions();
+  loadOverview();
+});
+
+async function loadSubscriptions() {
+  const response = await apiFetch("/subscriptions");
+  const subscriptions = await response.json();
+  const list = document.getElementById("subscriptions-list");
+  const empty = document.getElementById("subscriptions-empty");
+  list.innerHTML = "";
+  empty.style.display = subscriptions.length ? "none" : "block";
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (const sub of subscriptions) {
+    const row = document.createElement("div");
+    row.className = "entry-row";
+    const dueDate = new Date(sub.next_due_date);
+    const daysUntil = Math.round((dueDate - today) / 86400000);
+    const dueSoon = sub.is_active && daysUntil >= 0 && daysUntil <= 7;
+    const metaParts = [`${CYCLE_LABELS[sub.billing_cycle] || sub.billing_cycle} · ${formatDateTr(sub.next_due_date)}`];
+    if (sub.category) metaParts.push(escapeHtml(sub.category));
+    if (!sub.is_active) metaParts.push("pasif");
+    row.innerHTML = `
+      <div>
+        <div class="entry-title">${escapeHtml(sub.name)}</div>
+        <div class="entry-meta">${metaParts.join(" · ")}</div>
+      </div>
+      <div class="actions">
+        <div class="entry-amount expense${dueSoon ? " due-soon" : ""}">${formatMoney(sub.amount)}</div>
+        <button class="btn-archive btn-small">${sub.is_active ? "Pasifleştir" : "Aktifleştir"}</button>
+        <button class="btn-archive btn-small">Sil</button>
+      </div>
+    `;
+    const [toggleBtn, deleteBtn] = row.querySelectorAll(".btn-archive");
+    toggleBtn.addEventListener("click", async () => {
+      await apiFetch(`/subscriptions/${sub.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_active: !sub.is_active }),
+      });
+      loadSubscriptions();
+      loadOverview();
+    });
+    deleteBtn.addEventListener("click", async () => {
+      if (!confirm(`"${sub.name}" silinsin mi?`)) return;
+      await apiFetch(`/subscriptions/${sub.id}`, { method: "DELETE" });
+      loadSubscriptions();
+      loadOverview();
+    });
+    list.appendChild(row);
+  }
+}
+
+document.getElementById("show-register").addEventListener("click", () => {
+  const card = document.getElementById("register-card");
+  card.style.display = card.style.display === "none" ? "block" : "none";
+});
+
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+  const errorEl = document.getElementById("login-error");
+  errorEl.textContent = "";
+  const response = await fetch(API + "/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ username: email, password }),
+  });
+  if (!response.ok) {
+    errorEl.textContent = "E-posta veya şifre hatalı.";
+    return;
+  }
+  const data = await response.json();
+  setTokens(data.access_token, data.refresh_token);
+  showApp();
+});
+
+document.getElementById("register-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("register-email").value;
+  const password = document.getElementById("register-password").value;
+  const errorEl = document.getElementById("register-error");
+  errorEl.textContent = "";
+  const response = await fetch(API + "/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    errorEl.textContent = err.detail || "Kayıt olunamadı.";
+    return;
+  }
+  const loginResponse = await fetch(API + "/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ username: email, password }),
+  });
+  const data = await loginResponse.json();
+  setTokens(data.access_token, data.refresh_token);
+  showApp();
+});
+
+document.getElementById("logout-btn").addEventListener("click", async () => {
+  const { refresh } = getTokens();
+  if (refresh) {
+    await fetch(API + "/auth/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: refresh }),
+    });
+  }
+  showLogin();
+});
+
+(async function init() {
+  const { access } = getTokens();
+  if (!access) {
+    showLogin();
+    return;
+  }
+  const response = await fetch(API + "/me", { headers: { Authorization: `Bearer ${access}` } });
+  if (response.ok) {
+    showApp();
+  } else {
+    const refreshed = await tryRefresh();
+    if (refreshed) showApp();
+    else showLogin();
+  }
+})();
+</script>
+</body>
+</html>
