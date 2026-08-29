@@ -1,4 +1,4 @@
-# Budget Tracker API
+# Budget Control
 
 Kişisel bütçe, gider ve abonelik takibi için FastAPI tabanlı bir API + basit bir web arayüzü.
 

@@ -24,7 +24,7 @@ from .security import hash_password, verify_password
 
 configure_logging()
 
-app = FastAPI(title="Budget Tracker API")
+app = FastAPI(title="Budget Control")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(RequestLoggingMiddleware)
