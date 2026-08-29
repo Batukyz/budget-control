@@ -55,6 +55,29 @@ def test_delete_subscription(client):
     assert client.get(f"/subscriptions/{created['id']}").status_code == 404
 
 
+def test_list_subscriptions_filters_by_active_status(client):
+    active = client.post("/subscriptions", json={"name": "Active", "amount": 10, "next_due_date": IN_3_DAYS}).json()
+    cancelled = client.post(
+        "/subscriptions", json={"name": "Cancelled", "amount": 10, "next_due_date": IN_3_DAYS}
+    ).json()
+    client.put(f"/subscriptions/{cancelled['id']}", json={"is_active": False})
+
+    response = client.get("/subscriptions", params={"is_active": True})
+    names = [s["name"] for s in response.json()]
+    assert names == ["Active"]
+
+
+def test_list_subscriptions_paginates(client):
+    for i in range(5):
+        client.post("/subscriptions", json={"name": f"Sub{i}", "amount": 10, "next_due_date": IN_3_DAYS})
+
+    first_page = client.get("/subscriptions", params={"limit": 2, "skip": 0}).json()
+    second_page = client.get("/subscriptions", params={"limit": 2, "skip": 2}).json()
+    assert len(first_page) == 2
+    assert len(second_page) == 2
+    assert {s["id"] for s in first_page}.isdisjoint({s["id"] for s in second_page})
+
+
 def test_subscriptions_scoped_to_owner(make_authed_client):
     alice = make_authed_client(email="alice_sub@example.com")
     bob = make_authed_client(email="bob_sub@example.com")

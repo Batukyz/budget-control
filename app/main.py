@@ -1,7 +1,8 @@
 from datetime import date, timedelta
 from pathlib import Path
+from typing import Optional
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
@@ -144,11 +145,26 @@ def create_transaction(
 def list_transactions(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
+    type: Optional[schemas.TransactionType] = None,
+    category: Optional[str] = None,
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
 ):
+    query = db.query(models.Transaction).filter(models.Transaction.owner_id == current_user.id)
+    if type is not None:
+        query = query.filter(models.Transaction.type == type)
+    if category is not None:
+        query = query.filter(models.Transaction.category == category)
+    if from_date is not None:
+        query = query.filter(models.Transaction.occurred_on >= from_date)
+    if to_date is not None:
+        query = query.filter(models.Transaction.occurred_on <= to_date)
     return (
-        db.query(models.Transaction)
-        .filter(models.Transaction.owner_id == current_user.id)
-        .order_by(models.Transaction.occurred_on.desc(), models.Transaction.id.desc())
+        query.order_by(models.Transaction.occurred_on.desc(), models.Transaction.id.desc())
+        .offset(skip)
+        .limit(limit)
         .all()
     )
 
@@ -216,11 +232,17 @@ def create_subscription(
 def list_subscriptions(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
+    is_active: Optional[bool] = None,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=200),
 ):
+    query = db.query(models.Subscription).filter(models.Subscription.owner_id == current_user.id)
+    if is_active is not None:
+        query = query.filter(models.Subscription.is_active == is_active)
     return (
-        db.query(models.Subscription)
-        .filter(models.Subscription.owner_id == current_user.id)
-        .order_by(models.Subscription.next_due_date.asc())
+        query.order_by(models.Subscription.next_due_date.asc())
+        .offset(skip)
+        .limit(limit)
         .all()
     )
 
@@ -294,10 +316,130 @@ def get_overview(
     upcoming_cutoff = today + timedelta(days=7)
     upcoming_subscriptions = sum(1 for s in active_subscriptions if today <= s.next_due_date <= upcoming_cutoff)
 
+    budget_limits = (
+        db.query(models.BudgetLimit).filter(models.BudgetLimit.owner_id == current_user.id).all()
+    )
+    budgets_over_limit = 0
+    if budget_limits:
+        category_expense: dict = {}
+        for t in month_transactions:
+            if t.type == "expense":
+                category_expense[t.category] = category_expense.get(t.category, 0.0) + t.amount
+        for b in budget_limits:
+            spent = month_expense if b.category is None else category_expense.get(b.category, 0.0)
+            if spent > b.monthly_limit:
+                budgets_over_limit += 1
+
     return schemas.OverviewOut(
         month_income=round(month_income, 2),
         month_expense=round(month_expense, 2),
         net_balance=round(month_income - month_expense, 2),
         monthly_subscription_cost=round(monthly_subscription_cost, 2),
         upcoming_subscriptions=upcoming_subscriptions,
+        budgets_over_limit=budgets_over_limit,
     )
+
+
+def _get_owned_budget(budget_id: int, owner_id: int, db: Session) -> models.BudgetLimit:
+    budget = (
+        db.query(models.BudgetLimit)
+        .filter(models.BudgetLimit.id == budget_id, models.BudgetLimit.owner_id == owner_id)
+        .first()
+    )
+    if budget is None:
+        raise HTTPException(status_code=404, detail="Budget limit not found")
+    return budget
+
+
+@app.post("/budgets", response_model=schemas.BudgetLimitOut, status_code=201)
+def create_budget(
+    payload: schemas.BudgetLimitCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    existing = (
+        db.query(models.BudgetLimit)
+        .filter(
+            models.BudgetLimit.owner_id == current_user.id,
+            models.BudgetLimit.category == payload.category,
+        )
+        .first()
+    )
+    if existing is not None:
+        raise HTTPException(status_code=400, detail="Bu kategori için zaten bir bütçe limiti tanımlı")
+    budget = models.BudgetLimit(owner_id=current_user.id, **payload.model_dump())
+    db.add(budget)
+    db.commit()
+    db.refresh(budget)
+    return budget
+
+
+@app.get("/budgets", response_model=list[schemas.BudgetStatusOut])
+def list_budgets(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    budgets = (
+        db.query(models.BudgetLimit)
+        .filter(models.BudgetLimit.owner_id == current_user.id)
+        .order_by(models.BudgetLimit.id.asc())
+        .all()
+    )
+    today = date.today()
+    month_start = today.replace(day=1)
+    month_expenses = (
+        db.query(models.Transaction)
+        .filter(
+            models.Transaction.owner_id == current_user.id,
+            models.Transaction.type == "expense",
+            models.Transaction.occurred_on >= month_start,
+            models.Transaction.occurred_on <= today,
+        )
+        .all()
+    )
+    category_expense: dict = {}
+    total_expense = 0.0
+    for t in month_expenses:
+        total_expense += t.amount
+        category_expense[t.category] = category_expense.get(t.category, 0.0) + t.amount
+
+    results = []
+    for b in budgets:
+        spent = total_expense if b.category is None else category_expense.get(b.category, 0.0)
+        results.append(
+            schemas.BudgetStatusOut(
+                id=b.id,
+                category=b.category,
+                monthly_limit=b.monthly_limit,
+                created_at=b.created_at,
+                spent_this_month=round(spent, 2),
+                remaining=round(b.monthly_limit - spent, 2),
+                is_over_limit=spent > b.monthly_limit,
+            )
+        )
+    return results
+
+
+@app.put("/budgets/{budget_id}", response_model=schemas.BudgetLimitOut)
+def update_budget(
+    budget_id: int,
+    update: schemas.BudgetLimitUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    budget = _get_owned_budget(budget_id, current_user.id, db)
+    budget.monthly_limit = update.monthly_limit
+    db.commit()
+    db.refresh(budget)
+    return budget
+
+
+@app.delete("/budgets/{budget_id}", status_code=204)
+def delete_budget(
+    budget_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    budget = _get_owned_budget(budget_id, current_user.id, db)
+    db.delete(budget)
+    db.commit()

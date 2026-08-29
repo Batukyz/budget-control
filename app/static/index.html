@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bütçe Takip</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%B0%3C/text%3E%3C/svg%3E">
 <script>
   (function () {
     if (localStorage.getItem("theme") === "dark") {
@@ -55,14 +56,23 @@
     color: var(--text);
     min-height: 100vh;
     transition: background-color 0.2s ease, color 0.2s ease;
+    -webkit-font-smoothing: antialiased;
   }
   .wrap { max-width: 480px; margin: 0 auto; padding: 32px 20px 80px; }
   h1 { font-size: 22px; font-weight: 700; margin: 0 0 24px; letter-spacing: -0.01em; }
+  .app-icon { font-size: 40px; text-align: center; margin-bottom: 6px; }
+  .login-header { text-align: center; margin-bottom: 28px; }
+  .login-header h1 { margin-bottom: 4px; }
+  .login-subtitle { color: var(--muted); font-size: 13px; margin: 0; }
   .brand-title {
     background: var(--gradient);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+  }
+  @keyframes fade-slide-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   .card {
     background: var(--card);
@@ -72,6 +82,7 @@
     margin-bottom: 16px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 16px rgba(0, 0, 0, 0.04);
   }
+  #login-view .card { animation: fade-slide-in 0.35s ease; }
   label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
   input, select, textarea {
     width: 100%;
@@ -85,7 +96,14 @@
     font-family: inherit;
     transition: border-color 0.15s ease;
   }
-  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(47, 143, 111, 0.15);
+  }
+  [data-theme="dark"] input:focus, [data-theme="dark"] select:focus, [data-theme="dark"] textarea:focus {
+    box-shadow: 0 0 0 3px rgba(75, 191, 152, 0.18);
+  }
   textarea { resize: vertical; min-height: 50px; }
   button {
     cursor: pointer;
@@ -94,8 +112,10 @@
     padding: 10px 16px;
     font-size: 14px;
     font-weight: 600;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, filter 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, filter 0.15s ease, transform 0.1s ease;
   }
+  button:not(:disabled):active { transform: scale(0.97); }
+  button:disabled { opacity: 0.6; cursor: default; }
   .btn-primary { background: var(--gradient); color: var(--on-accent); width: 100%; }
   .btn-primary:hover { filter: brightness(1.08); }
   .btn-ghost { background: transparent; color: var(--muted); font-weight: 400; font-size: 13px; }
@@ -103,6 +123,8 @@
   .btn-small { padding: 6px 10px; font-size: 13px; }
   .btn-archive { background: transparent; border: 1px solid var(--border); color: var(--muted); }
   .btn-archive:hover { color: var(--danger-hover); border-color: var(--danger); }
+  .btn-edit { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-edit:hover { color: var(--accent); border-color: var(--accent); }
   .btn-income { background: var(--success); color: var(--on-success); }
   .btn-expense { background: var(--danger); color: #fff; }
   .type-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
@@ -111,6 +133,9 @@
   .type-toggle button.active.income { background: var(--success); color: var(--on-success); border-color: transparent; }
   .row { display: flex; gap: 8px; }
   .row input, .row select { margin-bottom: 0; }
+  .form-actions-row { display: flex; gap: 8px; align-items: center; }
+  .form-actions-row .btn-primary { margin-bottom: 0; }
+  .form-actions-row .btn-ghost { flex: none; margin-bottom: 0; }
   .error { color: var(--danger); font-size: 13px; margin: -6px 0 14px; min-height: 1em; }
   .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .empty { color: var(--muted); font-size: 14px; text-align: center; padding: 24px 0; }
@@ -121,27 +146,70 @@
   .stat-value { font-weight: 700; font-size: 13px; }
   .section-title { font-weight: 700; font-size: 14px; margin-bottom: 12px; }
   .overview-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: center; }
-  .overview-stat { padding: 10px 4px; border-radius: 12px; background: var(--input-bg); }
-  .overview-value { font-size: 19px; font-weight: 700; }
+  .overview-stat {
+    padding: 14px 6px;
+    border-radius: 14px;
+    background: var(--input-bg);
+    transition: transform 0.15s ease;
+  }
+  .overview-value { font-size: 21px; font-weight: 800; letter-spacing: -0.02em; }
   .overview-value.positive { color: var(--success); }
   .overview-value.negative { color: var(--danger); }
-  .overview-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .overview-label { font-size: 11px; color: var(--muted); margin-top: 6px; font-weight: 600; }
+  .tabbar { display: flex; gap: 6px; margin-bottom: 20px; }
+  .tab-btn {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 12px;
+    padding: 10px 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+  }
+  .tab-btn { transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease; }
+  .tab-btn.active {
+    background: var(--gradient);
+    color: var(--on-accent);
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fade-slide-in 0.25s ease; }
+  .filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .filter-row select { margin-bottom: 0; }
+  .chart-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .chart-row:last-child { margin-bottom: 0; }
+  .chart-label { font-size: 12px; color: var(--text); width: 84px; flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chart-bar-track { flex: 1; background: var(--input-bg); border-radius: 6px; height: 10px; overflow: hidden; }
+  .chart-bar-fill { height: 100%; background: var(--gradient); border-radius: 6px; transition: width 0.4s ease; }
+  .chart-value { font-size: 12px; color: var(--muted); width: 66px; flex: none; text-align: right; }
   .entry-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0;
+    flex-wrap: wrap;
+    padding: 12px 10px;
+    margin: 0 -10px;
+    border-radius: 10px;
     border-bottom: 1px solid var(--border);
     gap: 10px;
+    transition: background-color 0.15s ease;
   }
+  .entry-row:hover { background: var(--input-bg); }
   .entry-row:last-child { border-bottom: none; }
   .entry-title { font-size: 14px; font-weight: 600; }
   .entry-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
   .entry-amount { font-weight: 700; font-size: 14px; white-space: nowrap; }
   .entry-amount.income { color: var(--success); }
   .entry-amount.expense { color: var(--danger); }
-  .entry-amount.due-soon { color: var(--danger); }
-  .actions { display: flex; gap: 6px; flex: none; }
+  .entry-amount.due-soon { color: var(--danger); animation: pulse-soft 2s ease-in-out infinite; }
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+  .actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
   .theme-toggle-btn {
     position: fixed;
     top: 16px;
@@ -159,6 +227,31 @@
     justify-content: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
+  .toast-container {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: calc(100% - 40px);
+    max-width: 440px;
+  }
+  .toast {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--danger);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    opacity: 1;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .toast.success { border-left-color: var(--success); }
+  .toast.hide { opacity: 0; transform: translateY(8px); }
 </style>
 </head>
 <body>
@@ -166,7 +259,11 @@
 <div class="wrap">
 
   <div id="login-view">
-    <h1 class="brand-title">Bütçe Takip</h1>
+    <div class="login-header">
+      <div class="app-icon">💰</div>
+      <h1 class="brand-title">Bütçe Takip</h1>
+      <p class="login-subtitle">Gelir, gider ve aboneliklerini tek yerden yönet</p>
+    </div>
     <div class="card">
       <form id="login-form">
         <label>E-posta</label>
@@ -199,83 +296,116 @@
       <button class="btn-ghost" id="logout-btn">Çıkış yap</button>
     </div>
 
-    <div class="card">
-      <div class="section-title">Bu ay</div>
-      <div class="overview-grid">
-        <div class="overview-stat">
-          <div class="overview-value positive" id="overview-income">–</div>
-          <div class="overview-label">💰 Gelir</div>
+    <div class="tabbar">
+      <button type="button" class="tab-btn active" data-tab="overview">📊 Genel Bakış</button>
+      <button type="button" class="tab-btn" data-tab="transactions">💳 İşlemler</button>
+      <button type="button" class="tab-btn" data-tab="subscriptions">🔁 Abonelikler</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-overview">
+      <div class="card">
+        <div class="section-title">Bu ay</div>
+        <div class="overview-grid">
+          <div class="overview-stat">
+            <div class="overview-value positive" id="overview-income">–</div>
+            <div class="overview-label">💰 Gelir</div>
+          </div>
+          <div class="overview-stat">
+            <div class="overview-value negative" id="overview-expense">–</div>
+            <div class="overview-label">💸 Gider</div>
+          </div>
+          <div class="overview-stat">
+            <div class="overview-value" id="overview-balance">–</div>
+            <div class="overview-label">⚖️ Net bakiye</div>
+          </div>
+          <div class="overview-stat">
+            <div class="overview-value" id="overview-subs">–</div>
+            <div class="overview-label">🔁 Aylık abonelik</div>
+          </div>
         </div>
-        <div class="overview-stat">
-          <div class="overview-value negative" id="overview-expense">–</div>
-          <div class="overview-label">💸 Gider</div>
-        </div>
-        <div class="overview-stat">
-          <div class="overview-value" id="overview-balance">–</div>
-          <div class="overview-label">⚖️ Net bakiye</div>
-        </div>
-        <div class="overview-stat">
-          <div class="overview-value" id="overview-subs">–</div>
-          <div class="overview-label">🔁 Aylık abonelik</div>
-        </div>
+      </div>
+
+      <div class="card" id="upcoming-subs-card" style="display:none">
+        <div class="section-title">⏰ Yaklaşan abonelik ödemeleri</div>
+        <div id="upcoming-subs-note" class="empty" style="padding:0; text-align:left; margin-bottom:0;"></div>
+      </div>
+
+      <div class="card" id="category-chart-card" style="display:none">
+        <div class="section-title">📊 Kategoriye göre harcama (bu ay)</div>
+        <div id="category-chart"></div>
       </div>
     </div>
 
-    <div class="card" id="upcoming-subs-card" style="display:none">
-      <div class="section-title">⏰ Yaklaşan abonelik ödemeleri</div>
-      <div id="upcoming-subs-note" class="empty" style="padding:0; text-align:left; margin-bottom:0;"></div>
-    </div>
+    <div class="tab-panel" id="tab-transactions">
+      <div class="card">
+        <div class="section-title" id="tx-form-title">İşlem ekle</div>
+        <form id="add-transaction-form">
+          <div class="type-toggle">
+            <button type="button" class="expense active" id="type-expense-btn">Gider</button>
+            <button type="button" class="income" id="type-income-btn">Gelir</button>
+          </div>
+          <div class="row">
+            <input type="number" step="0.01" min="0.01" id="tx-amount" placeholder="Tutar" required>
+            <input type="date" id="tx-date" style="flex:none; width:150px;">
+          </div>
+          <input type="text" id="tx-category" placeholder="Kategori (örn. Market, Ulaşım)">
+          <textarea id="tx-note" placeholder="Not (opsiyonel)"></textarea>
+          <div class="form-actions-row">
+            <button type="submit" class="btn-primary" id="tx-submit-btn">Ekle</button>
+            <button type="button" class="btn-ghost" id="tx-cancel-edit" style="display:none">İptal</button>
+          </div>
+        </form>
+      </div>
 
-    <div class="card">
-      <div class="section-title">İşlem ekle</div>
-      <form id="add-transaction-form">
-        <div class="type-toggle">
-          <button type="button" class="expense active" id="type-expense-btn">Gider</button>
-          <button type="button" class="income" id="type-income-btn">Gelir</button>
-        </div>
-        <div class="row">
-          <input type="number" step="0.01" min="0.01" id="tx-amount" placeholder="Tutar" required>
-          <input type="date" id="tx-date" style="flex:none; width:150px;">
-        </div>
-        <input type="text" id="tx-category" placeholder="Kategori (örn. Market, Ulaşım)">
-        <textarea id="tx-note" placeholder="Not (opsiyonel)"></textarea>
-        <button type="submit" class="btn-primary">Ekle</button>
-      </form>
-    </div>
-
-    <div class="card">
-      <div class="section-title">Son işlemler</div>
-      <div id="transactions-list"></div>
-      <div class="empty" id="transactions-empty" style="display:none">Henüz işlem yok.</div>
-    </div>
-
-    <div class="card">
-      <div class="section-title">Abonelik ekle</div>
-      <form id="add-subscription-form">
-        <input type="text" id="sub-name" placeholder="Abonelik adı (örn. Netflix)" required>
-        <div class="row">
-          <input type="number" step="0.01" min="0.01" id="sub-amount" placeholder="Tutar" required>
-          <select id="sub-cycle" style="flex:none; width:130px;">
-            <option value="monthly">Aylık</option>
-            <option value="yearly">Yıllık</option>
-            <option value="weekly">Haftalık</option>
+      <div class="card">
+        <div class="section-title">Son işlemler</div>
+        <div class="filter-row">
+          <select id="tx-filter-category"><option value="">Tüm kategoriler</option></select>
+          <select id="tx-filter-type">
+            <option value="">Tümü</option>
+            <option value="expense">Gider</option>
+            <option value="income">Gelir</option>
           </select>
         </div>
-        <label>Sonraki ödeme tarihi</label>
-        <input type="date" id="sub-due-date" required>
-        <input type="text" id="sub-category" placeholder="Kategori (opsiyonel)">
-        <button type="submit" class="btn-primary">Ekle</button>
-      </form>
+        <div id="transactions-list"></div>
+        <div class="empty" id="transactions-empty" style="display:none">Henüz işlem yok.</div>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="section-title">Abonelikler</div>
-      <div id="subscriptions-list"></div>
-      <div class="empty" id="subscriptions-empty" style="display:none">Henüz abonelik yok.</div>
+    <div class="tab-panel" id="tab-subscriptions">
+      <div class="card">
+        <div class="section-title" id="sub-form-title">Abonelik ekle</div>
+        <form id="add-subscription-form">
+          <input type="text" id="sub-name" placeholder="Abonelik adı (örn. Netflix)" required>
+          <div class="row">
+            <input type="number" step="0.01" min="0.01" id="sub-amount" placeholder="Tutar" required>
+            <select id="sub-cycle" style="flex:none; width:130px;">
+              <option value="monthly">Aylık</option>
+              <option value="yearly">Yıllık</option>
+              <option value="weekly">Haftalık</option>
+            </select>
+          </div>
+          <label>Sonraki ödeme tarihi</label>
+          <input type="date" id="sub-due-date" required>
+          <input type="text" id="sub-category" placeholder="Kategori (opsiyonel)">
+          <div class="form-actions-row">
+            <button type="submit" class="btn-primary" id="sub-submit-btn">Ekle</button>
+            <button type="button" class="btn-ghost" id="sub-cancel-edit" style="display:none">İptal</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Abonelikler</div>
+        <div id="subscriptions-list"></div>
+        <div class="empty" id="subscriptions-empty" style="display:none">Henüz abonelik yok.</div>
+      </div>
     </div>
   </div>
 
 </div>
+
+<div class="toast-container" id="toast-container"></div>
 
 <script>
 const API = "";
@@ -326,10 +456,62 @@ async function apiFetch(path, options = {}) {
       response = await fetch(API + path, options);
     } else {
       showLogin();
-      throw new Error("Oturum süresi doldu");
+      throw new Error("Oturum süresi doldu, tekrar giriş yap.");
     }
   }
   return response;
+}
+
+async function extractErrorMessage(response) {
+  try {
+    const data = await response.json();
+    if (typeof data.detail === "string") return data.detail;
+    if (Array.isArray(data.detail)) return data.detail.map((d) => d.msg).join(", ");
+  } catch (_) {
+    // ignore parse errors, fall through to default message
+  }
+  return "Bir şeyler ters gitti. Lütfen tekrar dene.";
+}
+
+async function apiRead(path) {
+  try {
+    const response = await apiFetch(path);
+    if (!response.ok) {
+      showToast(await extractErrorMessage(response));
+      return null;
+    }
+    return await response.json();
+  } catch (err) {
+    showToast(err.message || "Bağlantı hatası.");
+    return null;
+  }
+}
+
+async function apiWrite(path, options, successMessage) {
+  try {
+    const response = await apiFetch(path, options);
+    if (!response.ok) {
+      showToast(await extractErrorMessage(response));
+      return false;
+    }
+    if (successMessage) showToast(successMessage, "success");
+    return true;
+  } catch (err) {
+    showToast(err.message || "Bağlantı hatası.");
+    return false;
+  }
+}
+
+function showToast(message, type = "error") {
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.className = "toast" + (type === "success" ? " success" : "");
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add("hide");
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
 }
 
 const themeToggleBtn = document.getElementById("theme-toggle-btn");
@@ -366,6 +548,15 @@ function formatDateTr(iso) {
   return `${d}.${m}.${y}`;
 }
 
+document.querySelectorAll(".tab-btn").forEach((btn) => {
+  btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
+});
+function setActiveTab(tab) {
+  document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".tab-panel").forEach((p) => p.classList.toggle("active", p.id === `tab-${tab}`));
+  window.scrollTo({ top: 0 });
+}
+
 function showLogin() {
   clearTokens();
   document.getElementById("app-view").style.display = "none";
@@ -375,16 +566,23 @@ function showLogin() {
 function showApp() {
   document.getElementById("login-view").style.display = "none";
   document.getElementById("app-view").style.display = "block";
-  document.getElementById("tx-date").value = todayIsoDate();
-  document.getElementById("sub-due-date").value = todayIsoDate();
+  setActiveTab("overview");
+  setTxFormMode(null);
+  setSubFormMode(null);
+  const txEmpty = document.getElementById("transactions-empty");
+  txEmpty.textContent = "Yükleniyor…";
+  txEmpty.style.display = "block";
+  const subEmpty = document.getElementById("subscriptions-empty");
+  subEmpty.textContent = "Yükleniyor…";
+  subEmpty.style.display = "block";
   loadOverview();
   loadTransactions();
   loadSubscriptions();
 }
 
 async function loadOverview() {
-  const response = await apiFetch("/overview");
-  const data = await response.json();
+  const data = await apiRead("/overview");
+  if (!data) return;
   document.getElementById("overview-income").textContent = formatMoney(data.month_income);
   document.getElementById("overview-expense").textContent = formatMoney(data.month_expense);
   const balanceEl = document.getElementById("overview-balance");
@@ -411,30 +609,83 @@ function setTxType(type) {
   document.getElementById("type-income-btn").classList.toggle("active", type === "income");
 }
 
+let editingTxId = null;
+function setTxFormMode(tx) {
+  editingTxId = tx ? tx.id : null;
+  document.getElementById("tx-form-title").textContent = tx ? "İşlemi düzenle" : "İşlem ekle";
+  document.getElementById("tx-submit-btn").textContent = tx ? "Güncelle" : "Ekle";
+  document.getElementById("tx-cancel-edit").style.display = tx ? "inline-block" : "none";
+  if (tx) {
+    setTxType(tx.type);
+    document.getElementById("tx-amount").value = tx.amount;
+    document.getElementById("tx-date").value = tx.occurred_on;
+    document.getElementById("tx-category").value = tx.category || "";
+    document.getElementById("tx-note").value = tx.note || "";
+  } else {
+    document.getElementById("add-transaction-form").reset();
+    document.getElementById("tx-date").value = todayIsoDate();
+    setTxType("expense");
+  }
+}
+document.getElementById("tx-cancel-edit").addEventListener("click", () => setTxFormMode(null));
+
 document.getElementById("add-transaction-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const amount = parseFloat(document.getElementById("tx-amount").value);
   const occurred_on = document.getElementById("tx-date").value || todayIsoDate();
   const category = document.getElementById("tx-category").value.trim() || null;
   const note = document.getElementById("tx-note").value.trim() || null;
-  await apiFetch("/transactions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount, type: currentTxType, category, note, occurred_on }),
-  });
-  document.getElementById("add-transaction-form").reset();
-  document.getElementById("tx-date").value = todayIsoDate();
-  setTxType("expense");
+  const isEdit = editingTxId !== null;
+  const submitBtn = document.getElementById("tx-submit-btn");
+  submitBtn.disabled = true;
+  const ok = await apiWrite(
+    isEdit ? `/transactions/${editingTxId}` : "/transactions",
+    {
+      method: isEdit ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount, type: currentTxType, category, note, occurred_on }),
+    },
+    isEdit ? "İşlem güncellendi." : null
+  );
+  submitBtn.disabled = false;
+  if (!ok) return;
+  setTxFormMode(null);
   loadTransactions();
   loadOverview();
 });
 
-async function loadTransactions() {
-  const response = await apiFetch("/transactions");
-  const transactions = await response.json();
+let allTransactions = [];
+
+function populateCategoryFilter(transactions) {
+  const select = document.getElementById("tx-filter-category");
+  const current = select.value;
+  const categories = [...new Set(transactions.map((t) => t.category).filter(Boolean))].sort();
+  select.innerHTML =
+    '<option value="">Tüm kategoriler</option>' +
+    categories.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+  select.value = categories.includes(current) ? current : "";
+}
+
+function getFilteredTransactions() {
+  const category = document.getElementById("tx-filter-category").value;
+  const type = document.getElementById("tx-filter-type").value;
+  return allTransactions.filter(
+    (t) => (!category || t.category === category) && (!type || t.type === type)
+  );
+}
+
+document.getElementById("tx-filter-category").addEventListener("change", renderFilteredTransactions);
+document.getElementById("tx-filter-type").addEventListener("change", renderFilteredTransactions);
+
+function renderFilteredTransactions() {
+  renderTransactionsList(getFilteredTransactions());
+}
+
+function renderTransactionsList(transactions) {
   const list = document.getElementById("transactions-list");
   const empty = document.getElementById("transactions-empty");
   list.innerHTML = "";
+  empty.textContent = allTransactions.length ? "Filtreyle eşleşen işlem yok." : "Henüz işlem yok.";
   empty.style.display = transactions.length ? "none" : "block";
   for (const tx of transactions.slice(0, 30)) {
     const row = document.createElement("div");
@@ -448,11 +699,20 @@ async function loadTransactions() {
       </div>
       <div class="actions">
         <div class="entry-amount ${tx.type}">${tx.type === "income" ? "+" : "-"}${formatMoney(tx.amount)}</div>
+        <button class="btn-edit btn-small">Düzenle</button>
         <button class="btn-archive btn-small">Sil</button>
       </div>
     `;
-    row.querySelector(".btn-archive").addEventListener("click", async () => {
-      await apiFetch(`/transactions/${tx.id}`, { method: "DELETE" });
+    const [editBtn, deleteBtn] = row.querySelectorAll(".actions button");
+    editBtn.addEventListener("click", () => {
+      setTxFormMode(tx);
+      document.getElementById("tx-form-title").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    deleteBtn.addEventListener("click", async () => {
+      if (!confirm("Bu işlem silinsin mi?")) return;
+      const ok = await apiWrite(`/transactions/${tx.id}`, { method: "DELETE" }, "İşlem silindi.");
+      if (!ok) return;
+      if (editingTxId === tx.id) setTxFormMode(null);
       loadTransactions();
       loadOverview();
     });
@@ -460,7 +720,67 @@ async function loadTransactions() {
   }
 }
 
+function renderCategoryChart() {
+  const card = document.getElementById("category-chart-card");
+  const container = document.getElementById("category-chart");
+  const today = new Date();
+  const monthStart = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-01`;
+  const monthExpenses = allTransactions.filter((t) => t.type === "expense" && t.occurred_on >= monthStart);
+  const totals = {};
+  for (const t of monthExpenses) {
+    const key = t.category || "Diğer";
+    totals[key] = (totals[key] || 0) + t.amount;
+  }
+  const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+  if (entries.length === 0) {
+    card.style.display = "none";
+    return;
+  }
+  card.style.display = "block";
+  const max = entries[0][1];
+  container.innerHTML = entries
+    .map(
+      ([label, value]) => `
+      <div class="chart-row">
+        <div class="chart-label" title="${escapeHtml(label)}">${escapeHtml(label)}</div>
+        <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.max(4, (value / max) * 100)}%"></div></div>
+        <div class="chart-value">${formatMoney(value)}</div>
+      </div>
+    `
+    )
+    .join("");
+}
+
+async function loadTransactions() {
+  const data = await apiRead("/transactions");
+  if (!data) return;
+  allTransactions = data;
+  populateCategoryFilter(allTransactions);
+  renderFilteredTransactions();
+  renderCategoryChart();
+}
+
 const CYCLE_LABELS = { monthly: "aylık", yearly: "yıllık", weekly: "haftalık" };
+
+let editingSubId = null;
+function setSubFormMode(sub) {
+  editingSubId = sub ? sub.id : null;
+  document.getElementById("sub-form-title").textContent = sub ? "Aboneliği düzenle" : "Abonelik ekle";
+  document.getElementById("sub-submit-btn").textContent = sub ? "Güncelle" : "Ekle";
+  document.getElementById("sub-cancel-edit").style.display = sub ? "inline-block" : "none";
+  if (sub) {
+    document.getElementById("sub-name").value = sub.name;
+    document.getElementById("sub-amount").value = sub.amount;
+    document.getElementById("sub-cycle").value = sub.billing_cycle;
+    document.getElementById("sub-due-date").value = sub.next_due_date;
+    document.getElementById("sub-category").value = sub.category || "";
+  } else {
+    document.getElementById("add-subscription-form").reset();
+    document.getElementById("sub-due-date").value = todayIsoDate();
+    document.getElementById("sub-cycle").value = "monthly";
+  }
+}
+document.getElementById("sub-cancel-edit").addEventListener("click", () => setSubFormMode(null));
 
 document.getElementById("add-subscription-form").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -469,23 +789,32 @@ document.getElementById("add-subscription-form").addEventListener("submit", asyn
   const billing_cycle = document.getElementById("sub-cycle").value;
   const next_due_date = document.getElementById("sub-due-date").value;
   const category = document.getElementById("sub-category").value.trim() || null;
-  await apiFetch("/subscriptions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, amount, billing_cycle, next_due_date, category }),
-  });
-  document.getElementById("add-subscription-form").reset();
-  document.getElementById("sub-due-date").value = todayIsoDate();
+  const isEdit = editingSubId !== null;
+  const submitBtn = document.getElementById("sub-submit-btn");
+  submitBtn.disabled = true;
+  const ok = await apiWrite(
+    isEdit ? `/subscriptions/${editingSubId}` : "/subscriptions",
+    {
+      method: isEdit ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, amount, billing_cycle, next_due_date, category }),
+    },
+    isEdit ? "Abonelik güncellendi." : null
+  );
+  submitBtn.disabled = false;
+  if (!ok) return;
+  setSubFormMode(null);
   loadSubscriptions();
   loadOverview();
 });
 
 async function loadSubscriptions() {
-  const response = await apiFetch("/subscriptions");
-  const subscriptions = await response.json();
+  const subscriptions = await apiRead("/subscriptions");
+  if (!subscriptions) return;
   const list = document.getElementById("subscriptions-list");
   const empty = document.getElementById("subscriptions-empty");
   list.innerHTML = "";
+  empty.textContent = "Henüz abonelik yok.";
   empty.style.display = subscriptions.length ? "none" : "block";
 
   const today = new Date();
@@ -507,23 +836,31 @@ async function loadSubscriptions() {
       </div>
       <div class="actions">
         <div class="entry-amount expense${dueSoon ? " due-soon" : ""}">${formatMoney(sub.amount)}</div>
+        <button class="btn-edit btn-small">Düzenle</button>
         <button class="btn-archive btn-small">${sub.is_active ? "Pasifleştir" : "Aktifleştir"}</button>
         <button class="btn-archive btn-small">Sil</button>
       </div>
     `;
-    const [toggleBtn, deleteBtn] = row.querySelectorAll(".btn-archive");
+    const [editBtn, toggleBtn, deleteBtn] = row.querySelectorAll(".actions button");
+    editBtn.addEventListener("click", () => {
+      setSubFormMode(sub);
+      document.getElementById("sub-form-title").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
     toggleBtn.addEventListener("click", async () => {
-      await apiFetch(`/subscriptions/${sub.id}`, {
+      const ok = await apiWrite(`/subscriptions/${sub.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ is_active: !sub.is_active }),
       });
+      if (!ok) return;
       loadSubscriptions();
       loadOverview();
     });
     deleteBtn.addEventListener("click", async () => {
       if (!confirm(`"${sub.name}" silinsin mi?`)) return;
-      await apiFetch(`/subscriptions/${sub.id}`, { method: "DELETE" });
+      const ok = await apiWrite(`/subscriptions/${sub.id}`, { method: "DELETE" }, "Abonelik silindi.");
+      if (!ok) return;
+      if (editingSubId === sub.id) setSubFormMode(null);
       loadSubscriptions();
       loadOverview();
     });

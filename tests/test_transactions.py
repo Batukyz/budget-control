@@ -84,6 +84,40 @@ def test_delete_transaction(client):
     assert client.get(f"/transactions/{created['id']}").status_code == 404
 
 
+def test_list_transactions_filters_by_type_and_category(client):
+    client.post("/transactions", json={"amount": 1, "type": "expense", "category": "Market"})
+    client.post("/transactions", json={"amount": 2, "type": "expense", "category": "Ulaşım"})
+    client.post("/transactions", json={"amount": 3, "type": "income", "category": "Market"})
+
+    response = client.get("/transactions", params={"type": "expense", "category": "Market"})
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body) == 1
+    assert body[0]["category"] == "Market"
+    assert body[0]["type"] == "expense"
+
+
+def test_list_transactions_filters_by_date_range(client):
+    client.post("/transactions", json={"amount": 1, "type": "expense", "occurred_on": YESTERDAY})
+    client.post("/transactions", json={"amount": 2, "type": "expense", "occurred_on": TODAY})
+
+    response = client.get("/transactions", params={"from_date": TODAY})
+    assert response.status_code == 200
+    dates = [t["occurred_on"] for t in response.json()]
+    assert dates == [TODAY]
+
+
+def test_list_transactions_paginates(client):
+    for i in range(5):
+        client.post("/transactions", json={"amount": i + 1, "type": "expense", "occurred_on": TODAY})
+
+    first_page = client.get("/transactions", params={"limit": 2, "skip": 0}).json()
+    second_page = client.get("/transactions", params={"limit": 2, "skip": 2}).json()
+    assert len(first_page) == 2
+    assert len(second_page) == 2
+    assert {t["id"] for t in first_page}.isdisjoint({t["id"] for t in second_page})
+
+
 def test_transactions_scoped_to_owner(make_authed_client):
     alice = make_authed_client(email="alice_tx@example.com")
     bob = make_authed_client(email="bob_tx@example.com")

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, DateTime, Float
+from sqlalchemy import Column, ForeignKey, Index, Integer, String, Boolean, Date, DateTime, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .database import Base
@@ -14,12 +14,14 @@ class User(Base):
 
     transactions = relationship("Transaction", back_populates="owner", cascade="all, delete-orphan")
     subscriptions = relationship("Subscription", back_populates="owner", cascade="all, delete-orphan")
+    budget_limits = relationship("BudgetLimit", back_populates="owner", cascade="all, delete-orphan")
 
 
 class Transaction(Base):
     """A single income or expense entry."""
 
     __tablename__ = "transactions"
+    __table_args__ = (Index("ix_transactions_owner_occurred", "owner_id", "occurred_on"),)
 
     id = Column(Integer, primary_key=True, index=True)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -38,6 +40,7 @@ class Subscription(Base):
     from one-off transactions so upcoming renewals can be surfaced."""
 
     __tablename__ = "subscriptions"
+    __table_args__ = (Index("ix_subscriptions_owner_active_due", "owner_id", "is_active", "next_due_date"),)
 
     id = Column(Integer, primary_key=True, index=True)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -51,6 +54,21 @@ class Subscription(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     owner = relationship("User", back_populates="subscriptions")
+
+
+class BudgetLimit(Base):
+    """A monthly spending cap for one category, or the whole budget when category is None."""
+
+    __tablename__ = "budget_limits"
+    __table_args__ = (Index("ix_budget_limits_owner_category", "owner_id", "category"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    category = Column(String, nullable=True)
+    monthly_limit = Column(Float, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    owner = relationship("User", back_populates="budget_limits")
 
 
 class RefreshToken(Base):

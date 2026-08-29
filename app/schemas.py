@@ -113,3 +113,28 @@ class OverviewOut(BaseModel):
     net_balance: float
     monthly_subscription_cost: float
     upcoming_subscriptions: int
+    budgets_over_limit: int
+
+
+class BudgetLimitCreate(BaseModel):
+    category: Optional[str] = None
+    monthly_limit: float = Field(gt=0)
+
+
+class BudgetLimitUpdate(BaseModel):
+    monthly_limit: float = Field(gt=0)
+
+
+class BudgetLimitOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    category: Optional[str] = None
+    monthly_limit: float
+    created_at: datetime
+
+
+class BudgetStatusOut(BudgetLimitOut):
+    spent_this_month: float
+    remaining: float
+    is_over_limit: bool

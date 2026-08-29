@@ -19,6 +19,7 @@ def test_overview_empty_state(client):
         "net_balance": 0.0,
         "monthly_subscription_cost": 0.0,
         "upcoming_subscriptions": 0,
+        "budgets_over_limit": 0,
     }
 
 
@@ -66,6 +67,16 @@ def test_overview_counts_upcoming_subscriptions_within_7_days(client):
 
     response = client.get("/overview")
     assert response.json()["upcoming_subscriptions"] == 1
+
+
+def test_overview_counts_budgets_over_limit(client):
+    client.post("/budgets", json={"category": "Market", "monthly_limit": 100})
+    client.post("/budgets", json={"category": "Ulaşım", "monthly_limit": 100})
+    client.post("/transactions", json={"amount": 150, "type": "expense", "category": "Market", "occurred_on": TODAY})
+    client.post("/transactions", json={"amount": 20, "type": "expense", "category": "Ulaşım", "occurred_on": TODAY})
+
+    response = client.get("/overview")
+    assert response.json()["budgets_over_limit"] == 1
 
 
 def test_overview_scoped_to_owner(make_authed_client):
