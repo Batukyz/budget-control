@@ -551,6 +551,88 @@ def get_overview(
     )
 
 
+def _month_start_offset(base: date, months_back: int) -> date:
+    total = base.year * 12 + (base.month - 1) - months_back
+    year, month = divmod(total, 12)
+    return date(year, month + 1, 1)
+
+
+@app.get("/reports/monthly-trend", response_model=list[schemas.MonthlyTrendItem])
+def monthly_trend(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+    months: int = Query(6, ge=1, le=24),
+):
+    today = date.today()
+    range_start = _month_start_offset(today, months - 1)
+    transactions = (
+        db.query(models.Transaction)
+        .filter(
+            models.Transaction.owner_id == current_user.id,
+            models.Transaction.occurred_on >= range_start,
+            models.Transaction.occurred_on <= today,
+        )
+        .all()
+    )
+    totals: dict = {}
+    for t in transactions:
+        key = f"{t.occurred_on.year:04d}-{t.occurred_on.month:02d}"
+        entry = totals.setdefault(key, {"income": 0.0, "expense": 0.0})
+        entry[t.type] += t.amount
+
+    results = []
+    for i in range(months):
+        month_date = _month_start_offset(today, months - 1 - i)
+        key = f"{month_date.year:04d}-{month_date.month:02d}"
+        entry = totals.get(key, {"income": 0.0, "expense": 0.0})
+        results.append(
+            schemas.MonthlyTrendItem(
+                month=key, income=round(entry["income"], 2), expense=round(entry["expense"], 2)
+            )
+        )
+    return results
+
+
+@app.get("/reports/category-breakdown", response_model=list[schemas.CategoryBreakdownItem])
+def category_breakdown(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+    month: Optional[str] = None,
+    type: schemas.TransactionType = "expense",
+):
+    if month is not None:
+        try:
+            year, month_num = (int(part) for part in month.split("-"))
+        except ValueError:
+            raise HTTPException(status_code=400, detail="month formatı 'YYYY-MM' olmalı")
+    else:
+        today = date.today()
+        year, month_num = today.year, today.month
+
+    month_start = date(year, month_num, 1)
+    month_end = date(year, month_num, calendar.monthrange(year, month_num)[1])
+
+    transactions = (
+        db.query(models.Transaction)
+        .filter(
+            models.Transaction.owner_id == current_user.id,
+            models.Transaction.type == type,
+            models.Transaction.occurred_on >= month_start,
+            models.Transaction.occurred_on <= month_end,
+        )
+        .all()
+    )
+    totals: dict = {}
+    for t in transactions:
+        key = t.category or "Diğer"
+        totals[key] = totals.get(key, 0.0) + t.amount
+
+    return [
+        schemas.CategoryBreakdownItem(category=category, amount=round(amount, 2))
+        for category, amount in sorted(totals.items(), key=lambda kv: kv[1], reverse=True)
+    ]
+
+
 def _get_owned_budget(budget_id: int, owner_id: int, db: Session) -> models.BudgetLimit:
     budget = (
         db.query(models.BudgetLimit)

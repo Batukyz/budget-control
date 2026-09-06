@@ -254,6 +254,19 @@
   }
   .toast.success { border-left-color: var(--success); }
   .toast.hide { opacity: 0; transform: translateY(8px); }
+  .trend-row { margin-bottom: 12px; }
+  .trend-row:last-child { margin-bottom: 0; }
+  .trend-month-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+  .trend-bar-line { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+  .trend-bar-track { flex: 1; background: var(--input-bg); border-radius: 6px; height: 8px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 6px; transition: width 0.4s ease; }
+  .trend-bar-fill.income { background: var(--success); }
+  .trend-bar-fill.expense { background: var(--danger); }
+  .trend-bar-value { font-size: 11px; color: var(--muted); width: 74px; text-align: right; flex: none; }
+  .trend-legend { display: flex; gap: 16px; margin-top: 14px; font-size: 12px; color: var(--muted); }
+  .trend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+  .trend-dot.income { background: var(--success); }
+  .trend-dot.expense { background: var(--danger); }
   .card-entry { padding: 14px 0; border-bottom: 1px solid var(--border); }
   .card-entry:last-child { border-bottom: none; }
   .card-entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
@@ -345,6 +358,15 @@
       <div class="card" id="category-chart-card" style="display:none">
         <div class="section-title">📊 Kategoriye göre harcama (bu ay)</div>
         <div id="category-chart"></div>
+      </div>
+
+      <div class="card" id="trend-chart-card" style="display:none">
+        <div class="section-title">📈 Son 6 ay</div>
+        <div id="trend-chart"></div>
+        <div class="trend-legend">
+          <span><i class="trend-dot income"></i> Gelir</span>
+          <span><i class="trend-dot expense"></i> Gider</span>
+        </div>
       </div>
     </div>
 
@@ -694,6 +716,8 @@ function showApp() {
   loadRecurring();
   loadCards();
   loadCategories();
+  loadCategoryChart();
+  loadTrendChart();
 }
 
 async function loadOverview() {
@@ -817,6 +841,8 @@ document.getElementById("add-transaction-form").addEventListener("submit", async
   setTxFormMode(null);
   loadTransactions();
   loadOverview();
+  loadCategoryChart();
+  loadTrendChart();
 });
 
 let allTransactions = [];
@@ -881,39 +907,66 @@ function renderTransactionsList(transactions) {
       if (editingTxId === tx.id) setTxFormMode(null);
       loadTransactions();
       loadOverview();
+      loadCategoryChart();
+      loadTrendChart();
     });
     list.appendChild(row);
   }
 }
 
-function renderCategoryChart() {
+async function loadCategoryChart() {
   const card = document.getElementById("category-chart-card");
   const container = document.getElementById("category-chart");
-  const today = new Date();
-  const monthStart = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-01`;
-  const monthExpenses = allTransactions.filter((t) => t.type === "expense" && t.occurred_on >= monthStart);
-  const totals = {};
-  for (const t of monthExpenses) {
-    const key = t.category || "Diğer";
-    totals[key] = (totals[key] || 0) + t.amount;
-  }
-  const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
-  if (entries.length === 0) {
+  const entries = await apiRead("/reports/category-breakdown");
+  if (!entries || entries.length === 0) {
     card.style.display = "none";
     return;
   }
   card.style.display = "block";
-  const max = entries[0][1];
+  const max = entries[0].amount;
   container.innerHTML = entries
     .map(
-      ([label, value]) => `
+      ({ category, amount }) => `
       <div class="chart-row">
-        <div class="chart-label" title="${escapeHtml(label)}">${escapeHtml(label)}</div>
-        <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.max(4, (value / max) * 100)}%"></div></div>
-        <div class="chart-value">${formatMoney(value)}</div>
+        <div class="chart-label" title="${escapeHtml(category)}">${escapeHtml(category)}</div>
+        <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.max(4, (amount / max) * 100)}%"></div></div>
+        <div class="chart-value">${formatMoney(amount)}</div>
       </div>
     `
     )
+    .join("");
+}
+
+const TREND_MONTH_LABELS = ["Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"];
+
+async function loadTrendChart() {
+  const card = document.getElementById("trend-chart-card");
+  const container = document.getElementById("trend-chart");
+  const entries = await apiRead("/reports/monthly-trend?months=6");
+  if (!entries || entries.every((e) => e.income === 0 && e.expense === 0)) {
+    card.style.display = "none";
+    return;
+  }
+  card.style.display = "block";
+  const max = Math.max(1, ...entries.flatMap((e) => [e.income, e.expense]));
+  container.innerHTML = entries
+    .map(({ month, income, expense }) => {
+      const [y, m] = month.split("-");
+      const label = `${TREND_MONTH_LABELS[parseInt(m, 10) - 1]} ${y}`;
+      return `
+      <div class="trend-row">
+        <div class="trend-month-label">${label}</div>
+        <div class="trend-bar-line">
+          <div class="trend-bar-track"><div class="trend-bar-fill income" style="width:${Math.max(2, (income / max) * 100)}%"></div></div>
+          <div class="trend-bar-value">${formatMoney(income)}</div>
+        </div>
+        <div class="trend-bar-line">
+          <div class="trend-bar-track"><div class="trend-bar-fill expense" style="width:${Math.max(2, (expense / max) * 100)}%"></div></div>
+          <div class="trend-bar-value">${formatMoney(expense)}</div>
+        </div>
+      </div>
+    `;
+    })
     .join("");
 }
 
@@ -923,7 +976,6 @@ async function loadTransactions() {
   allTransactions = data;
   populateCategoryFilter(allTransactions);
   renderFilteredTransactions();
-  renderCategoryChart();
 }
 
 const CYCLE_LABELS = { monthly: "aylık", yearly: "yıllık", weekly: "haftalık" };
@@ -1228,6 +1280,8 @@ document.getElementById("import-csv-input").addEventListener("change", async (e)
     showToast(`${result.created} işlem içe aktarıldı${suffix}.`, "success");
     loadTransactions();
     loadOverview();
+    loadCategoryChart();
+    loadTrendChart();
   } catch (err) {
     showToast(err.message || "Bağlantı hatası.");
   } finally {

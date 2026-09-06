@@ -181,6 +181,17 @@ class CategoryOut(BaseModel):
     created_at: datetime
 
 
+class CategoryBreakdownItem(BaseModel):
+    category: str
+    amount: float
+
+
+class MonthlyTrendItem(BaseModel):
+    month: str  # "YYYY-MM"
+    income: float
+    expense: float
+
+
 class BudgetLimitCreate(BaseModel):
     category: Optional[str] = None
     monthly_limit: float = Field(gt=0)
