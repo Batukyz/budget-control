@@ -72,6 +72,12 @@ class TransactionOut(BaseModel):
     recurring_transaction_id: Optional[int] = None
 
 
+class TransactionImportResult(BaseModel):
+    created: int
+    skipped: int
+    errors: list[str]
+
+
 BillingCycle = Literal["weekly", "monthly", "yearly"]
 
 

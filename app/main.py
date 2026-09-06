@@ -1,10 +1,12 @@
 import calendar
+import csv
+import io
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Optional
 
-from fastapi import Depends, FastAPI, HTTPException, Query, Request
-from fastapi.responses import JSONResponse
+from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, UploadFile
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
@@ -215,6 +217,87 @@ def list_transactions(
         .limit(limit)
         .all()
     )
+
+
+CSV_COLUMNS = ["occurred_on", "type", "category", "note", "amount"]
+
+
+@app.get("/transactions/export")
+def export_transactions(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+    type: Optional[schemas.TransactionType] = None,
+    category: Optional[str] = None,
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
+):
+    query = db.query(models.Transaction).filter(models.Transaction.owner_id == current_user.id)
+    if type is not None:
+        query = query.filter(models.Transaction.type == type)
+    if category is not None:
+        query = query.filter(models.Transaction.category == category)
+    if from_date is not None:
+        query = query.filter(models.Transaction.occurred_on >= from_date)
+    if to_date is not None:
+        query = query.filter(models.Transaction.occurred_on <= to_date)
+    transactions = query.order_by(models.Transaction.occurred_on.desc(), models.Transaction.id.desc()).all()
+
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(CSV_COLUMNS)
+    for t in transactions:
+        writer.writerow([t.occurred_on.isoformat(), t.type, t.category or "", t.note or "", t.amount])
+    buffer.seek(0)
+    filename = f"islemler_{date.today().isoformat()}.csv"
+    return StreamingResponse(
+        iter([buffer.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@app.post("/transactions/import", response_model=schemas.TransactionImportResult)
+def import_transactions(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    raw = file.file.read().decode("utf-8-sig")
+    reader = csv.DictReader(io.StringIO(raw))
+    missing = set(["occurred_on", "type", "amount"]) - set(reader.fieldnames or [])
+    if missing:
+        raise HTTPException(status_code=400, detail=f"CSV eksik sütun(lar): {', '.join(sorted(missing))}")
+
+    created = 0
+    errors: list[str] = []
+    new_transactions = []
+    for i, row in enumerate(reader, start=2):  # row 1 is the header
+        try:
+            occurred_on = date.fromisoformat(row["occurred_on"].strip())
+            tx_type = row["type"].strip().lower()
+            if tx_type not in ("income", "expense"):
+                raise ValueError(f"geçersiz tür '{tx_type}'")
+            amount = float(row["amount"])
+            if amount <= 0:
+                raise ValueError("tutar 0'dan büyük olmalı")
+        except (KeyError, ValueError, AttributeError) as exc:
+            errors.append(f"Satır {i}: {exc}")
+            continue
+        new_transactions.append(
+            models.Transaction(
+                owner_id=current_user.id,
+                amount=amount,
+                type=tx_type,
+                category=(row.get("category") or "").strip() or None,
+                note=(row.get("note") or "").strip() or None,
+                occurred_on=occurred_on,
+            )
+        )
+        created += 1
+
+    db.add_all(new_transactions)
+    db.commit()
+    return schemas.TransactionImportResult(created=created, skipped=len(errors), errors=errors)
 
 
 @app.get("/transactions/{transaction_id}", response_model=schemas.TransactionOut)

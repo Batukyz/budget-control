@@ -388,6 +388,17 @@
       </div>
 
       <div class="card">
+        <div class="section-title">CSV</div>
+        <div class="form-actions-row">
+          <button type="button" class="btn-ghost" id="export-csv-btn">⬇️ Dışa aktar</button>
+          <label class="btn-ghost" style="cursor:pointer; margin:0;">
+            ⬆️ İçe aktar
+            <input type="file" id="import-csv-input" accept=".csv" style="display:none">
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
         <div class="section-title">Son işlemler</div>
         <div class="filter-row">
           <select id="tx-filter-category"><option value="">Tüm kategoriler</option></select>
@@ -1179,6 +1190,50 @@ async function loadCards() {
     list.appendChild(row);
   }
 }
+
+document.getElementById("export-csv-btn").addEventListener("click", async () => {
+  try {
+    const response = await apiFetch("/transactions/export");
+    if (!response.ok) {
+      showToast(await extractErrorMessage(response));
+      return;
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `islemler_${todayIsoDate()}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    showToast(err.message || "Bağlantı hatası.");
+  }
+});
+
+document.getElementById("import-csv-input").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const formData = new FormData();
+  formData.append("file", file);
+  try {
+    const response = await apiFetch("/transactions/import", { method: "POST", body: formData });
+    if (!response.ok) {
+      showToast(await extractErrorMessage(response));
+      return;
+    }
+    const result = await response.json();
+    const suffix = result.skipped ? `, ${result.skipped} satır atlandı` : "";
+    showToast(`${result.created} işlem içe aktarıldı${suffix}.`, "success");
+    loadTransactions();
+    loadOverview();
+  } catch (err) {
+    showToast(err.message || "Bağlantı hatası.");
+  } finally {
+    e.target.value = "";
+  }
+});
 
 const CATEGORY_TYPE_LABELS = { expense: "sadece gider", income: "sadece gelir", both: "gider ve gelir" };
 
