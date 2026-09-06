@@ -254,6 +254,14 @@
   }
   .toast.success { border-left-color: var(--success); }
   .toast.hide { opacity: 0; transform: translateY(8px); }
+  .card-entry { padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .card-entry:last-child { border-bottom: none; }
+  .card-entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .card-usage-track { background: var(--input-bg); border-radius: 6px; height: 8px; overflow: hidden; margin-bottom: 8px; }
+  .card-usage-fill { height: 100%; background: var(--gradient); border-radius: 6px; transition: width 0.4s ease; }
+  .card-usage-fill.high { background: var(--danger); }
+  .card-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .card-meta-grid b { color: var(--text); }
 </style>
 </head>
 <body>
@@ -302,6 +310,7 @@
       <button type="button" class="tab-btn active" data-tab="overview">📊 Genel Bakış</button>
       <button type="button" class="tab-btn" data-tab="transactions">💳 İşlemler</button>
       <button type="button" class="tab-btn" data-tab="subscriptions">🔁 Abonelikler</button>
+      <button type="button" class="tab-btn" data-tab="bank">🏦 Banka</button>
     </div>
 
     <div class="tab-panel active" id="tab-overview">
@@ -419,6 +428,41 @@
         <div class="section-title">Abonelikler</div>
         <div id="subscriptions-list"></div>
         <div class="empty" id="subscriptions-empty" style="display:none">Henüz abonelik yok.</div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-bank">
+      <div class="card">
+        <div class="section-title" id="card-form-title">Kredi kartı ekle</div>
+        <form id="add-card-form">
+          <input type="text" id="card-bank-name" placeholder="Banka adı (örn. Garanti BBVA)" required>
+          <input type="text" id="card-name" placeholder="Kart adı (opsiyonel, örn. Bonus)">
+          <div class="row">
+            <input type="number" step="0.01" min="0.01" id="card-limit" placeholder="Kart limiti" required>
+            <input type="number" step="0.01" min="0" id="card-debt" placeholder="Güncel borç" value="0">
+          </div>
+          <div class="row">
+            <div style="flex:1">
+              <label>Ekstre kesim günü</label>
+              <input type="number" min="1" max="31" id="card-statement-day" placeholder="örn. 15" required>
+            </div>
+            <div style="flex:1">
+              <label>Son ödeme günü</label>
+              <input type="number" min="1" max="31" id="card-due-day" placeholder="örn. 25" required>
+            </div>
+          </div>
+          <textarea id="card-note" placeholder="Not (opsiyonel)"></textarea>
+          <div class="form-actions-row">
+            <button type="submit" class="btn-primary" id="card-submit-btn">Ekle</button>
+            <button type="button" class="btn-ghost" id="card-cancel-edit" style="display:none">İptal</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Kartlarım</div>
+        <div id="cards-list"></div>
+        <div class="empty" id="cards-empty" style="display:none">Henüz kart eklenmedi.</div>
       </div>
     </div>
   </div>
@@ -589,6 +633,7 @@ function showApp() {
   setActiveTab("overview");
   setTxFormMode(null);
   setSubFormMode(null);
+  setCardFormMode(null);
   const txEmpty = document.getElementById("transactions-empty");
   txEmpty.textContent = "Yükleniyor…";
   txEmpty.style.display = "block";
@@ -598,10 +643,14 @@ function showApp() {
   const recurringEmpty = document.getElementById("recurring-empty");
   recurringEmpty.textContent = "Yükleniyor…";
   recurringEmpty.style.display = "block";
+  const cardsEmpty = document.getElementById("cards-empty");
+  cardsEmpty.textContent = "Yükleniyor…";
+  cardsEmpty.style.display = "block";
   loadOverview();
   loadTransactions();
   loadSubscriptions();
   loadRecurring();
+  loadCards();
 }
 
 async function loadOverview() {
@@ -991,6 +1040,109 @@ async function loadRecurring() {
       if (editingRecurringId === r.id) setTxFormMode(null);
       loadRecurring();
       loadTransactions();
+    });
+    list.appendChild(row);
+  }
+}
+
+let editingCardId = null;
+function setCardFormMode(card) {
+  editingCardId = card ? card.id : null;
+  document.getElementById("card-form-title").textContent = card ? "Kartı düzenle" : "Kredi kartı ekle";
+  document.getElementById("card-submit-btn").textContent = card ? "Güncelle" : "Ekle";
+  document.getElementById("card-cancel-edit").style.display = card ? "inline-block" : "none";
+  if (card) {
+    document.getElementById("card-bank-name").value = card.bank_name;
+    document.getElementById("card-name").value = card.card_name || "";
+    document.getElementById("card-limit").value = card.limit_amount;
+    document.getElementById("card-debt").value = card.current_debt;
+    document.getElementById("card-statement-day").value = card.statement_day;
+    document.getElementById("card-due-day").value = card.due_day;
+    document.getElementById("card-note").value = card.note || "";
+  } else {
+    document.getElementById("add-card-form").reset();
+    document.getElementById("card-debt").value = 0;
+  }
+}
+document.getElementById("card-cancel-edit").addEventListener("click", () => setCardFormMode(null));
+
+document.getElementById("add-card-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const bank_name = document.getElementById("card-bank-name").value.trim();
+  const card_name = document.getElementById("card-name").value.trim() || null;
+  const limit_amount = parseFloat(document.getElementById("card-limit").value);
+  const current_debt = parseFloat(document.getElementById("card-debt").value || "0");
+  const statement_day = parseInt(document.getElementById("card-statement-day").value, 10);
+  const due_day = parseInt(document.getElementById("card-due-day").value, 10);
+  const note = document.getElementById("card-note").value.trim() || null;
+  const isEdit = editingCardId !== null;
+  const submitBtn = document.getElementById("card-submit-btn");
+  submitBtn.disabled = true;
+  const ok = await apiWrite(
+    isEdit ? `/credit-cards/${editingCardId}` : "/credit-cards",
+    {
+      method: isEdit ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bank_name, card_name, limit_amount, current_debt, statement_day, due_day, note }),
+    },
+    isEdit ? "Kart güncellendi." : "Kart eklendi."
+  );
+  submitBtn.disabled = false;
+  if (!ok) return;
+  setCardFormMode(null);
+  loadCards();
+});
+
+async function loadCards() {
+  const cards = await apiRead("/credit-cards");
+  if (!cards) return;
+  const list = document.getElementById("cards-list");
+  const empty = document.getElementById("cards-empty");
+  list.innerHTML = "";
+  empty.textContent = "Henüz kart eklenmedi.";
+  empty.style.display = cards.length ? "none" : "block";
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (const card of cards) {
+    const row = document.createElement("div");
+    row.className = "card-entry";
+    const usagePct = card.limit_amount > 0 ? Math.min(100, (card.current_debt / card.limit_amount) * 100) : 0;
+    const highUsage = usagePct >= 80;
+    const dueDate = new Date(card.next_due_date);
+    const daysUntilDue = Math.round((dueDate - today) / 86400000);
+    const dueSoon = daysUntilDue <= 7;
+    const title = card.card_name ? `${escapeHtml(card.bank_name)} · ${escapeHtml(card.card_name)}` : escapeHtml(card.bank_name);
+    row.innerHTML = `
+      <div class="card-entry-top">
+        <div class="entry-title">${title}</div>
+        <div class="actions">
+          <button class="btn-edit btn-small">Düzenle</button>
+          <button class="btn-archive btn-small">Sil</button>
+        </div>
+      </div>
+      <div class="card-usage-track"><div class="card-usage-fill${highUsage ? " high" : ""}" style="width:${usagePct}%"></div></div>
+      <div class="card-meta-grid">
+        <div>Limit: <b>${formatMoney(card.limit_amount)}</b></div>
+        <div>Kullanılabilir: <b>${formatMoney(card.available_limit)}</b></div>
+        <div>Güncel borç: <b>${formatMoney(card.current_debt)}</b></div>
+        <div>Ekstre tarihi: <b>${formatDateTr(card.next_statement_date)}</b></div>
+        <div class="${dueSoon ? "due-soon" : ""}">Son ödeme: <b>${formatDateTr(card.next_due_date)}</b></div>
+      </div>
+      ${card.note ? `<div class="entry-meta">${escapeHtml(card.note)}</div>` : ""}
+    `;
+    const [editBtn, deleteBtn] = row.querySelectorAll(".actions button");
+    editBtn.addEventListener("click", () => {
+      setCardFormMode(card);
+      document.getElementById("card-form-title").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    deleteBtn.addEventListener("click", async () => {
+      if (!confirm(`"${card.bank_name}" kartı silinsin mi?`)) return;
+      const ok = await apiWrite(`/credit-cards/${card.id}`, { method: "DELETE" }, "Kart silindi.");
+      if (!ok) return;
+      if (editingCardId === card.id) setCardFormMode(null);
+      loadCards();
     });
     list.appendChild(row);
   }

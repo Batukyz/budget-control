@@ -571,3 +571,106 @@ def delete_budget(
     budget = _get_owned_budget(budget_id, current_user.id, db)
     db.delete(budget)
     db.commit()
+
+
+def _next_occurrence_of_day(today: date, day: int) -> date:
+    """The next date (today included) that falls on the given day-of-month."""
+    this_month_day = min(day, calendar.monthrange(today.year, today.month)[1])
+    candidate = today.replace(day=this_month_day)
+    if candidate >= today:
+        return candidate
+    month = today.month + 1 if today.month < 12 else 1
+    year = today.year + 1 if today.month == 12 else today.year
+    next_month_day = min(day, calendar.monthrange(year, month)[1])
+    return date(year, month, next_month_day)
+
+
+def _credit_card_to_out(card: models.CreditCard) -> schemas.CreditCardOut:
+    today = date.today()
+    return schemas.CreditCardOut(
+        id=card.id,
+        bank_name=card.bank_name,
+        card_name=card.card_name,
+        limit_amount=card.limit_amount,
+        current_debt=card.current_debt,
+        statement_day=card.statement_day,
+        due_day=card.due_day,
+        note=card.note,
+        created_at=card.created_at,
+        available_limit=round(card.limit_amount - card.current_debt, 2),
+        next_statement_date=_next_occurrence_of_day(today, card.statement_day),
+        next_due_date=_next_occurrence_of_day(today, card.due_day),
+    )
+
+
+def _get_owned_credit_card(card_id: int, owner_id: int, db: Session) -> models.CreditCard:
+    card = (
+        db.query(models.CreditCard)
+        .filter(models.CreditCard.id == card_id, models.CreditCard.owner_id == owner_id)
+        .first()
+    )
+    if card is None:
+        raise HTTPException(status_code=404, detail="Credit card not found")
+    return card
+
+
+@app.post("/credit-cards", response_model=schemas.CreditCardOut, status_code=201)
+def create_credit_card(
+    payload: schemas.CreditCardCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    card = models.CreditCard(owner_id=current_user.id, **payload.model_dump())
+    db.add(card)
+    db.commit()
+    db.refresh(card)
+    return _credit_card_to_out(card)
+
+
+@app.get("/credit-cards", response_model=list[schemas.CreditCardOut])
+def list_credit_cards(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    cards = (
+        db.query(models.CreditCard)
+        .filter(models.CreditCard.owner_id == current_user.id)
+        .order_by(models.CreditCard.id.asc())
+        .all()
+    )
+    return [_credit_card_to_out(c) for c in cards]
+
+
+@app.get("/credit-cards/{card_id}", response_model=schemas.CreditCardOut)
+def get_credit_card(
+    card_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    return _credit_card_to_out(_get_owned_credit_card(card_id, current_user.id, db))
+
+
+@app.put("/credit-cards/{card_id}", response_model=schemas.CreditCardOut)
+def update_credit_card(
+    card_id: int,
+    update: schemas.CreditCardUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    card = _get_owned_credit_card(card_id, current_user.id, db)
+    for field, value in update.model_dump(exclude_unset=True).items():
+        setattr(card, field, value)
+    db.commit()
+    db.refresh(card)
+    return _credit_card_to_out(card)
+
+
+@app.delete("/credit-cards/{card_id}", status_code=204)
+def delete_credit_card(
+    card_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    card = _get_owned_credit_card(card_id, current_user.id, db)
+    db.delete(card)
+    db.commit()

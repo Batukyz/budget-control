@@ -18,6 +18,7 @@ class User(Base):
     recurring_transactions = relationship(
         "RecurringTransaction", back_populates="owner", cascade="all, delete-orphan"
     )
+    credit_cards = relationship("CreditCard", back_populates="owner", cascade="all, delete-orphan")
 
 
 class Transaction(Base):
@@ -85,6 +86,27 @@ class Subscription(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     owner = relationship("User", back_populates="subscriptions")
+
+
+class CreditCard(Base):
+    """A bank/credit card, tracked for its limit, current debt, and the
+    monthly statement (ekstre) and payment due (son ödeme) days."""
+
+    __tablename__ = "credit_cards"
+    __table_args__ = (Index("ix_credit_cards_owner", "owner_id"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    bank_name = Column(String, nullable=False)
+    card_name = Column(String, nullable=True)
+    limit_amount = Column(Float, nullable=False)
+    current_debt = Column(Float, nullable=False, default=0)
+    statement_day = Column(Integer, nullable=False)  # 1-31, ekstre kesim günü
+    due_day = Column(Integer, nullable=False)  # 1-31, son ödeme günü
+    note = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    owner = relationship("User", back_populates="credit_cards")
 
 
 class BudgetLimit(Base):

@@ -175,3 +175,40 @@ class BudgetStatusOut(BudgetLimitOut):
     spent_this_month: float
     remaining: float
     is_over_limit: bool
+
+
+class CreditCardCreate(BaseModel):
+    bank_name: str
+    card_name: Optional[str] = None
+    limit_amount: float = Field(gt=0)
+    current_debt: float = Field(default=0, ge=0)
+    statement_day: int = Field(ge=1, le=31)
+    due_day: int = Field(ge=1, le=31)
+    note: Optional[str] = None
+
+
+class CreditCardUpdate(BaseModel):
+    bank_name: Optional[str] = None
+    card_name: Optional[str] = None
+    limit_amount: Optional[float] = Field(default=None, gt=0)
+    current_debt: Optional[float] = Field(default=None, ge=0)
+    statement_day: Optional[int] = Field(default=None, ge=1, le=31)
+    due_day: Optional[int] = Field(default=None, ge=1, le=31)
+    note: Optional[str] = None
+
+
+class CreditCardOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    bank_name: str
+    card_name: Optional[str] = None
+    limit_amount: float
+    current_debt: float
+    statement_day: int
+    due_day: int
+    note: Optional[str] = None
+    created_at: datetime
+    available_limit: float
+    next_statement_date: date
+    next_due_date: date
