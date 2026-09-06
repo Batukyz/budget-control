@@ -69,9 +69,46 @@ class TransactionOut(BaseModel):
     note: Optional[str] = None
     occurred_on: date
     created_at: datetime
+    recurring_transaction_id: Optional[int] = None
 
 
 BillingCycle = Literal["weekly", "monthly", "yearly"]
+
+
+class RecurringTransactionCreate(BaseModel):
+    name: str
+    amount: float = Field(gt=0)
+    type: TransactionType
+    frequency: BillingCycle = "monthly"
+    next_due_date: date
+    category: Optional[str] = None
+    note: Optional[str] = None
+
+
+class RecurringTransactionUpdate(BaseModel):
+    name: Optional[str] = None
+    amount: Optional[float] = Field(default=None, gt=0)
+    type: Optional[TransactionType] = None
+    frequency: Optional[BillingCycle] = None
+    next_due_date: Optional[date] = None
+    category: Optional[str] = None
+    note: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+class RecurringTransactionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    amount: float
+    type: TransactionType
+    frequency: BillingCycle
+    next_due_date: date
+    category: Optional[str] = None
+    note: Optional[str] = None
+    is_active: bool
+    created_at: datetime
 
 
 class SubscriptionCreate(BaseModel):

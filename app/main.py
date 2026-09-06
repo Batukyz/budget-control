@@ -1,3 +1,4 @@
+import calendar
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Optional
@@ -125,6 +126,52 @@ def _get_owned_transaction(transaction_id: int, owner_id: int, db: Session) -> m
     return transaction
 
 
+def _advance_recurring_date(d: date, frequency: str) -> date:
+    if frequency == "weekly":
+        return d + timedelta(days=7)
+    if frequency == "yearly":
+        try:
+            return d.replace(year=d.year + 1)
+        except ValueError:  # Feb 29 on a non-leap target year
+            return d.replace(year=d.year + 1, day=28)
+    month = d.month + 1 if d.month < 12 else 1
+    year = d.year + 1 if d.month == 12 else d.year
+    day = min(d.day, calendar.monthrange(year, month)[1])
+    return date(year, month, day)
+
+
+def _process_due_recurring_transactions(db: Session, owner_id: int) -> None:
+    today = date.today()
+    due = (
+        db.query(models.RecurringTransaction)
+        .filter(
+            models.RecurringTransaction.owner_id == owner_id,
+            models.RecurringTransaction.is_active.is_(True),
+            models.RecurringTransaction.next_due_date <= today,
+        )
+        .all()
+    )
+    if not due:
+        return
+    for recurring in due:
+        for _ in range(500):  # safety cap against pathological/infinite loops
+            if recurring.next_due_date > today:
+                break
+            db.add(
+                models.Transaction(
+                    owner_id=owner_id,
+                    amount=recurring.amount,
+                    type=recurring.type,
+                    category=recurring.category,
+                    note=recurring.note or recurring.name,
+                    occurred_on=recurring.next_due_date,
+                    recurring_transaction_id=recurring.id,
+                )
+            )
+            recurring.next_due_date = _advance_recurring_date(recurring.next_due_date, recurring.frequency)
+    db.commit()
+
+
 @app.post("/transactions", response_model=schemas.TransactionOut, status_code=201)
 def create_transaction(
     payload: schemas.TransactionCreate,
@@ -152,6 +199,7 @@ def list_transactions(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
 ):
+    _process_due_recurring_transactions(db, current_user.id)
     query = db.query(models.Transaction).filter(models.Transaction.owner_id == current_user.id)
     if type is not None:
         query = query.filter(models.Transaction.type == type)
@@ -201,6 +249,85 @@ def delete_transaction(
 ):
     transaction = _get_owned_transaction(transaction_id, current_user.id, db)
     db.delete(transaction)
+    db.commit()
+
+
+def _get_owned_recurring_transaction(
+    recurring_id: int, owner_id: int, db: Session
+) -> models.RecurringTransaction:
+    recurring = (
+        db.query(models.RecurringTransaction)
+        .filter(models.RecurringTransaction.id == recurring_id, models.RecurringTransaction.owner_id == owner_id)
+        .first()
+    )
+    if recurring is None:
+        raise HTTPException(status_code=404, detail="Recurring transaction not found")
+    return recurring
+
+
+@app.post("/recurring-transactions", response_model=schemas.RecurringTransactionOut, status_code=201)
+def create_recurring_transaction(
+    payload: schemas.RecurringTransactionCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    recurring = models.RecurringTransaction(owner_id=current_user.id, **payload.model_dump())
+    db.add(recurring)
+    db.commit()
+    db.refresh(recurring)
+    _process_due_recurring_transactions(db, current_user.id)
+    db.refresh(recurring)
+    return recurring
+
+
+@app.get("/recurring-transactions", response_model=list[schemas.RecurringTransactionOut])
+def list_recurring_transactions(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+    is_active: Optional[bool] = None,
+):
+    _process_due_recurring_transactions(db, current_user.id)
+    query = db.query(models.RecurringTransaction).filter(models.RecurringTransaction.owner_id == current_user.id)
+    if is_active is not None:
+        query = query.filter(models.RecurringTransaction.is_active == is_active)
+    return query.order_by(models.RecurringTransaction.next_due_date.asc()).all()
+
+
+@app.get("/recurring-transactions/{recurring_id}", response_model=schemas.RecurringTransactionOut)
+def get_recurring_transaction(
+    recurring_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    return _get_owned_recurring_transaction(recurring_id, current_user.id, db)
+
+
+@app.put("/recurring-transactions/{recurring_id}", response_model=schemas.RecurringTransactionOut)
+def update_recurring_transaction(
+    recurring_id: int,
+    update: schemas.RecurringTransactionUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    recurring = _get_owned_recurring_transaction(recurring_id, current_user.id, db)
+    for field, value in update.model_dump(exclude_unset=True).items():
+        setattr(recurring, field, value)
+    db.commit()
+    db.refresh(recurring)
+    return recurring
+
+
+@app.delete("/recurring-transactions/{recurring_id}", status_code=204)
+def delete_recurring_transaction(
+    recurring_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    recurring = _get_owned_recurring_transaction(recurring_id, current_user.id, db)
+    db.query(models.Transaction).filter(models.Transaction.recurring_transaction_id == recurring.id).update(
+        {"recurring_transaction_id": None}
+    )
+    db.delete(recurring)
     db.commit()
 
 
@@ -290,6 +417,7 @@ def get_overview(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
+    _process_due_recurring_transactions(db, current_user.id)
     today = date.today()
     month_start = today.replace(day=1)
 

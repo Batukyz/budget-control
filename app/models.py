@@ -15,6 +15,9 @@ class User(Base):
     transactions = relationship("Transaction", back_populates="owner", cascade="all, delete-orphan")
     subscriptions = relationship("Subscription", back_populates="owner", cascade="all, delete-orphan")
     budget_limits = relationship("BudgetLimit", back_populates="owner", cascade="all, delete-orphan")
+    recurring_transactions = relationship(
+        "RecurringTransaction", back_populates="owner", cascade="all, delete-orphan"
+    )
 
 
 class Transaction(Base):
@@ -31,8 +34,36 @@ class Transaction(Base):
     note = Column(String, nullable=True)
     occurred_on = Column(Date, server_default=func.current_date(), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    recurring_transaction_id = Column(
+        Integer, ForeignKey("recurring_transactions.id"), nullable=True
+    )
 
     owner = relationship("User", back_populates="transactions")
+
+
+class RecurringTransaction(Base):
+    """A fixed, regularly repeating income or expense (salary, scholarship, rent, ...)
+    that automatically generates real Transaction rows as it comes due, as opposed
+    to one-off variable transactions entered manually."""
+
+    __tablename__ = "recurring_transactions"
+    __table_args__ = (
+        Index("ix_recurring_transactions_owner_active_due", "owner_id", "is_active", "next_due_date"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    name = Column(String, nullable=False)
+    amount = Column(Float, nullable=False)
+    type = Column(String, nullable=False)  # "expense" | "income"
+    frequency = Column(String, nullable=False, default="monthly")  # "weekly" | "monthly" | "yearly"
+    next_due_date = Column(Date, nullable=False)
+    category = Column(String, nullable=True)
+    note = Column(String, nullable=True)
+    is_active = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    owner = relationship("User", back_populates="recurring_transactions")
 
 
 class Subscription(Base):
