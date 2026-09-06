@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Index, Integer, String, Boolean, Date, DateTime, Float
+from sqlalchemy import Column, ForeignKey, Index, Integer, String, Boolean, Date, DateTime, Float, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .database import Base
@@ -19,6 +19,7 @@ class User(Base):
         "RecurringTransaction", back_populates="owner", cascade="all, delete-orphan"
     )
     credit_cards = relationship("CreditCard", back_populates="owner", cascade="all, delete-orphan")
+    categories = relationship("Category", back_populates="owner", cascade="all, delete-orphan")
 
 
 class Transaction(Base):
@@ -107,6 +108,23 @@ class CreditCard(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     owner = relationship("User", back_populates="credit_cards")
+
+
+class Category(Base):
+    """A user-defined category label (e.g. Market, Ulaşım, Maaş) used to
+    keep the free-text category fields on transactions, subscriptions,
+    recurring transactions, and budgets consistent."""
+
+    __tablename__ = "categories"
+    __table_args__ = (UniqueConstraint("owner_id", "name", name="uq_categories_owner_name"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    name = Column(String, nullable=False)
+    type = Column(String, nullable=False, default="both")  # "expense" | "income" | "both"
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    owner = relationship("User", back_populates="categories")
 
 
 class BudgetLimit(Base):

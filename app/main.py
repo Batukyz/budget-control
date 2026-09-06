@@ -573,6 +573,88 @@ def delete_budget(
     db.commit()
 
 
+def _get_owned_category(category_id: int, owner_id: int, db: Session) -> models.Category:
+    category = (
+        db.query(models.Category)
+        .filter(models.Category.id == category_id, models.Category.owner_id == owner_id)
+        .first()
+    )
+    if category is None:
+        raise HTTPException(status_code=404, detail="Category not found")
+    return category
+
+
+@app.post("/categories", response_model=schemas.CategoryOut, status_code=201)
+def create_category(
+    payload: schemas.CategoryCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    existing = (
+        db.query(models.Category)
+        .filter(models.Category.owner_id == current_user.id, models.Category.name == payload.name)
+        .first()
+    )
+    if existing is not None:
+        raise HTTPException(status_code=400, detail="Bu isimde bir kategori zaten var")
+    category = models.Category(owner_id=current_user.id, **payload.model_dump())
+    db.add(category)
+    db.commit()
+    db.refresh(category)
+    return category
+
+
+@app.get("/categories", response_model=list[schemas.CategoryOut])
+def list_categories(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    return (
+        db.query(models.Category)
+        .filter(models.Category.owner_id == current_user.id)
+        .order_by(models.Category.name.asc())
+        .all()
+    )
+
+
+@app.put("/categories/{category_id}", response_model=schemas.CategoryOut)
+def update_category(
+    category_id: int,
+    update: schemas.CategoryUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    category = _get_owned_category(category_id, current_user.id, db)
+    if update.name is not None and update.name != category.name:
+        existing = (
+            db.query(models.Category)
+            .filter(
+                models.Category.owner_id == current_user.id,
+                models.Category.name == update.name,
+                models.Category.id != category_id,
+            )
+            .first()
+        )
+        if existing is not None:
+            raise HTTPException(status_code=400, detail="Bu isimde bir kategori zaten var")
+    for field, value in update.model_dump(exclude_unset=True).items():
+        setattr(category, field, value)
+    db.commit()
+    db.refresh(category)
+    return category
+
+
+@app.delete("/categories/{category_id}", status_code=204)
+def delete_category(
+    category_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    category = _get_owned_category(category_id, current_user.id, db)
+    db.delete(category)
+    db.commit()
+
+
 def _next_occurrence_of_day(today: date, day: int) -> date:
     """The next date (today included) that falls on the given day-of-month."""
     this_month_day = min(day, calendar.monthrange(today.year, today.month)[1])

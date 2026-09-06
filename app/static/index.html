@@ -311,6 +311,7 @@
       <button type="button" class="tab-btn" data-tab="transactions">💳 İşlemler</button>
       <button type="button" class="tab-btn" data-tab="subscriptions">🔁 Abonelikler</button>
       <button type="button" class="tab-btn" data-tab="bank">🏦 Banka</button>
+      <button type="button" class="tab-btn" data-tab="categories">🏷️ Kategoriler</button>
     </div>
 
     <div class="tab-panel active" id="tab-overview">
@@ -371,7 +372,7 @@
               <option value="weekly">Haftalık</option>
             </select>
           </div>
-          <input type="text" id="tx-category" placeholder="Kategori (örn. Market, Ulaşım)">
+          <input type="text" id="tx-category" list="category-datalist" placeholder="Kategori (örn. Market, Ulaşım)">
           <textarea id="tx-note" placeholder="Not (opsiyonel)"></textarea>
           <div class="form-actions-row">
             <button type="submit" class="btn-primary" id="tx-submit-btn">Ekle</button>
@@ -416,7 +417,7 @@
           </div>
           <label>Sonraki ödeme tarihi</label>
           <input type="date" id="sub-due-date" required>
-          <input type="text" id="sub-category" placeholder="Kategori (opsiyonel)">
+          <input type="text" id="sub-category" list="category-datalist" placeholder="Kategori (opsiyonel)">
           <div class="form-actions-row">
             <button type="submit" class="btn-primary" id="sub-submit-btn">Ekle</button>
             <button type="button" class="btn-ghost" id="sub-cancel-edit" style="display:none">İptal</button>
@@ -465,7 +466,33 @@
         <div class="empty" id="cards-empty" style="display:none">Henüz kart eklenmedi.</div>
       </div>
     </div>
+
+    <div class="tab-panel" id="tab-categories">
+      <div class="card">
+        <div class="section-title" id="category-form-title">Kategori ekle</div>
+        <form id="add-category-form">
+          <input type="text" id="category-name" placeholder="Kategori adı (örn. Market)" required>
+          <select id="category-type">
+            <option value="both">Gider ve gelirde kullan</option>
+            <option value="expense">Sadece gider</option>
+            <option value="income">Sadece gelir</option>
+          </select>
+          <div class="form-actions-row">
+            <button type="submit" class="btn-primary" id="category-submit-btn">Ekle</button>
+            <button type="button" class="btn-ghost" id="category-cancel-edit" style="display:none">İptal</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Kategorilerim</div>
+        <div id="categories-list"></div>
+        <div class="empty" id="categories-empty" style="display:none">Henüz kategori yok.</div>
+      </div>
+    </div>
   </div>
+
+  <datalist id="category-datalist"></datalist>
 
 </div>
 
@@ -634,6 +661,7 @@ function showApp() {
   setTxFormMode(null);
   setSubFormMode(null);
   setCardFormMode(null);
+  setCategoryFormMode(null);
   const txEmpty = document.getElementById("transactions-empty");
   txEmpty.textContent = "Yükleniyor…";
   txEmpty.style.display = "block";
@@ -646,11 +674,15 @@ function showApp() {
   const cardsEmpty = document.getElementById("cards-empty");
   cardsEmpty.textContent = "Yükleniyor…";
   cardsEmpty.style.display = "block";
+  const categoriesEmpty = document.getElementById("categories-empty");
+  categoriesEmpty.textContent = "Yükleniyor…";
+  categoriesEmpty.style.display = "block";
   loadOverview();
   loadTransactions();
   loadSubscriptions();
   loadRecurring();
   loadCards();
+  loadCategories();
 }
 
 async function loadOverview() {
@@ -1143,6 +1175,87 @@ async function loadCards() {
       if (!ok) return;
       if (editingCardId === card.id) setCardFormMode(null);
       loadCards();
+    });
+    list.appendChild(row);
+  }
+}
+
+const CATEGORY_TYPE_LABELS = { expense: "sadece gider", income: "sadece gelir", both: "gider ve gelir" };
+
+let editingCategoryId = null;
+function setCategoryFormMode(category) {
+  editingCategoryId = category ? category.id : null;
+  document.getElementById("category-form-title").textContent = category ? "Kategoriyi düzenle" : "Kategori ekle";
+  document.getElementById("category-submit-btn").textContent = category ? "Güncelle" : "Ekle";
+  document.getElementById("category-cancel-edit").style.display = category ? "inline-block" : "none";
+  if (category) {
+    document.getElementById("category-name").value = category.name;
+    document.getElementById("category-type").value = category.type;
+  } else {
+    document.getElementById("add-category-form").reset();
+  }
+}
+document.getElementById("category-cancel-edit").addEventListener("click", () => setCategoryFormMode(null));
+
+document.getElementById("add-category-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("category-name").value.trim();
+  const type = document.getElementById("category-type").value;
+  const isEdit = editingCategoryId !== null;
+  const submitBtn = document.getElementById("category-submit-btn");
+  submitBtn.disabled = true;
+  const ok = await apiWrite(
+    isEdit ? `/categories/${editingCategoryId}` : "/categories",
+    {
+      method: isEdit ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, type }),
+    },
+    isEdit ? "Kategori güncellendi." : "Kategori eklendi."
+  );
+  submitBtn.disabled = false;
+  if (!ok) return;
+  setCategoryFormMode(null);
+  loadCategories();
+});
+
+async function loadCategories() {
+  const categories = await apiRead("/categories");
+  if (!categories) return;
+
+  const datalist = document.getElementById("category-datalist");
+  datalist.innerHTML = categories.map((c) => `<option value="${escapeHtml(c.name)}">`).join("");
+
+  const list = document.getElementById("categories-list");
+  const empty = document.getElementById("categories-empty");
+  list.innerHTML = "";
+  empty.textContent = "Henüz kategori yok.";
+  empty.style.display = categories.length ? "none" : "block";
+
+  for (const category of categories) {
+    const row = document.createElement("div");
+    row.className = "entry-row";
+    row.innerHTML = `
+      <div>
+        <div class="entry-title">${escapeHtml(category.name)}</div>
+        <div class="entry-meta">${CATEGORY_TYPE_LABELS[category.type] || category.type}</div>
+      </div>
+      <div class="actions">
+        <button class="btn-edit btn-small">Düzenle</button>
+        <button class="btn-archive btn-small">Sil</button>
+      </div>
+    `;
+    const [editBtn, deleteBtn] = row.querySelectorAll(".actions button");
+    editBtn.addEventListener("click", () => {
+      setCategoryFormMode(category);
+      document.getElementById("category-form-title").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    deleteBtn.addEventListener("click", async () => {
+      if (!confirm(`"${category.name}" kategorisi silinsin mi?`)) return;
+      const ok = await apiWrite(`/categories/${category.id}`, { method: "DELETE" }, "Kategori silindi.");
+      if (!ok) return;
+      if (editingCategoryId === category.id) setCategoryFormMode(null);
+      loadCategories();
     });
     list.appendChild(row);
   }
