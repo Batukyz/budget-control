@@ -518,6 +518,12 @@ def delete_subscription(
 _MONTHLY_MULTIPLIER = {"weekly": 52 / 12, "monthly": 1.0, "yearly": 1 / 12}
 
 
+def _normalize_category(category: Optional[str]) -> str:
+    """Case/whitespace-insensitive key so 'Market' and 'market' are treated
+    as the same budget category instead of silently splitting spend totals."""
+    return (category or "").strip().lower()
+
+
 @app.get("/overview", response_model=schemas.OverviewOut)
 def get_overview(
     db: Session = Depends(get_db),
@@ -558,9 +564,10 @@ def get_overview(
         category_expense: dict = {}
         for t in month_transactions:
             if t.type == "expense":
-                category_expense[t.category] = category_expense.get(t.category, 0.0) + t.amount
+                key = _normalize_category(t.category)
+                category_expense[key] = category_expense.get(key, 0.0) + t.amount
         for b in budget_limits:
-            spent = month_expense if b.category is None else category_expense.get(b.category, 0.0)
+            spent = month_expense if b.category is None else category_expense.get(_normalize_category(b.category), 0.0)
             if spent > b.monthly_limit:
                 budgets_over_limit += 1
 
@@ -673,15 +680,8 @@ def create_budget(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    existing = (
-        db.query(models.BudgetLimit)
-        .filter(
-            models.BudgetLimit.owner_id == current_user.id,
-            models.BudgetLimit.category == payload.category,
-        )
-        .first()
-    )
-    if existing is not None:
+    owner_budgets = db.query(models.BudgetLimit).filter(models.BudgetLimit.owner_id == current_user.id).all()
+    if any(_normalize_category(b.category) == _normalize_category(payload.category) for b in owner_budgets):
         raise HTTPException(status_code=400, detail="Bu kategori için zaten bir bütçe limiti tanımlı")
     budget = models.BudgetLimit(owner_id=current_user.id, **payload.model_dump())
     db.add(budget)
@@ -717,11 +717,12 @@ def list_budgets(
     total_expense = 0.0
     for t in month_expenses:
         total_expense += t.amount
-        category_expense[t.category] = category_expense.get(t.category, 0.0) + t.amount
+        key = _normalize_category(t.category)
+        category_expense[key] = category_expense.get(key, 0.0) + t.amount
 
     results = []
     for b in budgets:
-        spent = total_expense if b.category is None else category_expense.get(b.category, 0.0)
+        spent = total_expense if b.category is None else category_expense.get(_normalize_category(b.category), 0.0)
         results.append(
             schemas.BudgetStatusOut(
                 id=b.id,

@@ -68,6 +68,22 @@ def test_overall_budget_counts_all_expense_categories(client):
     assert body["is_over_limit"] is True
 
 
+def test_budget_spend_matching_ignores_category_case_and_whitespace(client):
+    client.post("/budgets", json={"category": "Market", "monthly_limit": 100})
+    client.post("/transactions", json={"amount": 40, "type": "expense", "category": "market", "occurred_on": TODAY})
+    client.post("/transactions", json={"amount": 10, "type": "expense", "category": " Market ", "occurred_on": TODAY})
+
+    response = client.get("/budgets")
+    body = response.json()[0]
+    assert body["spent_this_month"] == 50
+
+
+def test_create_budget_rejects_duplicate_category_case_insensitive(client):
+    client.post("/budgets", json={"category": "Market", "monthly_limit": 500})
+    response = client.post("/budgets", json={"category": "market", "monthly_limit": 300})
+    assert response.status_code == 400
+
+
 def test_update_budget_limit(client):
     created = client.post("/budgets", json={"category": "Market", "monthly_limit": 100}).json()
     response = client.put(f"/budgets/{created['id']}", json={"monthly_limit": 200})

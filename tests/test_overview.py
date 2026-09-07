@@ -79,6 +79,14 @@ def test_overview_counts_budgets_over_limit(client):
     assert response.json()["budgets_over_limit"] == 1
 
 
+def test_overview_budgets_over_limit_ignores_category_case(client):
+    client.post("/budgets", json={"category": "Market", "monthly_limit": 100})
+    client.post("/transactions", json={"amount": 150, "type": "expense", "category": "market", "occurred_on": TODAY})
+
+    response = client.get("/overview")
+    assert response.json()["budgets_over_limit"] == 1
+
+
 def test_overview_scoped_to_owner(make_authed_client):
     alice = make_authed_client(email="alice_ov@example.com")
     bob = make_authed_client(email="bob_ov@example.com")
