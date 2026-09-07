@@ -414,6 +414,32 @@ def delete_recurring_transaction(
     db.commit()
 
 
+def _is_paid_this_cycle(last_paid_date: Optional[date], billing_cycle: str, today: date) -> bool:
+    if last_paid_date is None or last_paid_date > today:
+        return False
+    if billing_cycle == "weekly":
+        return (today - last_paid_date).days < 7
+    if billing_cycle == "yearly":
+        return last_paid_date.year == today.year
+    return last_paid_date.year == today.year and last_paid_date.month == today.month
+
+
+def _subscription_to_out(subscription: models.Subscription) -> schemas.SubscriptionOut:
+    return schemas.SubscriptionOut(
+        id=subscription.id,
+        name=subscription.name,
+        amount=subscription.amount,
+        billing_cycle=subscription.billing_cycle,
+        next_due_date=subscription.next_due_date,
+        category=subscription.category,
+        note=subscription.note,
+        is_active=subscription.is_active,
+        last_paid_date=subscription.last_paid_date,
+        created_at=subscription.created_at,
+        is_paid_this_cycle=_is_paid_this_cycle(subscription.last_paid_date, subscription.billing_cycle, date.today()),
+    )
+
+
 def _get_owned_subscription(subscription_id: int, owner_id: int, db: Session) -> models.Subscription:
     subscription = (
         db.query(models.Subscription)
@@ -435,7 +461,7 @@ def create_subscription(
     db.add(subscription)
     db.commit()
     db.refresh(subscription)
-    return subscription
+    return _subscription_to_out(subscription)
 
 
 @app.get("/subscriptions", response_model=list[schemas.SubscriptionOut])
@@ -449,12 +475,13 @@ def list_subscriptions(
     query = db.query(models.Subscription).filter(models.Subscription.owner_id == current_user.id)
     if is_active is not None:
         query = query.filter(models.Subscription.is_active == is_active)
-    return (
+    subscriptions = (
         query.order_by(models.Subscription.next_due_date.asc())
         .offset(skip)
         .limit(limit)
         .all()
     )
+    return [_subscription_to_out(s) for s in subscriptions]
 
 
 @app.get("/subscriptions/{subscription_id}", response_model=schemas.SubscriptionOut)
@@ -463,7 +490,7 @@ def get_subscription(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    return _get_owned_subscription(subscription_id, current_user.id, db)
+    return _subscription_to_out(_get_owned_subscription(subscription_id, current_user.id, db))
 
 
 @app.put("/subscriptions/{subscription_id}", response_model=schemas.SubscriptionOut)
@@ -478,7 +505,7 @@ def update_subscription(
         setattr(subscription, field, value)
     db.commit()
     db.refresh(subscription)
-    return subscription
+    return _subscription_to_out(subscription)
 
 
 @app.post("/subscriptions/{subscription_id}/pay", response_model=schemas.SubscriptionPayOut)
@@ -497,11 +524,12 @@ def pay_subscription(
         occurred_on=date.today(),
     )
     db.add(transaction)
+    subscription.last_paid_date = date.today()
     subscription.next_due_date = _advance_by_cycle(subscription.next_due_date, subscription.billing_cycle)
     db.commit()
     db.refresh(transaction)
     db.refresh(subscription)
-    return schemas.SubscriptionPayOut(subscription=subscription, transaction=transaction)
+    return schemas.SubscriptionPayOut(subscription=_subscription_to_out(subscription), transaction=transaction)
 
 
 @app.delete("/subscriptions/{subscription_id}", status_code=204)

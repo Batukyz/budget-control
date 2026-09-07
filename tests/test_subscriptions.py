@@ -1,5 +1,7 @@
 from datetime import date, timedelta
 
+from app.main import _is_paid_this_cycle
+
 TODAY = date.today().isoformat()
 IN_3_DAYS = (date.today() + timedelta(days=3)).isoformat()
 IN_30_DAYS = (date.today() + timedelta(days=30)).isoformat()
@@ -127,6 +129,49 @@ def test_pay_subscription_advances_weekly_by_seven_days(client):
 
 def test_pay_subscription_not_found(client):
     assert client.post("/subscriptions/999/pay").status_code == 404
+
+
+def test_new_subscription_starts_unpaid(client):
+    created = client.post(
+        "/subscriptions", json={"name": "Netflix", "amount": 10, "next_due_date": TODAY}
+    ).json()
+    assert created["is_paid_this_cycle"] is False
+    assert created["last_paid_date"] is None
+
+
+def test_pay_subscription_marks_it_paid_this_cycle(client):
+    created = client.post(
+        "/subscriptions", json={"name": "Netflix", "amount": 10, "next_due_date": TODAY}
+    ).json()
+    response = client.post(f"/subscriptions/{created['id']}/pay")
+    body = response.json()["subscription"]
+    assert body["is_paid_this_cycle"] is True
+    assert body["last_paid_date"] == TODAY
+
+    refetched = client.get(f"/subscriptions/{created['id']}").json()
+    assert refetched["is_paid_this_cycle"] is True
+
+
+def test_is_paid_this_cycle_monthly_resets_on_new_month():
+    today = date(2026, 3, 15)
+    assert _is_paid_this_cycle(date(2026, 3, 1), "monthly", today) is True
+    assert _is_paid_this_cycle(date(2026, 2, 28), "monthly", today) is False
+
+
+def test_is_paid_this_cycle_weekly_resets_after_seven_days():
+    today = date(2026, 3, 15)
+    assert _is_paid_this_cycle(date(2026, 3, 10), "weekly", today) is True
+    assert _is_paid_this_cycle(date(2026, 3, 8), "weekly", today) is False
+
+
+def test_is_paid_this_cycle_yearly_resets_on_new_year():
+    today = date(2026, 1, 5)
+    assert _is_paid_this_cycle(date(2026, 1, 1), "yearly", today) is True
+    assert _is_paid_this_cycle(date(2025, 12, 31), "yearly", today) is False
+
+
+def test_is_paid_this_cycle_none_is_unpaid():
+    assert _is_paid_this_cycle(None, "monthly", date(2026, 3, 15)) is False
 
 
 def test_pay_subscription_scoped_to_owner(make_authed_client):

@@ -84,6 +84,7 @@ class Subscription(Base):
     category = Column(String, nullable=True)
     note = Column(String, nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)
+    last_paid_date = Column(Date, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     owner = relationship("User", back_populates="subscriptions")

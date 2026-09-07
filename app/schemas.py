@@ -147,7 +147,9 @@ class SubscriptionOut(BaseModel):
     category: Optional[str] = None
     note: Optional[str] = None
     is_active: bool
+    last_paid_date: Optional[date] = None
     created_at: datetime
+    is_paid_this_cycle: bool
 
 
 class SubscriptionPayOut(BaseModel):

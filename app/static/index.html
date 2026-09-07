@@ -1099,25 +1099,28 @@ async function loadSubscriptions() {
     row.className = "entry-row";
     const dueDate = new Date(sub.next_due_date);
     const daysUntil = Math.round((dueDate - today) / 86400000);
-    const dueSoon = sub.is_active && daysUntil >= 0 && daysUntil <= 7;
+    const paid = sub.is_active && sub.is_paid_this_cycle;
+    const dueSoon = sub.is_active && !paid && daysUntil >= 0 && daysUntil <= 7;
     const metaParts = [`${CYCLE_LABELS[sub.billing_cycle] || sub.billing_cycle} · ${formatDateTr(sub.next_due_date)}`];
     if (sub.category) metaParts.push(escapeHtml(sub.category));
+    if (paid) metaParts.push("✅ ödendi");
     if (!sub.is_active) metaParts.push("pasif");
+    const amountClass = sub.is_active ? (paid ? "income" : "expense") : "expense";
     row.innerHTML = `
       <div>
         <div class="entry-title">${escapeHtml(sub.name)}</div>
         <div class="entry-meta">${metaParts.join(" · ")}</div>
       </div>
       <div class="actions">
-        <div class="entry-amount expense${dueSoon ? " due-soon" : ""}">${formatMoney(sub.amount)}</div>
-        ${sub.is_active ? '<button class="btn-edit btn-small">Ödendi</button>' : ""}
+        <div class="entry-amount ${amountClass}${dueSoon ? " due-soon" : ""}">${formatMoney(sub.amount)}</div>
+        ${sub.is_active && !paid ? '<button class="btn-edit btn-small">Ödendi</button>' : ""}
         <button class="btn-edit btn-small">Düzenle</button>
         <button class="btn-archive btn-small">${sub.is_active ? "Pasifleştir" : "Aktifleştir"}</button>
         <button class="btn-archive btn-small">Sil</button>
       </div>
     `;
     const buttons = row.querySelectorAll(".actions button");
-    const [payBtn, editBtn, toggleBtn, deleteBtn] = sub.is_active ? buttons : [null, ...buttons];
+    const [payBtn, editBtn, toggleBtn, deleteBtn] = sub.is_active && !paid ? buttons : [null, ...buttons];
     if (payBtn) {
       payBtn.addEventListener("click", async () => {
         if (!confirm(`"${sub.name}" için ${formatMoney(sub.amount)} tutarında gider kaydedilsin mi?`)) return;
