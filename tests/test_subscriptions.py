@@ -87,3 +87,52 @@ def test_subscriptions_scoped_to_owner(make_authed_client):
 
     assert len(alice.get("/subscriptions").json()) == 1
     assert alice.get("/subscriptions").json()[0]["name"] == "Netflix"
+
+
+def test_pay_subscription_requires_auth(anon_client):
+    assert anon_client.post("/subscriptions/1/pay").status_code == 401
+
+
+def test_pay_subscription_creates_transaction_and_advances_due_date(client):
+    created = client.post(
+        "/subscriptions",
+        json={"name": "Netflix", "amount": 199.99, "category": "Eğlence", "billing_cycle": "monthly", "next_due_date": TODAY},
+    ).json()
+
+    response = client.post(f"/subscriptions/{created['id']}/pay")
+    assert response.status_code == 200
+    body = response.json()
+
+    assert body["transaction"]["amount"] == 199.99
+    assert body["transaction"]["type"] == "expense"
+    assert body["transaction"]["category"] == "Eğlence"
+    assert body["transaction"]["note"] == "Netflix"
+    assert body["transaction"]["occurred_on"] == TODAY
+
+    assert body["subscription"]["next_due_date"] > TODAY
+
+    transactions = client.get("/transactions").json()
+    assert len(transactions) == 1
+
+
+def test_pay_subscription_advances_weekly_by_seven_days(client):
+    created = client.post(
+        "/subscriptions", json={"name": "Weekly", "amount": 10, "billing_cycle": "weekly", "next_due_date": TODAY}
+    ).json()
+    response = client.post(f"/subscriptions/{created['id']}/pay")
+    body = response.json()
+    expected = (date.today() + timedelta(days=7)).isoformat()
+    assert body["subscription"]["next_due_date"] == expected
+
+
+def test_pay_subscription_not_found(client):
+    assert client.post("/subscriptions/999/pay").status_code == 404
+
+
+def test_pay_subscription_scoped_to_owner(make_authed_client):
+    alice = make_authed_client(email="alice_pay@example.com")
+    bob = make_authed_client(email="bob_pay@example.com")
+    created = alice.post("/subscriptions", json={"name": "Netflix", "amount": 10, "next_due_date": TODAY}).json()
+
+    response = bob.post(f"/subscriptions/{created['id']}/pay")
+    assert response.status_code == 404

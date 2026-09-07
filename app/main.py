@@ -128,7 +128,7 @@ def _get_owned_transaction(transaction_id: int, owner_id: int, db: Session) -> m
     return transaction
 
 
-def _advance_recurring_date(d: date, frequency: str) -> date:
+def _advance_by_cycle(d: date, frequency: str) -> date:
     if frequency == "weekly":
         return d + timedelta(days=7)
     if frequency == "yearly":
@@ -170,7 +170,7 @@ def _process_due_recurring_transactions(db: Session, owner_id: int) -> None:
                     recurring_transaction_id=recurring.id,
                 )
             )
-            recurring.next_due_date = _advance_recurring_date(recurring.next_due_date, recurring.frequency)
+            recurring.next_due_date = _advance_by_cycle(recurring.next_due_date, recurring.frequency)
     db.commit()
 
 
@@ -479,6 +479,29 @@ def update_subscription(
     db.commit()
     db.refresh(subscription)
     return subscription
+
+
+@app.post("/subscriptions/{subscription_id}/pay", response_model=schemas.SubscriptionPayOut)
+def pay_subscription(
+    subscription_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    subscription = _get_owned_subscription(subscription_id, current_user.id, db)
+    transaction = models.Transaction(
+        owner_id=current_user.id,
+        amount=subscription.amount,
+        type="expense",
+        category=subscription.category,
+        note=subscription.note or subscription.name,
+        occurred_on=date.today(),
+    )
+    db.add(transaction)
+    subscription.next_due_date = _advance_by_cycle(subscription.next_due_date, subscription.billing_cycle)
+    db.commit()
+    db.refresh(transaction)
+    db.refresh(subscription)
+    return schemas.SubscriptionPayOut(subscription=subscription, transaction=transaction)
 
 
 @app.delete("/subscriptions/{subscription_id}", status_code=204)

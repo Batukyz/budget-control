@@ -1054,12 +1054,26 @@ async function loadSubscriptions() {
       </div>
       <div class="actions">
         <div class="entry-amount expense${dueSoon ? " due-soon" : ""}">${formatMoney(sub.amount)}</div>
+        ${sub.is_active ? '<button class="btn-edit btn-small">Ödendi</button>' : ""}
         <button class="btn-edit btn-small">Düzenle</button>
         <button class="btn-archive btn-small">${sub.is_active ? "Pasifleştir" : "Aktifleştir"}</button>
         <button class="btn-archive btn-small">Sil</button>
       </div>
     `;
-    const [editBtn, toggleBtn, deleteBtn] = row.querySelectorAll(".actions button");
+    const buttons = row.querySelectorAll(".actions button");
+    const [payBtn, editBtn, toggleBtn, deleteBtn] = sub.is_active ? buttons : [null, ...buttons];
+    if (payBtn) {
+      payBtn.addEventListener("click", async () => {
+        if (!confirm(`"${sub.name}" için ${formatMoney(sub.amount)} tutarında gider kaydedilsin mi?`)) return;
+        const ok = await apiWrite(`/subscriptions/${sub.id}/pay`, { method: "POST" }, "Ödeme kaydedildi.");
+        if (!ok) return;
+        loadSubscriptions();
+        loadOverview();
+        loadTransactions();
+        loadCategoryChart();
+        loadTrendChart();
+      });
+    }
     editBtn.addEventListener("click", () => {
       setSubFormMode(sub);
       document.getElementById("sub-form-title").scrollIntoView({ behavior: "smooth", block: "center" });

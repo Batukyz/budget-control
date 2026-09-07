@@ -150,6 +150,11 @@ class SubscriptionOut(BaseModel):
     created_at: datetime
 
 
+class SubscriptionPayOut(BaseModel):
+    subscription: SubscriptionOut
+    transaction: TransactionOut
+
+
 class OverviewOut(BaseModel):
     month_income: float
     month_expense: float
