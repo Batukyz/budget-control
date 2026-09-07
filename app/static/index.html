@@ -326,6 +326,7 @@
       <button type="button" class="tab-btn" data-tab="bank">🏦 Banka</button>
       <button type="button" class="tab-btn" data-tab="categories">🏷️ Kategoriler</button>
       <button type="button" class="tab-btn" data-tab="budgets">🎯 Bütçe</button>
+      <button type="button" class="tab-btn" data-tab="account">⚙️ Hesap</button>
     </div>
 
     <div class="tab-panel active" id="tab-overview">
@@ -544,6 +545,32 @@
         <div class="empty" id="budgets-empty" style="display:none">Henüz bütçe limiti yok.</div>
       </div>
     </div>
+
+    <div class="tab-panel" id="tab-account">
+      <div class="card">
+        <div class="section-title">Hesap bilgileri</div>
+        <div class="stat-row">
+          <div class="stat-label">E-posta</div>
+          <div class="stat-value" id="account-email">–</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Üyelik tarihi</div>
+          <div class="stat-value" id="account-created">–</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Hesabı güncelle</div>
+        <form id="account-form">
+          <label>E-posta</label>
+          <input type="email" id="account-email-input" required>
+          <label>Yeni şifre</label>
+          <input type="password" id="account-password-input" minlength="8" placeholder="Değiştirmek istemiyorsan boş bırak" autocomplete="new-password">
+          <div class="error" id="account-error"></div>
+          <button type="submit" class="btn-primary" id="account-submit-btn">Kaydet</button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <datalist id="category-datalist"></datalist>
@@ -744,6 +771,7 @@ function showApp() {
   loadCategoryChart();
   loadTrendChart();
   loadBudgets();
+  loadAccount();
 }
 
 async function loadOverview() {
@@ -1498,6 +1526,44 @@ async function loadBudgets() {
     list.appendChild(row);
   }
 }
+
+async function loadAccount() {
+  const me = await apiRead("/me");
+  if (!me) return;
+  document.getElementById("account-email").textContent = me.email;
+  document.getElementById("account-created").textContent = formatDateTr(me.created_at.slice(0, 10));
+  document.getElementById("account-email-input").value = me.email;
+  document.getElementById("account-password-input").value = "";
+}
+
+document.getElementById("account-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("account-email-input").value.trim();
+  const password = document.getElementById("account-password-input").value;
+  const errorEl = document.getElementById("account-error");
+  errorEl.textContent = "";
+  const payload = { email };
+  if (password) payload.password = password;
+  const submitBtn = document.getElementById("account-submit-btn");
+  submitBtn.disabled = true;
+  try {
+    const response = await apiFetch("/me", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      errorEl.textContent = await extractErrorMessage(response);
+      return;
+    }
+    showToast("Hesap güncellendi.", "success");
+    loadAccount();
+  } catch (err) {
+    errorEl.textContent = err.message || "Bağlantı hatası.";
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
 
 document.getElementById("show-register").addEventListener("click", () => {
   const card = document.getElementById("register-card");
