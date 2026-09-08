@@ -11,6 +11,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from . import models, schemas
@@ -198,6 +199,7 @@ def list_transactions(
     category: Optional[str] = None,
     from_date: Optional[date] = None,
     to_date: Optional[date] = None,
+    search: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
 ):
@@ -211,6 +213,11 @@ def list_transactions(
         query = query.filter(models.Transaction.occurred_on >= from_date)
     if to_date is not None:
         query = query.filter(models.Transaction.occurred_on <= to_date)
+    if search:
+        like = f"%{search}%"
+        query = query.filter(
+            or_(models.Transaction.note.ilike(like), models.Transaction.category.ilike(like))
+        )
     return (
         query.order_by(models.Transaction.occurred_on.desc(), models.Transaction.id.desc())
         .offset(skip)
@@ -230,12 +237,18 @@ def export_transactions(
     category: Optional[str] = None,
     from_date: Optional[date] = None,
     to_date: Optional[date] = None,
+    search: Optional[str] = None,
 ):
     query = db.query(models.Transaction).filter(models.Transaction.owner_id == current_user.id)
     if type is not None:
         query = query.filter(models.Transaction.type == type)
     if category is not None:
         query = query.filter(models.Transaction.category == category)
+    if search:
+        like = f"%{search}%"
+        query = query.filter(
+            or_(models.Transaction.note.ilike(like), models.Transaction.category.ilike(like))
+        )
     if from_date is not None:
         query = query.filter(models.Transaction.occurred_on >= from_date)
     if to_date is not None:

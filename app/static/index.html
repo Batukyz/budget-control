@@ -424,6 +424,7 @@
 
       <div class="card">
         <div class="section-title">Son işlemler</div>
+        <input type="search" id="tx-search" placeholder="Not veya kategoride ara…" style="margin-bottom:10px;">
         <div class="filter-row">
           <select id="tx-filter-category"><option value="">Tüm kategoriler</option></select>
           <select id="tx-filter-type">
@@ -434,6 +435,7 @@
         </div>
         <div id="transactions-list"></div>
         <div class="empty" id="transactions-empty" style="display:none">Henüz işlem yok.</div>
+        <button type="button" class="btn-ghost" id="tx-load-more-btn" style="display:none; width:100%; margin-top:8px;">Daha fazla yükle</button>
       </div>
     </div>
 
@@ -901,39 +903,37 @@ document.getElementById("add-transaction-form").addEventListener("submit", async
 });
 
 let allTransactions = [];
+let txHasMore = false;
+const TX_PAGE_SIZE = 30;
 
-function populateCategoryFilter(transactions) {
+function populateCategoryFilter(categories) {
   const select = document.getElementById("tx-filter-category");
   const current = select.value;
-  const categories = [...new Set(transactions.map((t) => t.category).filter(Boolean))].sort();
+  const names = categories.map((c) => c.name).sort();
   select.innerHTML =
     '<option value="">Tüm kategoriler</option>' +
-    categories.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
-  select.value = categories.includes(current) ? current : "";
+    names.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+  select.value = names.includes(current) ? current : "";
 }
 
-function getFilteredTransactions() {
-  const category = document.getElementById("tx-filter-category").value;
-  const type = document.getElementById("tx-filter-type").value;
-  return allTransactions.filter(
-    (t) => (!category || t.category === category) && (!type || t.type === type)
-  );
-}
+document.getElementById("tx-filter-category").addEventListener("change", () => loadTransactions());
+document.getElementById("tx-filter-type").addEventListener("change", () => loadTransactions());
 
-document.getElementById("tx-filter-category").addEventListener("change", renderFilteredTransactions);
-document.getElementById("tx-filter-type").addEventListener("change", renderFilteredTransactions);
+let txSearchDebounce = null;
+document.getElementById("tx-search").addEventListener("input", () => {
+  clearTimeout(txSearchDebounce);
+  txSearchDebounce = setTimeout(() => loadTransactions(), 300);
+});
 
-function renderFilteredTransactions() {
-  renderTransactionsList(getFilteredTransactions());
-}
+document.getElementById("tx-load-more-btn").addEventListener("click", () => loadTransactions(false));
 
 function renderTransactionsList(transactions) {
   const list = document.getElementById("transactions-list");
   const empty = document.getElementById("transactions-empty");
   list.innerHTML = "";
-  empty.textContent = allTransactions.length ? "Filtreyle eşleşen işlem yok." : "Henüz işlem yok.";
+  empty.textContent = "Bu filtreyle eşleşen işlem yok.";
   empty.style.display = transactions.length ? "none" : "block";
-  for (const tx of transactions.slice(0, 30)) {
+  for (const tx of transactions) {
     const row = document.createElement("div");
     row.className = "entry-row";
     const metaParts = [formatDateTr(tx.occurred_on)];
@@ -1026,12 +1026,23 @@ async function loadTrendChart() {
     .join("");
 }
 
-async function loadTransactions() {
-  const data = await apiRead("/transactions");
+async function loadTransactions(reset = true) {
+  const category = document.getElementById("tx-filter-category").value;
+  const type = document.getElementById("tx-filter-type").value;
+  const search = document.getElementById("tx-search").value.trim();
+  const params = new URLSearchParams();
+  if (category) params.set("category", category);
+  if (type) params.set("type", type);
+  if (search) params.set("search", search);
+  params.set("skip", String(reset ? 0 : allTransactions.length));
+  params.set("limit", String(TX_PAGE_SIZE));
+
+  const data = await apiRead(`/transactions?${params.toString()}`);
   if (!data) return;
-  allTransactions = data;
-  populateCategoryFilter(allTransactions);
-  renderFilteredTransactions();
+  allTransactions = reset ? data : allTransactions.concat(data);
+  txHasMore = data.length === TX_PAGE_SIZE;
+  document.getElementById("tx-load-more-btn").style.display = txHasMore ? "block" : "none";
+  renderTransactionsList(allTransactions);
 }
 
 const CYCLE_LABELS = { monthly: "aylık", yearly: "yıllık", weekly: "haftalık" };
@@ -1409,6 +1420,7 @@ async function loadCategories() {
 
   const datalist = document.getElementById("category-datalist");
   datalist.innerHTML = categories.map((c) => `<option value="${escapeHtml(c.name)}">`).join("");
+  populateCategoryFilter(categories);
 
   const list = document.getElementById("categories-list");
   const empty = document.getElementById("categories-empty");

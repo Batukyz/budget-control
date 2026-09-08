@@ -97,6 +97,26 @@ def test_list_transactions_filters_by_type_and_category(client):
     assert body[0]["type"] == "expense"
 
 
+def test_list_transactions_search_matches_note_case_insensitively(client):
+    client.post("/transactions", json={"amount": 1, "type": "expense", "note": "Haftalık market alışverişi"})
+    client.post("/transactions", json={"amount": 2, "type": "expense", "note": "Otobüs bileti"})
+
+    response = client.get("/transactions", params={"search": "MARKET"})
+    body = response.json()
+    assert len(body) == 1
+    assert body[0]["note"] == "Haftalık market alışverişi"
+
+
+def test_list_transactions_search_matches_category(client):
+    client.post("/transactions", json={"amount": 1, "type": "expense", "category": "Eğlence"})
+    client.post("/transactions", json={"amount": 2, "type": "expense", "category": "Market"})
+
+    response = client.get("/transactions", params={"search": "eğlence"})
+    body = response.json()
+    assert len(body) == 1
+    assert body[0]["category"] == "Eğlence"
+
+
 def test_list_transactions_filters_by_date_range(client):
     client.post("/transactions", json={"amount": 1, "type": "expense", "occurred_on": YESTERDAY})
     client.post("/transactions", json={"amount": 2, "type": "expense", "occurred_on": TODAY})
