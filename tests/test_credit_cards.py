@@ -46,6 +46,14 @@ def test_create_credit_card_rejects_invalid_day(client):
     assert response.status_code == 422
 
 
+def test_create_credit_card_rejects_empty_bank_name(client):
+    response = client.post(
+        "/credit-cards",
+        json={"bank_name": "", "limit_amount": 10000, "statement_day": 5, "due_day": 20},
+    )
+    assert response.status_code == 422
+
+
 def test_next_occurrence_of_day_rolls_to_next_month_when_day_passed(client):
     past_day = TODAY.day - 1 if TODAY.day > 1 else 28
     response = client.post(

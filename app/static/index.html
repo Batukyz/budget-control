@@ -699,6 +699,22 @@ async function apiWrite(path, options, successMessage) {
   }
 }
 
+function showLoadError(emptyElId, retryFn) {
+  const el = document.getElementById(emptyElId);
+  el.innerHTML = "";
+  const text = document.createElement("div");
+  text.textContent = "Yüklenemedi.";
+  text.style.marginBottom = "8px";
+  const retryBtn = document.createElement("button");
+  retryBtn.type = "button";
+  retryBtn.className = "btn-ghost";
+  retryBtn.textContent = "Tekrar dene";
+  retryBtn.addEventListener("click", retryFn);
+  el.appendChild(text);
+  el.appendChild(retryBtn);
+  el.style.display = "block";
+}
+
 function showToast(message, type = "error") {
   const container = document.getElementById("toast-container");
   const toast = document.createElement("div");
@@ -1104,7 +1120,10 @@ async function loadTransactions(reset = true) {
   params.set("limit", String(TX_PAGE_SIZE));
 
   const data = await apiRead(`/transactions?${params.toString()}`);
-  if (!data) return;
+  if (!data) {
+    showLoadError("transactions-empty", () => loadTransactions(reset));
+    return;
+  }
   allTransactions = reset ? data : allTransactions.concat(data);
   txHasMore = data.length === TX_PAGE_SIZE;
   document.getElementById("tx-load-more-btn").style.display = txHasMore ? "block" : "none";
@@ -1161,7 +1180,10 @@ document.getElementById("add-subscription-form").addEventListener("submit", asyn
 
 async function loadSubscriptions() {
   const subscriptions = await apiRead("/subscriptions");
-  if (!subscriptions) return;
+  if (!subscriptions) {
+    showLoadError("subscriptions-empty", loadSubscriptions);
+    return;
+  }
   cachedSubscriptions = subscriptions;
   renderAlerts();
   const list = document.getElementById("subscriptions-list");
@@ -1241,7 +1263,10 @@ async function loadSubscriptions() {
 
 async function loadRecurring() {
   const recurring = await apiRead("/recurring-transactions");
-  if (!recurring) return;
+  if (!recurring) {
+    showLoadError("recurring-empty", loadRecurring);
+    return;
+  }
   const list = document.getElementById("recurring-list");
   const empty = document.getElementById("recurring-empty");
   list.innerHTML = "";
@@ -1343,7 +1368,10 @@ document.getElementById("add-card-form").addEventListener("submit", async (e) =>
 
 async function loadCards() {
   const cards = await apiRead("/credit-cards");
-  if (!cards) return;
+  if (!cards) {
+    showLoadError("cards-empty", loadCards);
+    return;
+  }
   cachedCreditCards = cards;
   renderAlerts();
   const list = document.getElementById("cards-list");
@@ -1486,7 +1514,10 @@ document.getElementById("add-category-form").addEventListener("submit", async (e
 
 async function loadCategories() {
   const categories = await apiRead("/categories");
-  if (!categories) return;
+  if (!categories) {
+    showLoadError("categories-empty", loadCategories);
+    return;
+  }
 
   const datalist = document.getElementById("category-datalist");
   datalist.innerHTML = categories.map((c) => `<option value="${escapeHtml(c.name)}">`).join("");
@@ -1569,7 +1600,10 @@ document.getElementById("add-budget-form").addEventListener("submit", async (e) 
 
 async function loadBudgets() {
   const budgets = await apiRead("/budgets");
-  if (!budgets) return;
+  if (!budgets) {
+    showLoadError("budgets-empty", loadBudgets);
+    return;
+  }
   cachedBudgets = budgets;
   renderAlerts();
   const list = document.getElementById("budgets-list");

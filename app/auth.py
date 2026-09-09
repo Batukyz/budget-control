@@ -10,8 +10,16 @@ from sqlalchemy.orm import Session
 
 from . import models
 from .database import get_db
+from .logging_config import logger
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
+_DEV_SECRET_KEY = "dev-secret-key-change-in-production"
+SECRET_KEY = os.environ.get("SECRET_KEY") or _DEV_SECRET_KEY
+if SECRET_KEY == _DEV_SECRET_KEY:
+    logger.warning(
+        "SECRET_KEY ortam değişkeni ayarlanmamış; geliştirme amaçlı varsayılan anahtar kullanılıyor. "
+        "Bu anahtarla üretilen JWT'ler tahmin edilebilir olur - production'a almadan önce "
+        "SECRET_KEY ortam değişkenini kendi rastgele değerinizle mutlaka ayarlayın."
+    )
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 30

@@ -46,6 +46,20 @@ def test_create_transaction_rejects_invalid_type(client):
     assert response.status_code == 422
 
 
+def test_create_transaction_rejects_oversized_category_and_note(client):
+    response = client.post(
+        "/transactions",
+        json={"amount": 10, "type": "expense", "category": "a" * 101},
+    )
+    assert response.status_code == 422
+
+    response = client.post(
+        "/transactions",
+        json={"amount": 10, "type": "expense", "note": "a" * 1001},
+    )
+    assert response.status_code == 422
+
+
 def test_list_transactions_sorted_newest_first(client):
     client.post("/transactions", json={"amount": 1, "type": "expense", "occurred_on": YESTERDAY})
     client.post("/transactions", json={"amount": 2, "type": "expense", "occurred_on": TODAY})

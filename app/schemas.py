@@ -46,16 +46,16 @@ TransactionType = Literal["expense", "income"]
 class TransactionCreate(BaseModel):
     amount: float = Field(gt=0)
     type: TransactionType
-    category: Optional[str] = None
-    note: Optional[str] = None
+    category: Optional[str] = Field(default=None, max_length=100)
+    note: Optional[str] = Field(default=None, max_length=1000)
     occurred_on: Optional[date] = None
 
 
 class TransactionUpdate(BaseModel):
     amount: Optional[float] = Field(default=None, gt=0)
     type: Optional[TransactionType] = None
-    category: Optional[str] = None
-    note: Optional[str] = None
+    category: Optional[str] = Field(default=None, max_length=100)
+    note: Optional[str] = Field(default=None, max_length=1000)
     occurred_on: Optional[date] = None
 
 
@@ -82,23 +82,23 @@ BillingCycle = Literal["weekly", "monthly", "yearly"]
 
 
 class RecurringTransactionCreate(BaseModel):
-    name: str
+    name: str = Field(min_length=1, max_length=200)
     amount: float = Field(gt=0)
     type: TransactionType
     frequency: BillingCycle = "monthly"
     next_due_date: date
-    category: Optional[str] = None
-    note: Optional[str] = None
+    category: Optional[str] = Field(default=None, max_length=100)
+    note: Optional[str] = Field(default=None, max_length=1000)
 
 
 class RecurringTransactionUpdate(BaseModel):
-    name: Optional[str] = None
+    name: Optional[str] = Field(default=None, min_length=1, max_length=200)
     amount: Optional[float] = Field(default=None, gt=0)
     type: Optional[TransactionType] = None
     frequency: Optional[BillingCycle] = None
     next_due_date: Optional[date] = None
-    category: Optional[str] = None
-    note: Optional[str] = None
+    category: Optional[str] = Field(default=None, max_length=100)
+    note: Optional[str] = Field(default=None, max_length=1000)
     is_active: Optional[bool] = None
 
 
@@ -118,21 +118,21 @@ class RecurringTransactionOut(BaseModel):
 
 
 class SubscriptionCreate(BaseModel):
-    name: str
+    name: str = Field(min_length=1, max_length=200)
     amount: float = Field(gt=0)
     billing_cycle: BillingCycle = "monthly"
     next_due_date: date
-    category: Optional[str] = None
-    note: Optional[str] = None
+    category: Optional[str] = Field(default=None, max_length=100)
+    note: Optional[str] = Field(default=None, max_length=1000)
 
 
 class SubscriptionUpdate(BaseModel):
-    name: Optional[str] = None
+    name: Optional[str] = Field(default=None, min_length=1, max_length=200)
     amount: Optional[float] = Field(default=None, gt=0)
     billing_cycle: Optional[BillingCycle] = None
     next_due_date: Optional[date] = None
-    category: Optional[str] = None
-    note: Optional[str] = None
+    category: Optional[str] = Field(default=None, max_length=100)
+    note: Optional[str] = Field(default=None, max_length=1000)
     is_active: Optional[bool] = None
 
 
@@ -170,12 +170,12 @@ CategoryType = Literal["expense", "income", "both"]
 
 
 class CategoryCreate(BaseModel):
-    name: str = Field(min_length=1)
+    name: str = Field(min_length=1, max_length=100)
     type: CategoryType = "both"
 
 
 class CategoryUpdate(BaseModel):
-    name: Optional[str] = Field(default=None, min_length=1)
+    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
     type: Optional[CategoryType] = None
 
 
@@ -200,7 +200,7 @@ class MonthlyTrendItem(BaseModel):
 
 
 class BudgetLimitCreate(BaseModel):
-    category: Optional[str] = None
+    category: Optional[str] = Field(default=None, max_length=100)
     monthly_limit: float = Field(gt=0)
 
 
@@ -224,23 +224,23 @@ class BudgetStatusOut(BudgetLimitOut):
 
 
 class CreditCardCreate(BaseModel):
-    bank_name: str
-    card_name: Optional[str] = None
+    bank_name: str = Field(min_length=1, max_length=200)
+    card_name: Optional[str] = Field(default=None, max_length=200)
     limit_amount: float = Field(gt=0)
     current_debt: float = Field(default=0, ge=0)
     statement_day: int = Field(ge=1, le=31)
     due_day: int = Field(ge=1, le=31)
-    note: Optional[str] = None
+    note: Optional[str] = Field(default=None, max_length=1000)
 
 
 class CreditCardUpdate(BaseModel):
-    bank_name: Optional[str] = None
-    card_name: Optional[str] = None
+    bank_name: Optional[str] = Field(default=None, min_length=1, max_length=200)
+    card_name: Optional[str] = Field(default=None, max_length=200)
     limit_amount: Optional[float] = Field(default=None, gt=0)
     current_debt: Optional[float] = Field(default=None, ge=0)
     statement_day: Optional[int] = Field(default=None, ge=1, le=31)
     due_day: Optional[int] = Field(default=None, ge=1, le=31)
-    note: Optional[str] = None
+    note: Optional[str] = Field(default=None, max_length=1000)
 
 
 class CreditCardOut(BaseModel):
