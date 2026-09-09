@@ -11,7 +11,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from . import models, schemas
@@ -565,6 +565,38 @@ def _normalize_category(category: Optional[str]) -> str:
     return (category or "").strip().lower()
 
 
+def _sum_amount(db: Session, owner_id: int, type_: str, start: date, end: date) -> float:
+    total = (
+        db.query(func.coalesce(func.sum(models.Transaction.amount), 0.0))
+        .filter(
+            models.Transaction.owner_id == owner_id,
+            models.Transaction.type == type_,
+            models.Transaction.occurred_on >= start,
+            models.Transaction.occurred_on <= end,
+        )
+        .scalar()
+    )
+    return total or 0.0
+
+
+def _month_category_expense(db: Session, owner_id: int, start: date, end: date) -> dict:
+    """Normalized-category -> summed expense amount for the date range, aggregated in SQL
+    so a month with thousands of transactions doesn't have to be pulled row-by-row into Python."""
+    category_key = func.lower(func.trim(func.coalesce(models.Transaction.category, ""))).label("category_key")
+    rows = (
+        db.query(category_key, func.sum(models.Transaction.amount))
+        .filter(
+            models.Transaction.owner_id == owner_id,
+            models.Transaction.type == "expense",
+            models.Transaction.occurred_on >= start,
+            models.Transaction.occurred_on <= end,
+        )
+        .group_by(category_key)
+        .all()
+    )
+    return {key: total for key, total in rows}
+
+
 @app.get("/overview", response_model=schemas.OverviewOut)
 def get_overview(
     db: Session = Depends(get_db),
@@ -574,17 +606,9 @@ def get_overview(
     today = date.today()
     month_start = today.replace(day=1)
 
-    month_transactions = (
-        db.query(models.Transaction)
-        .filter(
-            models.Transaction.owner_id == current_user.id,
-            models.Transaction.occurred_on >= month_start,
-            models.Transaction.occurred_on <= today,
-        )
-        .all()
-    )
-    month_income = sum(t.amount for t in month_transactions if t.type == "income")
-    month_expense = sum(t.amount for t in month_transactions if t.type == "expense")
+    category_expense = _month_category_expense(db, current_user.id, month_start, today)
+    month_expense = sum(category_expense.values())
+    month_income = _sum_amount(db, current_user.id, "income", month_start, today)
 
     active_subscriptions = (
         db.query(models.Subscription)
@@ -601,16 +625,10 @@ def get_overview(
         db.query(models.BudgetLimit).filter(models.BudgetLimit.owner_id == current_user.id).all()
     )
     budgets_over_limit = 0
-    if budget_limits:
-        category_expense: dict = {}
-        for t in month_transactions:
-            if t.type == "expense":
-                key = _normalize_category(t.category)
-                category_expense[key] = category_expense.get(key, 0.0) + t.amount
-        for b in budget_limits:
-            spent = month_expense if b.category is None else category_expense.get(_normalize_category(b.category), 0.0)
-            if spent > b.monthly_limit:
-                budgets_over_limit += 1
+    for b in budget_limits:
+        spent = month_expense if b.category is None else category_expense.get(_normalize_category(b.category), 0.0)
+        if spent > b.monthly_limit:
+            budgets_over_limit += 1
 
     return schemas.OverviewOut(
         month_income=round(month_income, 2),
@@ -636,20 +654,23 @@ def monthly_trend(
 ):
     today = date.today()
     range_start = _month_start_offset(today, months - 1)
-    transactions = (
-        db.query(models.Transaction)
+    year_expr = func.extract("year", models.Transaction.occurred_on).label("year")
+    month_expr = func.extract("month", models.Transaction.occurred_on).label("month")
+    rows = (
+        db.query(year_expr, month_expr, models.Transaction.type, func.sum(models.Transaction.amount))
         .filter(
             models.Transaction.owner_id == current_user.id,
             models.Transaction.occurred_on >= range_start,
             models.Transaction.occurred_on <= today,
         )
+        .group_by(year_expr, month_expr, models.Transaction.type)
         .all()
     )
     totals: dict = {}
-    for t in transactions:
-        key = f"{t.occurred_on.year:04d}-{t.occurred_on.month:02d}"
+    for year, month_num, type_, total in rows:
+        key = f"{int(year):04d}-{int(month_num):02d}"
         entry = totals.setdefault(key, {"income": 0.0, "expense": 0.0})
-        entry[t.type] += t.amount
+        entry[type_] = total
 
     results = []
     for i in range(months):
@@ -683,20 +704,21 @@ def category_breakdown(
     month_start = date(year, month_num, 1)
     month_end = date(year, month_num, calendar.monthrange(year, month_num)[1])
 
-    transactions = (
-        db.query(models.Transaction)
+    rows = (
+        db.query(models.Transaction.category, func.sum(models.Transaction.amount))
         .filter(
             models.Transaction.owner_id == current_user.id,
             models.Transaction.type == type,
             models.Transaction.occurred_on >= month_start,
             models.Transaction.occurred_on <= month_end,
         )
+        .group_by(models.Transaction.category)
         .all()
     )
     totals: dict = {}
-    for t in transactions:
-        key = t.category or "Diğer"
-        totals[key] = totals.get(key, 0.0) + t.amount
+    for category, total in rows:
+        key = category or "Diğer"
+        totals[key] = totals.get(key, 0.0) + total
 
     return [
         schemas.CategoryBreakdownItem(category=category, amount=round(amount, 2))
@@ -744,22 +766,8 @@ def list_budgets(
     )
     today = date.today()
     month_start = today.replace(day=1)
-    month_expenses = (
-        db.query(models.Transaction)
-        .filter(
-            models.Transaction.owner_id == current_user.id,
-            models.Transaction.type == "expense",
-            models.Transaction.occurred_on >= month_start,
-            models.Transaction.occurred_on <= today,
-        )
-        .all()
-    )
-    category_expense: dict = {}
-    total_expense = 0.0
-    for t in month_expenses:
-        total_expense += t.amount
-        key = _normalize_category(t.category)
-        category_expense[key] = category_expense.get(key, 0.0) + t.amount
+    category_expense = _month_category_expense(db, current_user.id, month_start, today)
+    total_expense = sum(category_expense.values())
 
     results = []
     for b in budgets:
