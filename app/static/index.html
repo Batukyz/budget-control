@@ -267,6 +267,29 @@
   .trend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
   .trend-dot.income { background: var(--success); }
   .trend-dot.expense { background: var(--danger); }
+  .alert-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    border-left: 3px solid var(--danger);
+    background: var(--input-bg);
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    font-family: inherit;
+  }
+  .alert-row:last-child { margin-bottom: 0; }
+  .alert-row:hover { filter: brightness(0.97); }
+  [data-theme="dark"] .alert-row:hover { filter: brightness(1.15); }
+  .alert-text { font-size: 13px; color: var(--text); }
+  .alert-meta { font-size: 12px; color: var(--danger); font-weight: 700; white-space: nowrap; }
   .card-entry { padding: 14px 0; border-bottom: 1px solid var(--border); }
   .card-entry:last-child { border-bottom: none; }
   .card-entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
@@ -352,9 +375,9 @@
         </div>
       </div>
 
-      <div class="card" id="upcoming-subs-card" style="display:none">
-        <div class="section-title">⏰ Yaklaşan abonelik ödemeleri</div>
-        <div id="upcoming-subs-note" class="empty" style="padding:0; text-align:left; margin-bottom:0;"></div>
+      <div class="card" id="alerts-card" style="display:none">
+        <div class="section-title">⚠️ Uyarılar</div>
+        <div id="alerts-list"></div>
       </div>
 
       <div class="card" id="category-chart-card" style="display:none">
@@ -776,6 +799,58 @@ function showApp() {
   loadAccount();
 }
 
+let cachedSubscriptions = [];
+let cachedCreditCards = [];
+let cachedBudgets = [];
+
+function renderAlerts() {
+  const card = document.getElementById("alerts-card");
+  const list = document.getElementById("alerts-list");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const alerts = [];
+
+  for (const sub of cachedSubscriptions) {
+    if (!sub.is_active || sub.is_paid_this_cycle) continue;
+    const daysUntil = Math.round((new Date(sub.next_due_date) - today) / 86400000);
+    if (daysUntil <= 7) {
+      const when = daysUntil < 0 ? "gecikti" : daysUntil === 0 ? "bugün" : `${daysUntil} gün sonra`;
+      alerts.push({ tab: "subscriptions", text: `🔁 ${sub.name} aboneliği`, meta: when, urgent: daysUntil <= 0 });
+    }
+  }
+
+  for (const card_ of cachedCreditCards) {
+    const daysUntil = Math.round((new Date(card_.next_due_date) - today) / 86400000);
+    if (daysUntil <= 7) {
+      const when = daysUntil < 0 ? "gecikti" : daysUntil === 0 ? "bugün" : `${daysUntil} gün sonra`;
+      const title = card_.card_name ? `${card_.bank_name} · ${card_.card_name}` : card_.bank_name;
+      alerts.push({ tab: "bank", text: `🏦 ${title} son ödeme`, meta: when, urgent: daysUntil <= 0 });
+    }
+  }
+
+  for (const budget of cachedBudgets) {
+    if (budget.is_over_limit) {
+      const title = budget.category || "Genel bütçe";
+      alerts.push({ tab: "budgets", text: `🎯 ${title} bütçesi aşıldı`, meta: formatMoney(Math.abs(budget.remaining)), urgent: true });
+    }
+  }
+
+  if (alerts.length === 0) {
+    card.style.display = "none";
+    return;
+  }
+  card.style.display = "block";
+  list.innerHTML = "";
+  for (const alert of alerts) {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "alert-row";
+    row.innerHTML = `<span class="alert-text">${escapeHtml(alert.text)}</span><span class="alert-meta">${escapeHtml(alert.meta)}</span>`;
+    row.addEventListener("click", () => setActiveTab(alert.tab));
+    list.appendChild(row);
+  }
+}
+
 async function loadOverview() {
   const data = await apiRead("/overview");
   if (!data) return;
@@ -785,15 +860,6 @@ async function loadOverview() {
   balanceEl.textContent = formatMoney(data.net_balance);
   balanceEl.className = "overview-value " + (data.net_balance >= 0 ? "positive" : "negative");
   document.getElementById("overview-subs").textContent = formatMoney(data.monthly_subscription_cost);
-
-  const card = document.getElementById("upcoming-subs-card");
-  const note = document.getElementById("upcoming-subs-note");
-  if (data.upcoming_subscriptions > 0) {
-    card.style.display = "block";
-    note.textContent = `Önümüzdeki 7 gün içinde ${data.upcoming_subscriptions} abonelik ödemen var.`;
-  } else {
-    card.style.display = "none";
-  }
 }
 
 let currentTxType = "expense";
@@ -1096,6 +1162,8 @@ document.getElementById("add-subscription-form").addEventListener("submit", asyn
 async function loadSubscriptions() {
   const subscriptions = await apiRead("/subscriptions");
   if (!subscriptions) return;
+  cachedSubscriptions = subscriptions;
+  renderAlerts();
   const list = document.getElementById("subscriptions-list");
   const empty = document.getElementById("subscriptions-empty");
   list.innerHTML = "";
@@ -1276,6 +1344,8 @@ document.getElementById("add-card-form").addEventListener("submit", async (e) =>
 async function loadCards() {
   const cards = await apiRead("/credit-cards");
   if (!cards) return;
+  cachedCreditCards = cards;
+  renderAlerts();
   const list = document.getElementById("cards-list");
   const empty = document.getElementById("cards-empty");
   list.innerHTML = "";
@@ -1500,6 +1570,8 @@ document.getElementById("add-budget-form").addEventListener("submit", async (e) 
 async function loadBudgets() {
   const budgets = await apiRead("/budgets");
   if (!budgets) return;
+  cachedBudgets = budgets;
+  renderAlerts();
   const list = document.getElementById("budgets-list");
   const empty = document.getElementById("budgets-empty");
   list.innerHTML = "";
