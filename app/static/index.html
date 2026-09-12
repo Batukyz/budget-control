@@ -598,6 +598,20 @@
           <button type="submit" class="btn-primary" id="account-submit-btn">Kaydet</button>
         </form>
       </div>
+
+      <div class="card">
+        <div class="section-title">Yedekleme</div>
+        <div class="entry-meta" style="margin-bottom:14px;">
+          Tüm işlem, abonelik, sabit işlem, kredi kartı, kategori ve bütçe verilerini tek bir dosyada yedekle veya geri yükle.
+        </div>
+        <div class="form-actions-row">
+          <button type="button" class="btn-ghost" id="export-backup-btn">⬇️ Yedeği indir</button>
+          <label class="btn-ghost" style="cursor:pointer; margin:0;">
+            ⬆️ Yedekten geri yükle
+            <input type="file" id="import-backup-input" accept=".json" style="display:none">
+          </label>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1683,6 +1697,62 @@ async function loadBudgets() {
     list.appendChild(row);
   }
 }
+
+document.getElementById("export-backup-btn").addEventListener("click", async () => {
+  try {
+    const response = await apiFetch("/account/export");
+    if (!response.ok) {
+      showToast(await extractErrorMessage(response));
+      return;
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `butce_yedek_${todayIsoDate()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    showToast(err.message || "Bağlantı hatası.");
+  }
+});
+
+document.getElementById("import-backup-input").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const backup = JSON.parse(await file.text());
+    const response = await apiFetch("/account/import", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(backup),
+    });
+    if (!response.ok) {
+      showToast(await extractErrorMessage(response));
+      return;
+    }
+    const result = await response.json();
+    showToast(
+      `Geri yüklendi: ${result.transactions} işlem, ${result.subscriptions} abonelik, ${result.recurring_transactions} sabit işlem, ${result.credit_cards} kart, ${result.categories} kategori, ${result.budgets} bütçe.`,
+      "success"
+    );
+    loadTransactions();
+    loadOverview();
+    loadSubscriptions();
+    loadRecurring();
+    loadCards();
+    loadCategories();
+    loadBudgets();
+    loadCategoryChart();
+    loadTrendChart();
+  } catch (err) {
+    showToast(err.message || "Geçersiz yedek dosyası.");
+  } finally {
+    e.target.value = "";
+  }
+});
 
 async function loadAccount() {
   const me = await apiRead("/me");

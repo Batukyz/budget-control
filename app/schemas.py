@@ -261,3 +261,72 @@ class CreditCardOut(BaseModel):
     available_limit: float
     next_statement_date: date
     next_due_date: date
+
+
+class AccountBackupTransaction(BaseModel):
+    amount: float = Field(gt=0)
+    type: TransactionType
+    category: Optional[str] = Field(default=None, max_length=100)
+    note: Optional[str] = Field(default=None, max_length=1000)
+    occurred_on: date
+
+
+class AccountBackupSubscription(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    amount: float = Field(gt=0)
+    billing_cycle: BillingCycle = "monthly"
+    next_due_date: date
+    category: Optional[str] = Field(default=None, max_length=100)
+    note: Optional[str] = Field(default=None, max_length=1000)
+    is_active: bool = True
+    last_paid_date: Optional[date] = None
+
+
+class AccountBackupRecurringTransaction(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    amount: float = Field(gt=0)
+    type: TransactionType
+    frequency: BillingCycle = "monthly"
+    next_due_date: date
+    category: Optional[str] = Field(default=None, max_length=100)
+    note: Optional[str] = Field(default=None, max_length=1000)
+    is_active: bool = True
+
+
+class AccountBackupCreditCard(BaseModel):
+    bank_name: str = Field(min_length=1, max_length=200)
+    card_name: Optional[str] = Field(default=None, max_length=200)
+    limit_amount: float = Field(gt=0)
+    current_debt: float = Field(default=0, ge=0)
+    statement_day: int = Field(ge=1, le=31)
+    due_day: int = Field(ge=1, le=31)
+    note: Optional[str] = Field(default=None, max_length=1000)
+
+
+class AccountBackupCategory(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    type: CategoryType = "both"
+
+
+class AccountBackupBudget(BaseModel):
+    category: Optional[str] = Field(default=None, max_length=100)
+    monthly_limit: float = Field(gt=0)
+
+
+class AccountBackup(BaseModel):
+    exported_at: Optional[datetime] = None
+    transactions: list[AccountBackupTransaction] = []
+    subscriptions: list[AccountBackupSubscription] = []
+    recurring_transactions: list[AccountBackupRecurringTransaction] = []
+    credit_cards: list[AccountBackupCreditCard] = []
+    categories: list[AccountBackupCategory] = []
+    budgets: list[AccountBackupBudget] = []
+
+
+class AccountImportResult(BaseModel):
+    transactions: int
+    subscriptions: int
+    recurring_transactions: int
+    credit_cards: int
+    categories: int
+    budgets: int

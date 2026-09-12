@@ -1,7 +1,7 @@
 import calendar
 import csv
 import io
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -1033,3 +1033,121 @@ def delete_credit_card(
     )
     db.delete(card)
     db.commit()
+
+
+@app.get("/account/export", response_model=schemas.AccountBackup)
+def export_account(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    owner_id = current_user.id
+    transactions = db.query(models.Transaction).filter(models.Transaction.owner_id == owner_id).all()
+    subscriptions = db.query(models.Subscription).filter(models.Subscription.owner_id == owner_id).all()
+    recurring = db.query(models.RecurringTransaction).filter(models.RecurringTransaction.owner_id == owner_id).all()
+    cards = db.query(models.CreditCard).filter(models.CreditCard.owner_id == owner_id).all()
+    categories = db.query(models.Category).filter(models.Category.owner_id == owner_id).all()
+    budgets = db.query(models.BudgetLimit).filter(models.BudgetLimit.owner_id == owner_id).all()
+
+    return schemas.AccountBackup(
+        exported_at=datetime.utcnow(),
+        transactions=[
+            schemas.AccountBackupTransaction(
+                amount=t.amount, type=t.type, category=t.category, note=t.note, occurred_on=t.occurred_on
+            )
+            for t in transactions
+        ],
+        subscriptions=[
+            schemas.AccountBackupSubscription(
+                name=s.name,
+                amount=s.amount,
+                billing_cycle=s.billing_cycle,
+                next_due_date=s.next_due_date,
+                category=s.category,
+                note=s.note,
+                is_active=s.is_active,
+                last_paid_date=s.last_paid_date,
+            )
+            for s in subscriptions
+        ],
+        recurring_transactions=[
+            schemas.AccountBackupRecurringTransaction(
+                name=r.name,
+                amount=r.amount,
+                type=r.type,
+                frequency=r.frequency,
+                next_due_date=r.next_due_date,
+                category=r.category,
+                note=r.note,
+                is_active=r.is_active,
+            )
+            for r in recurring
+        ],
+        credit_cards=[
+            schemas.AccountBackupCreditCard(
+                bank_name=c.bank_name,
+                card_name=c.card_name,
+                limit_amount=c.limit_amount,
+                current_debt=c.current_debt,
+                statement_day=c.statement_day,
+                due_day=c.due_day,
+                note=c.note,
+            )
+            for c in cards
+        ],
+        categories=[schemas.AccountBackupCategory(name=cat.name, type=cat.type) for cat in categories],
+        budgets=[schemas.AccountBackupBudget(category=b.category, monthly_limit=b.monthly_limit) for b in budgets],
+    )
+
+
+@app.post("/account/import", response_model=schemas.AccountImportResult)
+def import_account(
+    payload: schemas.AccountBackup,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    owner_id = current_user.id
+
+    for t in payload.transactions:
+        db.add(models.Transaction(owner_id=owner_id, **t.model_dump()))
+    for s in payload.subscriptions:
+        db.add(models.Subscription(owner_id=owner_id, **s.model_dump()))
+    for r in payload.recurring_transactions:
+        db.add(models.RecurringTransaction(owner_id=owner_id, **r.model_dump()))
+    for c in payload.credit_cards:
+        db.add(models.CreditCard(owner_id=owner_id, **c.model_dump()))
+
+    existing_category_names = {
+        _normalize_category(c.name)
+        for c in db.query(models.Category).filter(models.Category.owner_id == owner_id).all()
+    }
+    categories_created = 0
+    for cat in payload.categories:
+        key = _normalize_category(cat.name)
+        if key in existing_category_names:
+            continue
+        existing_category_names.add(key)
+        db.add(models.Category(owner_id=owner_id, **cat.model_dump()))
+        categories_created += 1
+
+    existing_budget_categories = {
+        _normalize_category(b.category)
+        for b in db.query(models.BudgetLimit).filter(models.BudgetLimit.owner_id == owner_id).all()
+    }
+    budgets_created = 0
+    for b in payload.budgets:
+        key = _normalize_category(b.category)
+        if key in existing_budget_categories:
+            continue
+        existing_budget_categories.add(key)
+        db.add(models.BudgetLimit(owner_id=owner_id, **b.model_dump()))
+        budgets_created += 1
+
+    db.commit()
+    return schemas.AccountImportResult(
+        transactions=len(payload.transactions),
+        subscriptions=len(payload.subscriptions),
+        recurring_transactions=len(payload.recurring_transactions),
+        credit_cards=len(payload.credit_cards),
+        categories=categories_created,
+        budgets=budgets_created,
+    )
