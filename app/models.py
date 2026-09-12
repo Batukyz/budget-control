@@ -39,6 +39,7 @@ class Transaction(Base):
     recurring_transaction_id = Column(
         Integer, ForeignKey("recurring_transactions.id"), nullable=True
     )
+    credit_card_id = Column(Integer, ForeignKey("credit_cards.id"), nullable=True)
 
     owner = relationship("User", back_populates="transactions")
 

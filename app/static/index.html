@@ -420,6 +420,9 @@
             </select>
           </div>
           <input type="text" id="tx-category" list="category-datalist" placeholder="Kategori (örn. Market, Ulaşım)">
+          <select id="tx-credit-card" style="display:none">
+            <option value="">Krediye bağlama</option>
+          </select>
           <textarea id="tx-note" placeholder="Not (opsiyonel)"></textarea>
           <div class="form-actions-row">
             <button type="submit" class="btn-primary" id="tx-submit-btn">Ekle</button>
@@ -878,6 +881,27 @@ async function loadOverview() {
   document.getElementById("overview-subs").textContent = formatMoney(data.monthly_subscription_cost);
 }
 
+function updateCreditCardFieldVisibility() {
+  const show = currentTxType === "expense" && currentTxNature === "variable";
+  const select = document.getElementById("tx-credit-card");
+  select.style.display = show ? "block" : "none";
+  if (!show) select.value = "";
+}
+
+function populateCreditCardSelect(cards) {
+  const select = document.getElementById("tx-credit-card");
+  const current = select.value;
+  select.innerHTML =
+    '<option value="">Krediye bağlama</option>' +
+    cards
+      .map((c) => {
+        const title = c.card_name ? `${c.bank_name} · ${c.card_name}` : c.bank_name;
+        return `<option value="${c.id}">${escapeHtml(title)}</option>`;
+      })
+      .join("");
+  select.value = cards.some((c) => String(c.id) === current) ? current : "";
+}
+
 let currentTxType = "expense";
 document.getElementById("type-expense-btn").addEventListener("click", () => setTxType("expense"));
 document.getElementById("type-income-btn").addEventListener("click", () => setTxType("income"));
@@ -885,6 +909,7 @@ function setTxType(type) {
   currentTxType = type;
   document.getElementById("type-expense-btn").classList.toggle("active", type === "expense");
   document.getElementById("type-income-btn").classList.toggle("active", type === "income");
+  updateCreditCardFieldVisibility();
 }
 
 let currentTxNature = "variable"; // "variable" | "fixed"
@@ -896,6 +921,7 @@ function setTxNature(nature) {
   document.getElementById("nature-fixed-btn").classList.toggle("active", nature === "fixed");
   document.getElementById("tx-fixed-fields").style.display = nature === "fixed" ? "flex" : "none";
   document.getElementById("tx-name").required = nature === "fixed";
+  updateCreditCardFieldVisibility();
 }
 
 let editingTxId = null;
@@ -914,6 +940,7 @@ function setTxFormMode(tx) {
     document.getElementById("tx-date").value = tx.occurred_on;
     document.getElementById("tx-category").value = tx.category || "";
     document.getElementById("tx-note").value = tx.note || "";
+    document.getElementById("tx-credit-card").value = tx.credit_card_id || "";
   } else {
     document.getElementById("add-transaction-form").reset();
     document.getElementById("tx-date").value = todayIsoDate();
@@ -963,16 +990,19 @@ document.getElementById("add-transaction-form").addEventListener("submit", async
     if (ok) loadRecurring();
   } else {
     const occurred_on = document.getElementById("tx-date").value || todayIsoDate();
+    const creditCardValue = document.getElementById("tx-credit-card").value;
+    const credit_card_id = creditCardValue ? parseInt(creditCardValue, 10) : null;
     const isEdit = editingTxId !== null;
     ok = await apiWrite(
       isEdit ? `/transactions/${editingTxId}` : "/transactions",
       {
         method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount, type: currentTxType, category, note, occurred_on }),
+        body: JSON.stringify({ amount, type: currentTxType, category, note, occurred_on, credit_card_id }),
       },
       isEdit ? "İşlem güncellendi." : null
     );
+    if (ok) loadCards();
   }
   submitBtn.disabled = false;
   if (!ok) return;
@@ -1021,6 +1051,10 @@ function renderTransactionsList(transactions) {
     const metaParts = [formatDateTr(tx.occurred_on)];
     if (tx.category) metaParts.push(escapeHtml(tx.category));
     if (tx.recurring_transaction_id) metaParts.push("🔁 Sabit");
+    if (tx.credit_card_id) {
+      const card = cachedCreditCards.find((c) => c.id === tx.credit_card_id);
+      metaParts.push(`💳 ${card ? escapeHtml(card.bank_name) : "kredi kartı"}`);
+    }
     row.innerHTML = `
       <div>
         <div class="entry-title">${tx.note ? escapeHtml(tx.note) : (tx.category ? escapeHtml(tx.category) : (tx.type === "income" ? "Gelir" : "Gider"))}</div>
@@ -1047,6 +1081,7 @@ function renderTransactionsList(transactions) {
       loadCategoryChart();
       loadTrendChart();
       loadBudgets();
+      loadCards();
     });
     list.appendChild(row);
   }
@@ -1374,6 +1409,7 @@ async function loadCards() {
   }
   cachedCreditCards = cards;
   renderAlerts();
+  populateCreditCardSelect(cards);
   const list = document.getElementById("cards-list");
   const empty = document.getElementById("cards-empty");
   list.innerHTML = "";

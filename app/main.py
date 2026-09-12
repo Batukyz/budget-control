@@ -129,6 +129,14 @@ def _get_owned_transaction(transaction_id: int, owner_id: int, db: Session) -> m
     return transaction
 
 
+def _adjust_card_debt(db: Session, card_id: int, delta: float) -> None:
+    """Nudges a credit card's current_debt by delta (never below zero) to keep it in
+    sync with the expense transactions charged to it."""
+    card = db.query(models.CreditCard).filter(models.CreditCard.id == card_id).first()
+    if card is not None:
+        card.current_debt = max(0.0, card.current_debt + delta)
+
+
 def _advance_by_cycle(d: date, frequency: str) -> date:
     if frequency == "weekly":
         return d + timedelta(days=7)
@@ -184,6 +192,11 @@ def create_transaction(
     data = payload.model_dump()
     if data["occurred_on"] is None:
         data["occurred_on"] = date.today()
+    if data["credit_card_id"] is not None:
+        if data["type"] != "expense":
+            raise HTTPException(status_code=400, detail="Sadece gider işlemleri bir krediye bağlanabilir")
+        card = _get_owned_credit_card(data["credit_card_id"], current_user.id, db)
+        card.current_debt += data["amount"]
     transaction = models.Transaction(owner_id=current_user.id, **data)
     db.add(transaction)
     db.commit()
@@ -330,8 +343,29 @@ def update_transaction(
     current_user: models.User = Depends(get_current_user),
 ):
     transaction = _get_owned_transaction(transaction_id, current_user.id, db)
-    for field, value in update.model_dump(exclude_unset=True).items():
+    updates = update.model_dump(exclude_unset=True)
+
+    new_type = updates.get("type", transaction.type)
+    new_amount = updates.get("amount", transaction.amount)
+    new_card_id = updates.get("credit_card_id", transaction.credit_card_id)
+    if new_card_id is not None and new_type != "expense":
+        raise HTTPException(status_code=400, detail="Sadece gider işlemleri bir krediye bağlanabilir")
+
+    new_card = _get_owned_credit_card(new_card_id, current_user.id, db) if new_card_id is not None else None
+    old_card_id = transaction.credit_card_id
+    old_amount = transaction.amount
+
+    for field, value in updates.items():
         setattr(transaction, field, value)
+
+    if old_card_id != new_card_id:
+        if old_card_id is not None:
+            _adjust_card_debt(db, old_card_id, -old_amount)
+        if new_card is not None:
+            new_card.current_debt += new_amount
+    elif new_card is not None and new_amount != old_amount:
+        new_card.current_debt = max(0.0, new_card.current_debt + (new_amount - old_amount))
+
     db.commit()
     db.refresh(transaction)
     return transaction
@@ -344,6 +378,8 @@ def delete_transaction(
     current_user: models.User = Depends(get_current_user),
 ):
     transaction = _get_owned_transaction(transaction_id, current_user.id, db)
+    if transaction.credit_card_id is not None:
+        _adjust_card_debt(db, transaction.credit_card_id, -transaction.amount)
     db.delete(transaction)
     db.commit()
 
@@ -992,5 +1028,8 @@ def delete_credit_card(
     current_user: models.User = Depends(get_current_user),
 ):
     card = _get_owned_credit_card(card_id, current_user.id, db)
+    db.query(models.Transaction).filter(models.Transaction.credit_card_id == card.id).update(
+        {"credit_card_id": None}
+    )
     db.delete(card)
     db.commit()

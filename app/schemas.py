@@ -49,6 +49,7 @@ class TransactionCreate(BaseModel):
     category: Optional[str] = Field(default=None, max_length=100)
     note: Optional[str] = Field(default=None, max_length=1000)
     occurred_on: Optional[date] = None
+    credit_card_id: Optional[int] = None
 
 
 class TransactionUpdate(BaseModel):
@@ -57,6 +58,7 @@ class TransactionUpdate(BaseModel):
     category: Optional[str] = Field(default=None, max_length=100)
     note: Optional[str] = Field(default=None, max_length=1000)
     occurred_on: Optional[date] = None
+    credit_card_id: Optional[int] = None
 
 
 class TransactionOut(BaseModel):
@@ -70,6 +72,7 @@ class TransactionOut(BaseModel):
     occurred_on: date
     created_at: datetime
     recurring_transaction_id: Optional[int] = None
+    credit_card_id: Optional[int] = None
 
 
 class TransactionImportResult(BaseModel):
