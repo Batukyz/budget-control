@@ -4,7 +4,7 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
@@ -13,7 +13,10 @@ from .database import get_db
 from .logging_config import logger
 
 _DEV_SECRET_KEY = "dev-secret-key-change-in-production"
+APP_ENV = os.environ.get("APP_ENV", "development").lower()
 SECRET_KEY = os.environ.get("SECRET_KEY") or _DEV_SECRET_KEY
+if APP_ENV in {"production", "prod"} and SECRET_KEY == _DEV_SECRET_KEY:
+    raise RuntimeError("SECRET_KEY must be set when APP_ENV=production")
 if SECRET_KEY == _DEV_SECRET_KEY:
     logger.warning(
         "SECRET_KEY ortam değişkeni ayarlanmamış; geliştirme amaçlı varsayılan anahtar kullanılıyor. "
@@ -24,7 +27,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 30
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
 
 def create_access_token(subject: str) -> str:
@@ -32,13 +35,18 @@ def create_access_token(subject: str) -> str:
     return jwt.encode({"sub": subject, "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> models.User:
+def get_current_user(
+    request: Request, token: str | None = Depends(oauth2_scheme), db: Session = Depends(get_db)
+) -> models.User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    token = token or request.cookies.get("access_token")
     try:
+        if not token:
+            raise credentials_exception
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email = payload.get("sub")
         if email is None:

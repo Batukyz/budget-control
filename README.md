@@ -11,13 +11,28 @@ Kişisel bütçe, gider ve abonelik takibi için FastAPI tabanlı bir API + basi
 
 ## Kurulum
 
-```bash
+PowerShell:
+
+```powershell
 python -m venv venv
-source venv/Scripts/activate  # Windows (Git Bash)
+.\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 alembic upgrade head
 uvicorn app.main:app --reload
 ```
+
+Git Bash:
+
+```bash
+source venv/Scripts/activate
+pip install -r requirements.txt
+alembic upgrade head
+uvicorn app.main:app --reload
+```
+
+VarsayÄ±lan veritabanÄ± proje kÃ¶kÃ¼ndeki SQLite `budget.db` dosyasÄ±dÄ±r. FarklÄ± bir
+SQLAlchemy baÄŸlantÄ±sÄ± iÃ§in `DATABASE_URL` kullanÄ±labilir. CanlÄ± ortamda `APP_ENV=production`
+ve rastgele, gizli bir `SECRET_KEY` tanÄ±mlamak zorunludur.
 
 Uygulama arayüzü: `http://127.0.0.1:8000/app/`
 

@@ -104,6 +104,33 @@ def test_export_then_import_round_trip_preserves_counts(client):
     assert result.json()["subscriptions"] == 1
     # importing on top doubles transactions (no dedup for those) but not categories/budgets
     assert len(client.get("/transactions").json()) == 2
+    repeat = client.post("/account/import", json=backup)
+    assert repeat.json()["transactions"] == 0
+    assert len(client.get("/transactions").json()) == 2
+
+
+def test_backup_restores_credit_card_and_recurring_transaction_links(client):
+    card = client.post(
+        "/credit-cards", json={"bank_name": "Bank", "limit_amount": 1000, "statement_day": 5, "due_day": 20}
+    ).json()
+    recurring = client.post(
+        "/recurring-transactions", json={"name": "Rent", "amount": 100, "type": "expense", "next_due_date": IN_3_DAYS}
+    ).json()
+    client.post(
+        "/transactions",
+        json={"amount": 50, "type": "expense", "occurred_on": TODAY, "credit_card_id": card["id"]},
+    )
+    client.put(f"/recurring-transactions/{recurring['id']}", json={"next_due_date": TODAY})
+    client.post("/recurring-transactions/process-due")
+    backup = client.get("/account/export").json()
+    target = client.post("/auth/register", json={"email": "restore@example.com", "password": "testpassword123"})
+    assert target.status_code == 201
+    login = client.post("/auth/login", data={"username": "restore@example.com", "password": "testpassword123"}).json()
+    client.headers["Authorization"] = f"Bearer {login['access_token']}"
+    assert client.post("/account/import", json=backup).status_code == 200
+    restored = client.get("/transactions").json()
+    assert any(t["credit_card_id"] is not None for t in restored)
+    assert any(t["recurring_transaction_id"] is not None for t in restored)
 
 
 def test_import_does_not_leak_across_owners(make_authed_client):

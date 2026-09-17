@@ -26,7 +26,13 @@ class Transaction(Base):
     """A single income or expense entry."""
 
     __tablename__ = "transactions"
-    __table_args__ = (Index("ix_transactions_owner_occurred", "owner_id", "occurred_on"),)
+    __table_args__ = (
+        Index("ix_transactions_owner_occurred", "owner_id", "occurred_on"),
+        UniqueConstraint(
+            "owner_id", "recurring_transaction_id", "occurred_on",
+            name="uq_transactions_recurring_occurrence",
+        ),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -152,4 +158,16 @@ class RefreshToken(Base):
     token_hash = Column(String, unique=True, index=True, nullable=False)
     expires_at = Column(DateTime, nullable=False)
     revoked = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class BackupImport(Base):
+    """A successfully imported backup fingerprint, used to make restore idempotent."""
+
+    __tablename__ = "backup_imports"
+    __table_args__ = (UniqueConstraint("owner_id", "fingerprint", name="uq_backup_import_owner_fingerprint"),)
+
+    id = Column(Integer, primary_key=True)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    fingerprint = Column(String(64), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

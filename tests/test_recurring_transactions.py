@@ -156,3 +156,18 @@ def test_list_recurring_transactions_filters_by_active_status(client):
     response = client.get("/recurring-transactions", params={"is_active": True})
     names = [r["name"] for r in response.json()]
     assert names == ["Active"]
+
+
+def test_processing_due_transactions_is_an_explicit_idempotent_write(client):
+    recurring = client.post(
+        "/recurring-transactions",
+        json={"name": "Kira", "amount": 100, "type": "expense", "next_due_date": IN_3_DAYS},
+    ).json()
+    client.put(f"/recurring-transactions/{recurring['id']}", json={"next_due_date": TODAY.isoformat()})
+
+    assert client.get("/transactions").json() == []
+    first = client.post("/recurring-transactions/process-due")
+    assert first.status_code == 200
+    assert first.json()["created"] == 1
+    assert client.post("/recurring-transactions/process-due").json()["created"] == 0
+    assert len(client.get("/transactions").json()) == 1

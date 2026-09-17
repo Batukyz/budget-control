@@ -625,14 +625,12 @@
 const API = "";
 
 function getTokens() {
-  return {
-    access: localStorage.getItem("access_token"),
-    refresh: localStorage.getItem("refresh_token"),
-  };
+  return { access: null, refresh: null };
 }
 function setTokens(access, refresh) {
-  localStorage.setItem("access_token", access);
-  localStorage.setItem("refresh_token", refresh);
+  // Authentication cookies are HttpOnly and are set by the server.
+  // Remove tokens left behind by earlier versions of the application.
+  clearTokens();
 }
 function clearTokens() {
   localStorage.removeItem("access_token");
@@ -640,12 +638,9 @@ function clearTokens() {
 }
 
 async function tryRefresh() {
-  const { refresh } = getTokens();
-  if (!refresh) return false;
   const response = await fetch(API + "/auth/refresh", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refresh_token: refresh }),
+    credentials: "same-origin",
   });
   if (!response.ok) {
     clearTokens();
@@ -658,15 +653,15 @@ async function tryRefresh() {
 
 async function apiFetch(path, options = {}) {
   const { access } = getTokens();
-  options.headers = Object.assign({}, options.headers, {
-    Authorization: `Bearer ${access}`,
-  });
+  options.headers = Object.assign({}, options.headers);
+  if (access) options.headers.Authorization = `Bearer ${access}`;
+  options.credentials = "same-origin";
   let response = await fetch(API + path, options);
   if (response.status === 401) {
     const refreshed = await tryRefresh();
     if (refreshed) {
       const { access: newAccess } = getTokens();
-      options.headers.Authorization = `Bearer ${newAccess}`;
+      if (newAccess) options.headers.Authorization = `Bearer ${newAccess}`;
       response = await fetch(API + path, options);
     } else {
       showLogin();
@@ -793,7 +788,7 @@ function showLogin() {
   document.getElementById("login-view").style.display = "block";
 }
 
-function showApp() {
+async function showApp() {
   document.getElementById("login-view").style.display = "none";
   document.getElementById("app-view").style.display = "block";
   setActiveTab("overview");
@@ -820,6 +815,11 @@ function showApp() {
   const budgetsEmpty = document.getElementById("budgets-empty");
   budgetsEmpty.textContent = "Yükleniyor…";
   budgetsEmpty.style.display = "block";
+  try {
+    await apiFetch("/recurring-transactions/process-due", { method: "POST" });
+  } catch (_) {
+    // Individual data loads below display their own retry messages.
+  }
   loadOverview();
   loadTransactions();
   loadSubscriptions();
@@ -1844,24 +1844,12 @@ document.getElementById("register-form").addEventListener("submit", async (e) =>
 });
 
 document.getElementById("logout-btn").addEventListener("click", async () => {
-  const { refresh } = getTokens();
-  if (refresh) {
-    await fetch(API + "/auth/logout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh_token: refresh }),
-    });
-  }
+  await fetch(API + "/auth/logout", { method: "POST", credentials: "same-origin" });
   showLogin();
 });
 
 (async function init() {
-  const { access } = getTokens();
-  if (!access) {
-    showLogin();
-    return;
-  }
-  const response = await fetch(API + "/me", { headers: { Authorization: `Bearer ${access}` } });
+  const response = await fetch(API + "/me", { credentials: "same-origin" });
   if (response.ok) {
     showApp();
   } else {

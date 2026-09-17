@@ -1,21 +1,25 @@
 import calendar
 import csv
+import hashlib
 import io
+import json
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
-from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, Response, UploadFile
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from . import models, schemas
 from .auth import (
+    APP_ENV,
     create_access_token,
     create_refresh_token,
     get_current_user,
@@ -43,8 +47,30 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 
 
 @app.get("/health")
-def health():
+def health(db: Session = Depends(get_db)):
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception as exc:
+        logger.exception("Health check database failure")
+        raise HTTPException(status_code=503, detail="Database unavailable") from exc
     return {"status": "ok"}
+
+
+def _set_auth_cookies(response: Response, access_token: str, refresh_token: str) -> None:
+    """Keep browser credentials out of JavaScript while retaining API token compatibility."""
+    common = {
+        "httponly": True,
+        "secure": APP_ENV in {"production", "prod"},
+        "samesite": "lax",
+        "path": "/",
+    }
+    response.set_cookie("access_token", access_token, max_age=30 * 60, **common)
+    response.set_cookie("refresh_token", refresh_token, max_age=30 * 24 * 60 * 60, **common)
+
+
+def _clear_auth_cookies(response: Response) -> None:
+    response.delete_cookie("access_token", path="/")
+    response.delete_cookie("refresh_token", path="/")
 
 
 @app.post("/auth/register", response_model=schemas.UserOut, status_code=201)
@@ -64,31 +90,48 @@ def register(request: Request, user: schemas.UserCreate, db: Session = Depends(g
 @limiter.limit("5/minute")
 def login(
     request: Request,
+    response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
     user = db.query(models.User).filter(models.User.email == form_data.username).first()
     if user is None or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
-    return schemas.Token(
-        access_token=create_access_token(subject=user.email),
-        refresh_token=create_refresh_token(user_id=user.id, db=db),
-    )
+    access_token = create_access_token(subject=user.email)
+    refresh_token = create_refresh_token(user_id=user.id, db=db)
+    _set_auth_cookies(response, access_token, refresh_token)
+    return schemas.Token(access_token=access_token, refresh_token=refresh_token)
 
 
 @app.post("/auth/refresh", response_model=schemas.Token)
-def refresh(payload: schemas.RefreshRequest, db: Session = Depends(get_db)):
-    user = use_refresh_token(payload.refresh_token, db)
-    revoke_refresh_token(payload.refresh_token, db)
-    return schemas.Token(
-        access_token=create_access_token(subject=user.email),
-        refresh_token=create_refresh_token(user_id=user.id, db=db),
-    )
+def refresh(
+    request: Request,
+    response: Response,
+    payload: Optional[schemas.RefreshRequest] = None,
+    db: Session = Depends(get_db),
+):
+    raw_token = (payload.refresh_token if payload is not None else None) or request.cookies.get("refresh_token")
+    if not raw_token:
+        raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
+    user = use_refresh_token(raw_token, db)
+    revoke_refresh_token(raw_token, db)
+    access_token = create_access_token(subject=user.email)
+    refresh_token = create_refresh_token(user_id=user.id, db=db)
+    _set_auth_cookies(response, access_token, refresh_token)
+    return schemas.Token(access_token=access_token, refresh_token=refresh_token)
 
 
 @app.post("/auth/logout", status_code=204)
-def logout(payload: schemas.LogoutRequest, db: Session = Depends(get_db)):
-    revoke_refresh_token(payload.refresh_token, db)
+def logout(
+    request: Request,
+    response: Response,
+    payload: Optional[schemas.LogoutRequest] = None,
+    db: Session = Depends(get_db),
+):
+    raw_token = (payload.refresh_token if payload is not None else None) or request.cookies.get("refresh_token")
+    if raw_token:
+        revoke_refresh_token(raw_token, db)
+    _clear_auth_cookies(response)
 
 
 @app.get("/me", response_model=schemas.UserOut)
@@ -151,7 +194,7 @@ def _advance_by_cycle(d: date, frequency: str) -> date:
     return date(year, month, day)
 
 
-def _process_due_recurring_transactions(db: Session, owner_id: int) -> None:
+def _process_due_recurring_transactions(db: Session, owner_id: int) -> int:
     today = date.today()
     due = (
         db.query(models.RecurringTransaction)
@@ -163,24 +206,28 @@ def _process_due_recurring_transactions(db: Session, owner_id: int) -> None:
         .all()
     )
     if not due:
-        return
+        return 0
+    created = 0
     for recurring in due:
         for _ in range(500):  # safety cap against pathological/infinite loops
             if recurring.next_due_date > today:
                 break
-            db.add(
-                models.Transaction(
-                    owner_id=owner_id,
-                    amount=recurring.amount,
-                    type=recurring.type,
-                    category=recurring.category,
-                    note=recurring.note or recurring.name,
-                    occurred_on=recurring.next_due_date,
-                    recurring_transaction_id=recurring.id,
-                )
-            )
+            occurrence_date = recurring.next_due_date
+            exists = db.query(models.Transaction.id).filter(
+                models.Transaction.owner_id == owner_id,
+                models.Transaction.recurring_transaction_id == recurring.id,
+                models.Transaction.occurred_on == occurrence_date,
+            ).first()
+            if not exists:
+                db.add(models.Transaction(
+                    owner_id=owner_id, amount=recurring.amount, type=recurring.type,
+                    category=recurring.category, note=recurring.note or recurring.name,
+                    occurred_on=occurrence_date, recurring_transaction_id=recurring.id,
+                ))
+                created += 1
             recurring.next_due_date = _advance_by_cycle(recurring.next_due_date, recurring.frequency)
     db.commit()
+    return created
 
 
 @app.post("/transactions", response_model=schemas.TransactionOut, status_code=201)
@@ -216,7 +263,6 @@ def list_transactions(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
 ):
-    _process_due_recurring_transactions(db, current_user.id)
     query = db.query(models.Transaction).filter(models.Transaction.owner_id == current_user.id)
     if type is not None:
         query = query.filter(models.Transaction.type == type)
@@ -418,11 +464,17 @@ def list_recurring_transactions(
     current_user: models.User = Depends(get_current_user),
     is_active: Optional[bool] = None,
 ):
-    _process_due_recurring_transactions(db, current_user.id)
     query = db.query(models.RecurringTransaction).filter(models.RecurringTransaction.owner_id == current_user.id)
     if is_active is not None:
         query = query.filter(models.RecurringTransaction.is_active == is_active)
     return query.order_by(models.RecurringTransaction.next_due_date.asc()).all()
+
+
+@app.post("/recurring-transactions/process-due", response_model=schemas.RecurringProcessResult)
+def process_due_recurring_transactions(
+    db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)
+):
+    return schemas.RecurringProcessResult(created=_process_due_recurring_transactions(db, current_user.id))
 
 
 @app.get("/recurring-transactions/{recurring_id}", response_model=schemas.RecurringTransactionOut)
@@ -638,7 +690,6 @@ def get_overview(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    _process_due_recurring_transactions(db, current_user.id)
     today = date.today()
     month_start = today.replace(day=1)
 
@@ -864,14 +915,18 @@ def create_category(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
+    name = payload.name.strip()
     existing = (
         db.query(models.Category)
-        .filter(models.Category.owner_id == current_user.id, models.Category.name == payload.name)
+        .filter(
+            models.Category.owner_id == current_user.id,
+            func.lower(func.trim(models.Category.name)) == _normalize_category(name),
+        )
         .first()
     )
     if existing is not None:
         raise HTTPException(status_code=400, detail="Bu isimde bir kategori zaten var")
-    category = models.Category(owner_id=current_user.id, **payload.model_dump())
+    category = models.Category(owner_id=current_user.id, name=name, type=payload.type)
     db.add(category)
     db.commit()
     db.refresh(category)
@@ -899,19 +954,40 @@ def update_category(
     current_user: models.User = Depends(get_current_user),
 ):
     category = _get_owned_category(category_id, current_user.id, db)
-    if update.name is not None and update.name != category.name:
+    new_name = update.name.strip() if update.name is not None else None
+    if new_name is not None and new_name != category.name:
         existing = (
             db.query(models.Category)
             .filter(
                 models.Category.owner_id == current_user.id,
-                models.Category.name == update.name,
+                func.lower(func.trim(models.Category.name)) == _normalize_category(new_name),
                 models.Category.id != category_id,
             )
             .first()
         )
         if existing is not None:
             raise HTTPException(status_code=400, detail="Bu isimde bir kategori zaten var")
-    for field, value in update.model_dump(exclude_unset=True).items():
+        old_key = _normalize_category(category.name)
+        category_key = func.lower(func.trim(models.Transaction.category))
+        db.query(models.Transaction).filter(
+            models.Transaction.owner_id == current_user.id, category_key == old_key
+        ).update({"category": new_name}, synchronize_session=False)
+        db.query(models.Subscription).filter(
+            models.Subscription.owner_id == current_user.id,
+            func.lower(func.trim(models.Subscription.category)) == old_key,
+        ).update({"category": new_name}, synchronize_session=False)
+        db.query(models.RecurringTransaction).filter(
+            models.RecurringTransaction.owner_id == current_user.id,
+            func.lower(func.trim(models.RecurringTransaction.category)) == old_key,
+        ).update({"category": new_name}, synchronize_session=False)
+        db.query(models.BudgetLimit).filter(
+            models.BudgetLimit.owner_id == current_user.id,
+            func.lower(func.trim(models.BudgetLimit.category)) == old_key,
+        ).update({"category": new_name}, synchronize_session=False)
+    updates = update.model_dump(exclude_unset=True)
+    if new_name is not None:
+        updates["name"] = new_name
+    for field, value in updates.items():
         setattr(category, field, value)
     db.commit()
     db.refresh(category)
@@ -1052,7 +1128,9 @@ def export_account(
         exported_at=datetime.utcnow(),
         transactions=[
             schemas.AccountBackupTransaction(
-                amount=t.amount, type=t.type, category=t.category, note=t.note, occurred_on=t.occurred_on
+                source_id=t.id, amount=t.amount, type=t.type, category=t.category, note=t.note,
+                occurred_on=t.occurred_on, credit_card_source_id=t.credit_card_id,
+                recurring_transaction_source_id=t.recurring_transaction_id,
             )
             for t in transactions
         ],
@@ -1071,7 +1149,7 @@ def export_account(
         ],
         recurring_transactions=[
             schemas.AccountBackupRecurringTransaction(
-                name=r.name,
+                source_id=r.id, name=r.name,
                 amount=r.amount,
                 type=r.type,
                 frequency=r.frequency,
@@ -1084,7 +1162,7 @@ def export_account(
         ],
         credit_cards=[
             schemas.AccountBackupCreditCard(
-                bank_name=c.bank_name,
+                source_id=c.id, bank_name=c.bank_name,
                 card_name=c.card_name,
                 limit_amount=c.limit_amount,
                 current_debt=c.current_debt,
@@ -1106,15 +1184,38 @@ def import_account(
     current_user: models.User = Depends(get_current_user),
 ):
     owner_id = current_user.id
+    canonical = json.dumps(payload.model_dump(mode="json"), sort_keys=True, separators=(",", ":"))
+    fingerprint = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    already_imported = db.query(models.BackupImport).filter(
+        models.BackupImport.owner_id == owner_id, models.BackupImport.fingerprint == fingerprint
+    ).first()
+    if already_imported:
+        return schemas.AccountImportResult(
+            transactions=0, subscriptions=0, recurring_transactions=0,
+            credit_cards=0, categories=0, budgets=0,
+        )
 
+    card_map: dict[int, int] = {}
+    recurring_map: dict[int, int] = {}
+    for c in payload.credit_cards:
+        card = models.CreditCard(owner_id=owner_id, **c.model_dump(exclude={"source_id"}))
+        db.add(card)
+        db.flush()
+        if c.source_id is not None:
+            card_map[c.source_id] = card.id
+    for r in payload.recurring_transactions:
+        recurring = models.RecurringTransaction(owner_id=owner_id, **r.model_dump(exclude={"source_id"}))
+        db.add(recurring)
+        db.flush()
+        if r.source_id is not None:
+            recurring_map[r.source_id] = recurring.id
     for t in payload.transactions:
-        db.add(models.Transaction(owner_id=owner_id, **t.model_dump()))
+        data = t.model_dump(exclude={"source_id", "credit_card_source_id", "recurring_transaction_source_id"})
+        data["credit_card_id"] = card_map.get(t.credit_card_source_id)
+        data["recurring_transaction_id"] = recurring_map.get(t.recurring_transaction_source_id)
+        db.add(models.Transaction(owner_id=owner_id, **data))
     for s in payload.subscriptions:
         db.add(models.Subscription(owner_id=owner_id, **s.model_dump()))
-    for r in payload.recurring_transactions:
-        db.add(models.RecurringTransaction(owner_id=owner_id, **r.model_dump()))
-    for c in payload.credit_cards:
-        db.add(models.CreditCard(owner_id=owner_id, **c.model_dump()))
 
     existing_category_names = {
         _normalize_category(c.name)
@@ -1142,7 +1243,12 @@ def import_account(
         db.add(models.BudgetLimit(owner_id=owner_id, **b.model_dump()))
         budgets_created += 1
 
-    db.commit()
+    db.add(models.BackupImport(owner_id=owner_id, fingerprint=fingerprint))
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Yedek geri yüklenemedi; hiçbir veri değiştirilmedi") from exc
     return schemas.AccountImportResult(
         transactions=len(payload.transactions),
         subscriptions=len(payload.subscriptions),

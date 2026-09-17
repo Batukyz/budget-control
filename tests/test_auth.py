@@ -27,6 +27,18 @@ def test_login(anon_client):
     body = response.json()
     assert "access_token" in body
     assert "refresh_token" in body
+    assert "access_token" in response.headers["set-cookie"]
+    assert "HttpOnly" in response.headers["set-cookie"]
+
+
+def test_cookie_session_authenticates_browser_without_javascript_token(anon_client):
+    anon_client.post(
+        "/auth/register", json={"email": "cookie@example.com", "password": "testpassword123"}
+    )
+    anon_client.post(
+        "/auth/login", data={"username": "cookie@example.com", "password": "testpassword123"}
+    )
+    assert anon_client.get("/me").status_code == 200
 
 
 def test_login_wrong_password(anon_client):
@@ -68,6 +80,16 @@ def test_refresh_token_flow(anon_client):
     # the old refresh token is revoked after use
     reuse = anon_client.post("/auth/refresh", json={"refresh_token": refresh_token})
     assert reuse.status_code == 401
+
+
+def test_refresh_uses_cookie_when_no_token_is_sent_in_json(anon_client):
+    anon_client.post(
+        "/auth/register", json={"email": "refresh-cookie@example.com", "password": "testpassword123"}
+    )
+    anon_client.post(
+        "/auth/login", data={"username": "refresh-cookie@example.com", "password": "testpassword123"}
+    )
+    assert anon_client.post("/auth/refresh").status_code == 200
 
 
 def test_logout_revokes_refresh_token(anon_client):

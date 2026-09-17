@@ -120,6 +120,10 @@ class RecurringTransactionOut(BaseModel):
     created_at: datetime
 
 
+class RecurringProcessResult(BaseModel):
+    created: int
+
+
 class SubscriptionCreate(BaseModel):
     name: str = Field(min_length=1, max_length=200)
     amount: float = Field(gt=0)
@@ -264,11 +268,14 @@ class CreditCardOut(BaseModel):
 
 
 class AccountBackupTransaction(BaseModel):
+    source_id: Optional[int] = None
     amount: float = Field(gt=0)
     type: TransactionType
     category: Optional[str] = Field(default=None, max_length=100)
     note: Optional[str] = Field(default=None, max_length=1000)
     occurred_on: date
+    credit_card_source_id: Optional[int] = None
+    recurring_transaction_source_id: Optional[int] = None
 
 
 class AccountBackupSubscription(BaseModel):
@@ -283,6 +290,7 @@ class AccountBackupSubscription(BaseModel):
 
 
 class AccountBackupRecurringTransaction(BaseModel):
+    source_id: Optional[int] = None
     name: str = Field(min_length=1, max_length=200)
     amount: float = Field(gt=0)
     type: TransactionType
@@ -294,6 +302,7 @@ class AccountBackupRecurringTransaction(BaseModel):
 
 
 class AccountBackupCreditCard(BaseModel):
+    source_id: Optional[int] = None
     bank_name: str = Field(min_length=1, max_length=200)
     card_name: Optional[str] = Field(default=None, max_length=200)
     limit_amount: float = Field(gt=0)

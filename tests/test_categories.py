@@ -38,6 +38,26 @@ def test_update_category(client):
     assert response.json()["type"] == "expense"
 
 
+def test_renaming_category_propagates_to_financial_records(client):
+    category = client.post("/categories", json={"name": "Market"}).json()
+    client.post("/transactions", json={"amount": 10, "type": "expense", "category": " market "})
+    client.post("/subscriptions", json={"name": "S", "amount": 10, "category": "MARKET", "next_due_date": "2030-01-01"})
+    client.post("/recurring-transactions", json={"name": "R", "amount": 10, "type": "expense", "category": "Market", "next_due_date": "2030-01-01"})
+    client.post("/budgets", json={"category": "Market", "monthly_limit": 100})
+
+    assert client.put(f"/categories/{category['id']}", json={"name": "Gıda"}).status_code == 200
+    assert client.get("/transactions").json()[0]["category"] == "Gıda"
+    assert client.get("/subscriptions").json()[0]["category"] == "Gıda"
+    assert client.get("/recurring-transactions").json()[0]["category"] == "Gıda"
+    assert client.get("/budgets").json()[0]["category"] == "Gıda"
+
+
+def test_category_names_are_case_and_whitespace_insensitive(client):
+    client.post("/categories", json={"name": " Market "})
+    response = client.post("/categories", json={"name": "market"})
+    assert response.status_code == 400
+
+
 def test_update_category_rejects_rename_to_existing_name(client):
     client.post("/categories", json={"name": "Market"})
     other = client.post("/categories", json={"name": "Eğlence"}).json()
