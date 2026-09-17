@@ -27,8 +27,14 @@
     --secondary-hover: #c90f3f;
     --danger: #e8114a;
     --danger-hover: #c90f3f;
+    --danger-bg: rgba(232, 17, 74, 0.08);
+    --warning: #f59e0b;
+    --warning-bg: rgba(245, 158, 11, 0.12);
     --success: #4ade80;
+    --success-bg: rgba(74, 222, 128, 0.12);
     --on-success: #0f3d22;
+    --info: #3b82f6;
+    --info-bg: rgba(59, 130, 246, 0.08);
     --gradient: linear-gradient(135deg, var(--accent), #3fae8a);
   }
   [data-theme="dark"] {
@@ -45,8 +51,15 @@
     --secondary-hover: #ff8299;
     --danger: #ff6b85;
     --danger-hover: #ff8299;
+    --danger-bg: rgba(255, 107, 133, 0.12);
+    --warning: #fbbf24;
+    --warning-bg: rgba(251, 191, 36, 0.14);
     --success: #34d399;
+    --success-bg: rgba(52, 211, 153, 0.14);
     --on-success: #0f3d22;
+    --info: #60a5fa;
+    --info-bg: rgba(96, 165, 250, 0.12);
+    --gradient: linear-gradient(135deg, var(--accent), #3fae8a);
   }
   * { box-sizing: border-box; }
   body {
@@ -366,6 +379,424 @@
   .stat-label { color: var(--muted); font-size: 13px; }
   .stat-value { font-weight: 700; font-size: 13px; }
   .section-title { font-weight: 700; font-size: 14px; margin-bottom: 12px; }
+  /* ==========================================================================
+     Dashboard Redesign (Milestone 2) Styles
+     ========================================================================== */
+  
+  /* Hero Card */
+  .dashboard-hero {
+    position: relative;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+  }
+  .hero-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+  .hero-tag {
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .hero-month-title {
+    margin: 3px 0 0;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .hero-badge.positive {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+  .hero-badge.negative {
+    background: var(--danger-bg);
+    color: var(--danger);
+  }
+
+  /* Net Balance Spotlight */
+  .hero-balance-spotlight {
+    margin-bottom: 20px;
+    padding: 4px 0 8px;
+  }
+  .hero-balance-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .hero-balance-value {
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--text);
+  }
+  .hero-balance-value.positive { color: var(--success); }
+  .hero-balance-value.negative { color: var(--danger); }
+
+  /* Income & Expense Split Grid */
+  .hero-split-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .hero-mini-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    transition: transform 0.15s ease;
+  }
+  .mini-card-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .hero-mini-card.income .mini-card-icon-wrap {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+  .hero-mini-card.expense .mini-card-icon-wrap {
+    background: var(--danger-bg);
+    color: var(--danger);
+  }
+  .mini-card-content {
+    min-width: 0;
+    flex: 1;
+  }
+  .mini-card-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .mini-card-value {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mini-card-value.positive { color: var(--success); }
+  .mini-card-value.negative { color: var(--danger); }
+
+  /* Secondary Metrics Grid */
+  .dashboard-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .metric-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.15s ease;
+  }
+  .metric-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .metric-icon {
+    font-size: 15px;
+    line-height: 1;
+  }
+  .metric-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .metric-value {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .metric-subtext {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .metric-progress-track {
+    height: 5px;
+    background: var(--input-bg);
+    border-radius: 3px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  .metric-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+  .metric-progress-fill.warning { background: var(--warning); }
+  .metric-progress-fill.danger { background: var(--danger); }
+
+  /* Two-Column Workspace Grid */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .dashboard-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  /* Section Header Row */
+  .section-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+  .section-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-icon {
+    font-size: 15px;
+    line-height: 1;
+  }
+  .section-header-row .section-title {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .btn-link-action {
+    background: transparent;
+    border: none;
+    padding: 4px 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--accent);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: opacity 0.15s ease;
+    font-family: inherit;
+  }
+  .btn-link-action:hover {
+    opacity: 0.8;
+  }
+  .counter-badge {
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  /* Compact Empty States */
+  .empty-compact {
+    padding: 22px 14px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    background: var(--input-bg);
+    border-radius: 12px;
+    border: 1px dashed var(--border);
+    margin: 8px 0;
+  }
+
+  /* Upcoming Payments List */
+  .upcoming-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 10px;
+    margin: 0 -6px;
+    border-radius: 10px;
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.15s ease;
+    gap: 10px;
+  }
+  .upcoming-item-row:hover { background: var(--input-bg); }
+  .upcoming-item-row:last-child { border-bottom: none; }
+  .upcoming-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .upcoming-item-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .upcoming-item-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .upcoming-item-meta {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .upcoming-item-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+  .upcoming-item-amount {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .upcoming-status-badge {
+    display: inline-block;
+    padding: 1.5px 6px;
+    border-radius: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    margin-top: 2px;
+    background: var(--input-bg);
+    color: var(--muted);
+  }
+  .upcoming-status-badge.urgent {
+    background: var(--danger-bg);
+    color: var(--danger);
+  }
+  .upcoming-status-badge.due-today {
+    background: var(--warning-bg);
+    color: var(--warning);
+  }
+
+  /* Recent Activity List */
+  .recent-tx-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 10px;
+    margin: 0 -6px;
+    border-radius: 10px;
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.15s ease;
+    gap: 10px;
+  }
+  .recent-tx-row:hover { background: var(--input-bg); }
+  .recent-tx-row:last-child { border-bottom: none; }
+  .recent-tx-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .recent-tx-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .recent-tx-icon.income {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+  .recent-tx-icon.expense {
+    background: var(--input-bg);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .recent-tx-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .recent-tx-meta {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .recent-tx-amount {
+    font-size: 14px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .recent-tx-amount.positive { color: var(--success); }
+  .recent-tx-amount.negative { color: var(--text); }
+
+  /* Charts refinement */
+  .chart-subtitle {
+    font-size: 11.5px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .chart-label-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 115px;
+    flex: none;
+  }
+  .chart-percent-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--muted);
+    background: var(--input-bg);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  /* Legacy & overview backward-compatibility */
   .overview-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: center; }
   @media (min-width: 680px) {
     .overview-grid { grid-template-columns: repeat(4, 1fr); }
@@ -461,24 +892,73 @@
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    padding: 10px 12px;
+    padding: 11px 13px;
     margin-bottom: 8px;
-    border-radius: 10px;
-    border-left: 3px solid var(--danger);
-    background: var(--input-bg);
+    border-radius: 11px;
+    border: 1px solid var(--border);
+    background: var(--card);
     cursor: pointer;
     text-align: left;
     width: 100%;
-    border-top: none;
-    border-right: none;
-    border-bottom: none;
     font-family: inherit;
+    transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease;
   }
   .alert-row:last-child { margin-bottom: 0; }
-  .alert-row:hover { filter: brightness(0.97); }
-  [data-theme="dark"] .alert-row:hover { filter: brightness(1.15); }
-  .alert-text { font-size: 13px; color: var(--text); }
-  .alert-meta { font-size: 12px; color: var(--danger); font-weight: 700; white-space: nowrap; }
+  .alert-row:hover {
+    background: var(--input-bg);
+    transform: translateY(-1px);
+  }
+  .alert-row.alert-critical {
+    border-left: 4px solid var(--danger);
+    background: var(--danger-bg);
+  }
+  .alert-row.alert-warning {
+    border-left: 4px solid var(--warning);
+    background: var(--warning-bg);
+  }
+  .alert-row.alert-info {
+    border-left: 4px solid var(--accent);
+    background: var(--input-bg);
+  }
+  .alert-content-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .alert-badge-icon {
+    font-size: 14px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .alert-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .alert-content-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .alert-meta {
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+  .alert-meta.critical { color: var(--danger); }
+  .alert-meta.warning { color: var(--warning); }
+  .alert-meta.info { color: var(--muted); }
+  .alert-arrow {
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  .alert-row:hover .alert-arrow {
+    transform: translateX(2px);
+  }
   .card-entry { padding: 14px 0; border-bottom: 1px solid var(--border); }
   .card-entry:last-child { border-bottom: none; }
   .card-entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
@@ -618,6 +1098,26 @@
       flex: 1;
       text-align: center;
     }
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+    .dashboard-metrics-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .hero-split-grid {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .dashboard-hero {
+      padding: 18px 16px;
+    }
+    .hero-balance-value {
+      font-size: 28px;
+    }
+    .mini-card-value {
+      font-size: 15.5px;
+    }
   }
 </style>
 </head>
@@ -732,47 +1232,160 @@
       <div class="app-container">
 
         <div class="main-tab-panel active" id="tab-overview" data-tab="dashboard">
-      <div class="card">
-        <div class="section-title">Bu ay</div>
-        <div class="overview-grid">
-          <div class="overview-stat">
-            <div class="overview-value positive" id="overview-income">–</div>
-            <div class="overview-label">💰 Gelir</div>
+          
+          <!-- 1. Monthly Financial Summary Hero -->
+          <div class="dashboard-hero card">
+            <div class="hero-header">
+              <div class="hero-header-left">
+                <span class="hero-tag">Aylık Finansal Durum</span>
+                <h2 class="hero-month-title" id="overview-month-title">Bu Ay</h2>
+              </div>
+              <div class="hero-header-right">
+                <span class="hero-badge" id="overview-savings-rate" style="display:none;"></span>
+              </div>
+            </div>
+
+            <!-- Net Position Spotlight -->
+            <div class="hero-balance-spotlight">
+              <span class="hero-balance-label">Net Bakiye</span>
+              <div class="hero-balance-value" id="overview-balance">–</div>
+            </div>
+
+            <!-- Income vs Expense Dual Cards -->
+            <div class="hero-split-grid">
+              <div class="hero-mini-card income">
+                <div class="mini-card-icon-wrap">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                </div>
+                <div class="mini-card-content">
+                  <div class="mini-card-label">Toplam Gelir</div>
+                  <div class="mini-card-value positive" id="overview-income">–</div>
+                </div>
+              </div>
+
+              <div class="hero-mini-card expense">
+                <div class="mini-card-icon-wrap">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 7 17 17 7 17"/></svg>
+                </div>
+                <div class="mini-card-content">
+                  <div class="mini-card-label">Toplam Gider</div>
+                  <div class="mini-card-value negative" id="overview-expense">–</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="overview-stat">
-            <div class="overview-value negative" id="overview-expense">–</div>
-            <div class="overview-label">💸 Gider</div>
+
+          <!-- 2. Secondary Metrics Row -->
+          <div class="dashboard-metrics-grid">
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-icon">🔁</span>
+                <span class="metric-title">Aylık Sabit Taahhüt</span>
+              </div>
+              <div class="metric-value" id="overview-subs">–</div>
+              <div class="metric-subtext">Aktif abonelik yükü</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-icon">🎯</span>
+                <span class="metric-title">Bütçe Durumu</span>
+              </div>
+              <div class="metric-value" id="overview-budget-metric">Hesaplanıyor…</div>
+              <div class="metric-progress-track">
+                <div class="metric-progress-fill" id="overview-budget-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-icon">⏰</span>
+                <span class="metric-title">7 Günlük Ödemeler</span>
+              </div>
+              <div class="metric-value" id="overview-upcoming-metric">0 ödeme</div>
+              <div class="metric-subtext">Yaklaşan işlem takvimi</div>
+            </div>
           </div>
-          <div class="overview-stat">
-            <div class="overview-value" id="overview-balance">–</div>
-            <div class="overview-label">⚖️ Net bakiye</div>
-          </div>
-          <div class="overview-stat">
-            <div class="overview-value" id="overview-subs">–</div>
-            <div class="overview-label">🔁 Aylık abonelik</div>
+
+          <!-- 3. Two-Column Workspace Grid -->
+          <div class="dashboard-grid">
+            
+            <!-- Left Column: Alerts + Upcoming Payments + 6-Month Trend -->
+            <div class="dashboard-column">
+              <!-- Alerts Section -->
+              <div class="card" id="alerts-card">
+                <div class="section-header-row">
+                  <div class="section-title-wrap">
+                    <span class="section-icon">🔔</span>
+                    <h3 class="section-title">Bildirimler & Uyarılar</h3>
+                  </div>
+                </div>
+                <div id="alerts-list"></div>
+              </div>
+
+              <!-- Upcoming Payments Section -->
+              <div class="card" id="upcoming-card">
+                <div class="section-header-row">
+                  <div class="section-title-wrap">
+                    <span class="section-icon">📅</span>
+                    <h3 class="section-title">Yaklaşan Ödemeler</h3>
+                  </div>
+                  <span class="counter-badge" id="upcoming-count-badge" style="display:none;"></span>
+                </div>
+                <div id="upcoming-list"></div>
+                <div class="empty-compact" id="upcoming-empty" style="display:none;">
+                  Önümüzdeki 7 gün içinde bekleyen ödeme bulunmuyor.
+                </div>
+              </div>
+
+              <!-- 6-Month Trend Chart -->
+              <div class="card" id="trend-chart-card" style="display:none">
+                <div class="section-header-row">
+                  <div class="section-title-wrap">
+                    <span class="section-icon">📈</span>
+                    <h3 class="section-title">Son 6 Ay Trendi</h3>
+                  </div>
+                  <div class="trend-legend" style="margin-top:0;">
+                    <span><i class="trend-dot income"></i> Gelir</span>
+                    <span><i class="trend-dot expense"></i> Gider</span>
+                  </div>
+                </div>
+                <div id="trend-chart"></div>
+              </div>
+            </div>
+
+            <!-- Right Column: Recent Activity + Category Spending Breakdown -->
+            <div class="dashboard-column">
+              <!-- Recent Activity -->
+              <div class="card" id="recent-activity-card">
+                <div class="section-header-row">
+                  <div class="section-title-wrap">
+                    <span class="section-icon">⚡</span>
+                    <h3 class="section-title">Son İşlemler</h3>
+                  </div>
+                  <button type="button" class="btn-link-action" id="recent-view-all-btn">Tümünü gör →</button>
+                </div>
+                <div id="recent-activity-list"></div>
+                <div class="empty-compact" id="recent-activity-empty" style="display:none;">
+                  Henüz bir işlem kaydedilmedi.
+                </div>
+              </div>
+
+              <!-- Category Spending Breakdown -->
+              <div class="card" id="category-chart-card" style="display:none">
+                <div class="section-header-row">
+                  <div class="section-title-wrap">
+                    <span class="section-icon">📊</span>
+                    <h3 class="section-title">Kategori Dağılımı</h3>
+                  </div>
+                  <span class="chart-subtitle">Bu Ay</span>
+                </div>
+                <div id="category-chart"></div>
+              </div>
+            </div>
+
           </div>
         </div>
-      </div>
-
-      <div class="card" id="alerts-card" style="display:none">
-        <div class="section-title">⚠️ Uyarılar</div>
-        <div id="alerts-list"></div>
-      </div>
-
-      <div class="card" id="category-chart-card" style="display:none">
-        <div class="section-title">📊 Kategoriye göre harcama (bu ay)</div>
-        <div id="category-chart"></div>
-      </div>
-
-      <div class="card" id="trend-chart-card" style="display:none">
-        <div class="section-title">📈 Son 6 ay</div>
-        <div id="trend-chart"></div>
-        <div class="trend-legend">
-          <span><i class="trend-dot income"></i> Gelir</span>
-          <span><i class="trend-dot expense"></i> Gider</span>
-        </div>
-      </div>
-    </div>
 
     <div class="main-tab-panel" id="tab-transactions" data-tab="activity">
       <div class="card">
@@ -1333,10 +1946,14 @@ async function showApp() {
 let cachedSubscriptions = [];
 let cachedCreditCards = [];
 let cachedBudgets = [];
+let cachedRecurring = [];
+let latestTransactions = [];
 
 function renderAlerts() {
   const card = document.getElementById("alerts-card");
   const list = document.getElementById("alerts-list");
+  if (!card || !list) return;
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const alerts = [];
@@ -1346,7 +1963,12 @@ function renderAlerts() {
     const daysUntil = Math.round((new Date(sub.next_due_date) - today) / 86400000);
     if (daysUntil <= 7) {
       const when = daysUntil < 0 ? "gecikti" : daysUntil === 0 ? "bugün" : `${daysUntil} gün sonra`;
-      alerts.push({ tab: "subscriptions", text: `🔁 ${sub.name} aboneliği`, meta: when, urgent: daysUntil <= 0 });
+      alerts.push({
+        tab: "subscriptions",
+        text: `🔁 ${sub.name} aboneliği`,
+        meta: when,
+        severity: daysUntil < 0 ? "critical" : daysUntil <= 2 ? "warning" : "info",
+      });
     }
   }
 
@@ -1355,42 +1977,291 @@ function renderAlerts() {
     if (daysUntil <= 7) {
       const when = daysUntil < 0 ? "gecikti" : daysUntil === 0 ? "bugün" : `${daysUntil} gün sonra`;
       const title = card_.card_name ? `${card_.bank_name} · ${card_.card_name}` : card_.bank_name;
-      alerts.push({ tab: "bank", text: `🏦 ${title} son ödeme`, meta: when, urgent: daysUntil <= 0 });
+      alerts.push({
+        tab: "bank",
+        text: `🏦 ${title} son ödeme`,
+        meta: when,
+        severity: daysUntil < 0 ? "critical" : daysUntil <= 2 ? "warning" : "info",
+      });
     }
   }
 
   for (const budget of cachedBudgets) {
     if (budget.is_over_limit) {
       const title = budget.category || "Genel bütçe";
-      alerts.push({ tab: "budgets", text: `🎯 ${title} bütçesi aşıldı`, meta: formatMoney(Math.abs(budget.remaining)), urgent: true });
+      alerts.push({
+        tab: "budgets",
+        text: `🎯 ${title} bütçesi aşıldı`,
+        meta: formatMoney(Math.abs(budget.remaining)),
+        severity: "critical",
+      });
     }
   }
 
-  if (alerts.length === 0) {
-    card.style.display = "none";
-    return;
-  }
   card.style.display = "block";
   list.innerHTML = "";
+
+  if (alerts.length === 0) {
+    list.innerHTML = `
+      <div class="alerts-positive-state">
+        <span class="status-dot-pulse"></span>
+        <span>Her şey yolunda; geciken ödeme veya bütçe aşımı bulunmuyor.</span>
+      </div>
+    `;
+    return;
+  }
+
   for (const alert of alerts) {
     const row = document.createElement("button");
     row.type = "button";
-    row.className = "alert-row";
-    row.innerHTML = `<span class="alert-text">${escapeHtml(alert.text)}</span><span class="alert-meta">${escapeHtml(alert.meta)}</span>`;
+    row.className = `alert-row alert-${alert.severity}`;
+    row.innerHTML = `
+      <div class="alert-content-left">
+        <span class="alert-badge-icon">${alert.severity === "critical" ? "⚠️" : alert.severity === "warning" ? "⏰" : "ℹ️"}</span>
+        <span class="alert-text">${escapeHtml(alert.text)}</span>
+      </div>
+      <div class="alert-content-right">
+        <span class="alert-meta ${alert.severity}">${escapeHtml(alert.meta)}</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="alert-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    `;
     row.addEventListener("click", () => setActiveTab(alert.tab));
     list.appendChild(row);
   }
 }
 
+function updateBudgetMetric() {
+  const metricEl = document.getElementById("overview-budget-metric");
+  const fillEl = document.getElementById("overview-budget-fill");
+  if (!metricEl) return;
+
+  if (!cachedBudgets || cachedBudgets.length === 0) {
+    metricEl.textContent = "Bütçe tanımlı değil";
+    if (fillEl) fillEl.style.width = "0%";
+    return;
+  }
+
+  let totalLimit = 0;
+  let totalSpent = 0;
+  for (const b of cachedBudgets) {
+    totalLimit += b.monthly_limit;
+    totalSpent += b.spent_this_month;
+  }
+
+  if (totalLimit > 0) {
+    const pct = Math.min(100, Math.round((totalSpent / totalLimit) * 100));
+    metricEl.textContent = `%${pct} (${formatMoney(Math.max(0, totalLimit - totalSpent))} kaldı)`;
+    if (fillEl) {
+      fillEl.style.width = `${pct}%`;
+      fillEl.className = "metric-progress-fill" + (pct > 90 ? " danger" : pct > 75 ? " warning" : "");
+    }
+  } else {
+    metricEl.textContent = "Bütçe tanımlı değil";
+    if (fillEl) fillEl.style.width = "0%";
+  }
+}
+
+function renderUpcomingPayments() {
+  const container = document.getElementById("upcoming-list");
+  const empty = document.getElementById("upcoming-empty");
+  const countBadge = document.getElementById("upcoming-count-badge");
+  const metricBadge = document.getElementById("overview-upcoming-metric");
+  if (!container) return;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const items = [];
+
+  for (const sub of cachedSubscriptions) {
+    if (!sub.is_active || sub.is_paid_this_cycle) continue;
+    const daysUntil = Math.round((new Date(sub.next_due_date) - today) / 86400000);
+    if (daysUntil <= 7) {
+      items.push({
+        title: sub.name,
+        category: sub.category || "Abonelik",
+        amount: sub.amount,
+        dueDate: sub.next_due_date,
+        daysUntil,
+        icon: "🔁",
+        tab: "subscriptions",
+      });
+    }
+  }
+
+  for (const card of cachedCreditCards) {
+    if (!card.next_due_date) continue;
+    const daysUntil = Math.round((new Date(card.next_due_date) - today) / 86400000);
+    if (daysUntil <= 7) {
+      items.push({
+        title: card.card_name ? `${card.bank_name} · ${card.card_name}` : card.bank_name,
+        category: "Kredi Kartı",
+        amount: card.current_debt,
+        dueDate: card.next_due_date,
+        daysUntil,
+        icon: "💳",
+        tab: "bank",
+      });
+    }
+  }
+
+  for (const r of cachedRecurring) {
+    if (!r.is_active || !r.next_due_date || r.type !== "expense") continue;
+    const daysUntil = Math.round((new Date(r.next_due_date) - today) / 86400000);
+    if (daysUntil <= 7) {
+      items.push({
+        title: r.name,
+        category: r.category || "Sabit Gider",
+        amount: r.amount,
+        dueDate: r.next_due_date,
+        daysUntil,
+        icon: "⏱️",
+        tab: "transactions",
+      });
+    }
+  }
+
+  items.sort((a, b) => a.daysUntil - b.daysUntil);
+
+  if (metricBadge) {
+    metricBadge.textContent = `${items.length} ödeme`;
+  }
+  if (countBadge) {
+    countBadge.textContent = items.length ? `${items.length}` : "";
+    countBadge.style.display = items.length ? "inline-block" : "none";
+  }
+
+  container.innerHTML = "";
+  if (items.length === 0) {
+    if (empty) empty.style.display = "block";
+    return;
+  }
+  if (empty) empty.style.display = "none";
+
+  for (const item of items.slice(0, 5)) {
+    const row = document.createElement("div");
+    row.className = "upcoming-item-row";
+    const statusClass = item.daysUntil < 0 ? "urgent" : item.daysUntil === 0 ? "due-today" : "";
+    const statusText =
+      item.daysUntil < 0
+        ? "Gecikti"
+        : item.daysUntil === 0
+        ? "Bugün"
+        : item.daysUntil === 1
+        ? "Yarın"
+        : `${item.daysUntil} gün kaldı`;
+
+    row.innerHTML = `
+      <div class="upcoming-item-left">
+        <div class="upcoming-item-icon">${item.icon}</div>
+        <div style="min-width:0;">
+          <div class="upcoming-item-title">${escapeHtml(item.title)}</div>
+          <div class="upcoming-item-meta">${escapeHtml(item.category)} · ${formatDateTr(item.dueDate)}</div>
+        </div>
+      </div>
+      <div class="upcoming-item-right">
+        <div class="upcoming-item-amount">${formatMoney(item.amount)}</div>
+        <span class="upcoming-status-badge ${statusClass}">${statusText}</span>
+      </div>
+    `;
+    row.style.cursor = "pointer";
+    row.addEventListener("click", () => setActiveTab(item.tab));
+    container.appendChild(row);
+  }
+}
+
+function renderRecentActivity() {
+  const container = document.getElementById("recent-activity-list");
+  const empty = document.getElementById("recent-activity-empty");
+  if (!container) return;
+
+  const list = (latestTransactions && latestTransactions.length ? latestTransactions : allTransactions || []).slice(0, 5);
+  container.innerHTML = "";
+
+  if (list.length === 0) {
+    if (empty) empty.style.display = "block";
+    return;
+  }
+  if (empty) empty.style.display = "none";
+
+  for (const tx of list) {
+    const row = document.createElement("div");
+    row.className = "recent-tx-row";
+    const isIncome = tx.type === "income";
+    const sign = isIncome ? "+" : "-";
+    const title = tx.note
+      ? escapeHtml(tx.note)
+      : tx.category
+      ? escapeHtml(tx.category)
+      : isIncome
+      ? "Gelir"
+      : "Gider";
+    const metaParts = [formatDateTr(tx.occurred_on)];
+    if (tx.category) metaParts.push(escapeHtml(tx.category));
+
+    row.innerHTML = `
+      <div class="recent-tx-left">
+        <div class="recent-tx-icon ${isIncome ? "income" : "expense"}">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            ${isIncome ? '<line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>' : '<line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 7 17 7 17 17"/>'}
+          </svg>
+        </div>
+        <div style="min-width:0;">
+          <div class="recent-tx-title">${title}</div>
+          <div class="recent-tx-meta">${metaParts.join(" · ")}</div>
+        </div>
+      </div>
+      <div class="recent-tx-amount ${isIncome ? "positive" : "negative"}">
+        ${sign}${formatMoney(tx.amount)}
+      </div>
+    `;
+    row.style.cursor = "pointer";
+    row.addEventListener("click", () => setActiveTab("activity"));
+    container.appendChild(row);
+  }
+}
+
+const recentViewAllBtn = document.getElementById("recent-view-all-btn");
+if (recentViewAllBtn) {
+  recentViewAllBtn.addEventListener("click", () => setActiveTab("activity"));
+}
+
 async function loadOverview() {
   const data = await apiRead("/overview");
   if (!data) return;
+
+  const now = new Date();
+  const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+  const currentMonthName = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+  const monthTitleEl = document.getElementById("overview-month-title");
+  if (monthTitleEl) monthTitleEl.textContent = currentMonthName;
+
   document.getElementById("overview-income").textContent = formatMoney(data.month_income);
   document.getElementById("overview-expense").textContent = formatMoney(data.month_expense);
   const balanceEl = document.getElementById("overview-balance");
   balanceEl.textContent = formatMoney(data.net_balance);
-  balanceEl.className = "overview-value " + (data.net_balance >= 0 ? "positive" : "negative");
-  document.getElementById("overview-subs").textContent = formatMoney(data.monthly_subscription_cost);
+  balanceEl.className = "hero-balance-value " + (data.net_balance >= 0 ? "positive" : "negative");
+
+  const rateBadge = document.getElementById("overview-savings-rate");
+  if (rateBadge) {
+    if (data.month_income > 0) {
+      const rate = Math.round((data.net_balance / data.month_income) * 100);
+      if (rate >= 0) {
+        rateBadge.textContent = `Tasarruf: %${rate}`;
+        rateBadge.className = "hero-badge positive";
+      } else {
+        rateBadge.textContent = `Açık: %${Math.abs(rate)}`;
+        rateBadge.className = "hero-badge negative";
+      }
+      rateBadge.style.display = "inline-flex";
+    } else {
+      rateBadge.style.display = "none";
+    }
+  }
+
+  const subsEl = document.getElementById("overview-subs");
+  if (subsEl) subsEl.textContent = formatMoney(data.monthly_subscription_cost);
+
+  updateBudgetMetric();
 }
 
 function updateCreditCardFieldVisibility() {
@@ -1608,17 +2479,22 @@ async function loadCategoryChart() {
     return;
   }
   card.style.display = "block";
+  const total = entries.reduce((acc, e) => acc + e.amount, 0);
   const max = entries[0].amount;
   container.innerHTML = entries
-    .map(
-      ({ category, amount }) => `
+    .map(({ category, amount }) => {
+      const pct = total > 0 ? Math.round((amount / total) * 100) : 0;
+      return `
       <div class="chart-row">
-        <div class="chart-label" title="${escapeHtml(category)}">${escapeHtml(category)}</div>
+        <div class="chart-label-group">
+          <span class="chart-label" title="${escapeHtml(category)}">${escapeHtml(category)}</span>
+          <span class="chart-percent-badge">%${pct}</span>
+        </div>
         <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.max(4, (amount / max) * 100)}%"></div></div>
         <div class="chart-value">${formatMoney(amount)}</div>
       </div>
-    `
-    )
+    `;
+    })
     .join("");
 }
 
@@ -1675,6 +2551,14 @@ async function loadTransactions(reset = true) {
   txHasMore = data.length === TX_PAGE_SIZE;
   document.getElementById("tx-load-more-btn").style.display = txHasMore ? "block" : "none";
   renderTransactionsList(allTransactions);
+
+  if (reset && !category && !type && !search) {
+    latestTransactions = data.slice(0, 5);
+    renderRecentActivity();
+  } else if (!latestTransactions.length && data.length) {
+    latestTransactions = data.slice(0, 5);
+    renderRecentActivity();
+  }
 }
 
 const CYCLE_LABELS = { monthly: "aylık", yearly: "yıllık", weekly: "haftalık" };
@@ -1733,6 +2617,7 @@ async function loadSubscriptions() {
   }
   cachedSubscriptions = subscriptions;
   renderAlerts();
+  renderUpcomingPayments();
   const list = document.getElementById("subscriptions-list");
   const empty = document.getElementById("subscriptions-empty");
   list.innerHTML = "";
@@ -1814,6 +2699,8 @@ async function loadRecurring() {
     showLoadError("recurring-empty", loadRecurring);
     return;
   }
+  cachedRecurring = recurring;
+  renderUpcomingPayments();
   const list = document.getElementById("recurring-list");
   const empty = document.getElementById("recurring-empty");
   list.innerHTML = "";
@@ -1921,6 +2808,7 @@ async function loadCards() {
   }
   cachedCreditCards = cards;
   renderAlerts();
+  renderUpcomingPayments();
   populateCreditCardSelect(cards);
   const list = document.getElementById("cards-list");
   const empty = document.getElementById("cards-empty");
@@ -2154,6 +3042,7 @@ async function loadBudgets() {
   }
   cachedBudgets = budgets;
   renderAlerts();
+  updateBudgetMetric();
   const list = document.getElementById("budgets-list");
   const empty = document.getElementById("budgets-empty");
   list.innerHTML = "";
