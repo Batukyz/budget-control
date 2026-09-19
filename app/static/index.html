@@ -18,6 +18,7 @@
     --card: #ffffff;
     --input-bg: #f1f2f8;
     --border: #e1e3ed;
+    --border-hover: #c8cbd9;
     --text: #23252b;
     --muted: #7b7e8c;
     --accent: #2f8f6f;
@@ -29,6 +30,7 @@
     --danger-hover: #c90f3f;
     --danger-bg: rgba(232, 17, 74, 0.08);
     --warning: #f59e0b;
+    --warning-hover: #d97706;
     --warning-bg: rgba(245, 158, 11, 0.12);
     --success: #4ade80;
     --success-bg: rgba(74, 222, 128, 0.12);
@@ -36,12 +38,35 @@
     --info: #3b82f6;
     --info-bg: rgba(59, 130, 246, 0.08);
     --gradient: linear-gradient(135deg, var(--accent), #3fae8a);
+
+    /* Consistent Design Tokens */
+    --radius-xs: 6px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-pill: 9999px;
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+    --shadow-xl: 0 20px 48px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
+
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
   }
   [data-theme="dark"] {
     --bg: #16171d;
     --card: #21222c;
     --input-bg: #1c1d26;
     --border: #33343f;
+    --border-hover: #4a4c5b;
     --text: #ededf2;
     --muted: #9294a3;
     --accent: #4bbf98;
@@ -53,6 +78,7 @@
     --danger-hover: #ff8299;
     --danger-bg: rgba(255, 107, 133, 0.12);
     --warning: #fbbf24;
+    --warning-hover: #f59e0b;
     --warning-bg: rgba(251, 191, 36, 0.14);
     --success: #34d399;
     --success-bg: rgba(52, 211, 153, 0.14);
@@ -60,6 +86,12 @@
     --info: #60a5fa;
     --info-bg: rgba(96, 165, 250, 0.12);
     --gradient: linear-gradient(135deg, var(--accent), #3fae8a);
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 14px 36px rgba(0, 0, 0, 0.45);
+    --shadow-xl: 0 24px 54px rgba(0, 0, 0, 0.55);
   }
   * { box-sizing: border-box; }
   body {
@@ -70,6 +102,37 @@
     min-height: 100vh;
     transition: background-color 0.2s ease, color 0.2s ease;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Accessibility: Visible Focus Ring */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: none;
+  }
+
+  /* Accessibility: Respect Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Lightweight Skeleton Loading Indicator */
+  @keyframes skeleton-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .skeleton {
+    background: linear-gradient(90deg, var(--input-bg) 25%, var(--border) 50%, var(--input-bg) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+    border-radius: var(--radius-sm);
   }
   
   /* Shell & Layout */
@@ -311,53 +374,97 @@
   .card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 18px;
+    border-radius: var(--radius-lg, 16px);
     padding: 20px;
     margin-bottom: 16px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 16px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
-  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  label { display: block; font-size: 12.5px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
   input, select, textarea {
     width: 100%;
     padding: 10px 12px;
+    height: 40px;
     background: var(--input-bg);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: var(--radius-md, 10px);
     color: var(--text);
-    font-size: 14px;
+    font-size: 13.5px;
     margin-bottom: 14px;
     font-family: inherit;
-    transition: border-color 0.15s ease;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
   input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(47, 143, 111, 0.15);
+    box-shadow: 0 0 0 3px rgba(47, 143, 111, 0.16);
   }
   [data-theme="dark"] input:focus, [data-theme="dark"] select:focus, [data-theme="dark"] textarea:focus {
-    box-shadow: 0 0 0 3px rgba(75, 191, 152, 0.18);
+    box-shadow: 0 0 0 3px rgba(75, 191, 152, 0.2);
   }
-  textarea { resize: vertical; min-height: 50px; }
+  textarea { height: auto; min-height: 60px; resize: vertical; }
   button {
     cursor: pointer;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-md, 10px);
     padding: 10px 16px;
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 600;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, filter 0.15s ease, transform 0.1s ease;
   }
   button:not(:disabled):active { transform: scale(0.97); }
   button:disabled { opacity: 0.6; cursor: default; }
-  .btn-primary { background: var(--gradient); color: var(--on-accent); width: 100%; }
-  .btn-primary:hover { filter: brightness(1.08); }
-  .btn-ghost { background: transparent; color: var(--muted); font-weight: 400; font-size: 13px; }
-  .btn-ghost:hover { color: var(--text); }
-  .btn-small { padding: 6px 10px; font-size: 13px; }
-  .btn-archive { background: transparent; border: 1px solid var(--border); color: var(--muted); }
-  .btn-archive:hover { color: var(--danger-hover); border-color: var(--danger); }
-  .btn-edit { background: transparent; border: 1px solid var(--border); color: var(--muted); }
-  .btn-edit:hover { color: var(--accent); border-color: var(--accent); }
+  .btn-primary {
+    background: var(--gradient);
+    color: var(--on-accent);
+    width: 100%;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(47, 143, 111, 0.2);
+  }
+  .btn-primary:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 4px 14px rgba(47, 143, 111, 0.28);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .btn-ghost:hover {
+    color: var(--text);
+    background: var(--input-bg);
+  }
+  .btn-small {
+    padding: 6px 12px;
+    font-size: 12.5px;
+    height: 32px;
+    border-radius: var(--radius-sm, 8px);
+  }
+  .btn-archive {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-archive:hover {
+    color: var(--danger);
+    border-color: var(--danger);
+    background: var(--danger-bg);
+  }
+  .btn-edit {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-edit:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
   .btn-income { background: var(--success); color: var(--on-success); }
   .btn-expense { background: var(--danger); color: #fff; }
   .type-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
@@ -854,26 +961,48 @@
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 100;
+    z-index: 250;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    width: calc(100% - 40px);
+    width: calc(100% - 32px);
     max-width: 440px;
+    pointer-events: none;
   }
   .toast {
+    pointer-events: auto;
     background: var(--card);
     border: 1px solid var(--border);
     border-left: 4px solid var(--danger);
-    border-radius: 10px;
+    border-radius: var(--radius-md, 12px);
     padding: 12px 14px;
-    font-size: 13px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    font-size: 13.5px;
+    font-weight: 600;
+    box-shadow: var(--shadow-lg);
     opacity: 1;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    cursor: pointer;
+    animation: toast-slide-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes toast-slide-up {
+    from { opacity: 0; transform: translateY(12px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
   }
   .toast.success { border-left-color: var(--success); }
-  .toast.hide { opacity: 0; transform: translateY(8px); }
+  .toast.warning { border-left-color: var(--warning); }
+  .toast.info { border-left-color: var(--info); }
+  .toast-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .toast.success .toast-icon { color: var(--success); }
+  .toast.error .toast-icon, .toast:not(.success):not(.warning):not(.info) .toast-icon { color: var(--danger); }
+  .toast.warning .toast-icon { color: var(--warning); }
+  .toast.info .toast-icon { color: var(--info); }
+  .toast-msg { flex: 1; color: var(--text); line-height: 1.4; word-break: break-word; font-size: 13px; }
+  .toast-close { background: transparent; border: none; font-size: 18px; color: var(--muted); cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0; }
+  .toast-close:hover { color: var(--text); }
+  .toast.hide { opacity: 0; transform: translateY(8px) scale(0.96); }
 
   .alert-row {
     display: flex;
@@ -1752,6 +1881,76 @@
   }
   .modal-actions-row .btn-ghost:hover {
     background: var(--input-bg);
+  }
+
+  /* Confirmation Dialog */
+  .confirm-modal-sheet {
+    max-width: 400px;
+    padding: 24px;
+    border-radius: var(--radius-xl, 20px);
+  }
+  .confirm-modal-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 4px 0 16px;
+  }
+  .confirm-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    flex-shrink: 0;
+  }
+  .confirm-icon-wrap.danger {
+    background: var(--danger-bg);
+    color: var(--danger);
+    border: 1px solid rgba(232, 17, 74, 0.25);
+  }
+  .confirm-icon-wrap.info {
+    background: var(--info-bg);
+    color: var(--info);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+  }
+  .confirm-text-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .confirm-modal-title {
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .confirm-modal-message {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+  .confirm-actions-row {
+    margin-top: 14px;
+  }
+  .confirm-actions-row .btn-ghost,
+  .confirm-actions-row .btn-primary {
+    height: 42px;
+    border-radius: var(--radius-md, 10px);
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+  .btn-danger-action {
+    background: var(--danger) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(232, 17, 74, 0.28) !important;
+  }
+  .btn-danger-action:hover {
+    filter: brightness(1.08) !important;
   }
 
   @keyframes modal-scale-in {
@@ -4373,6 +4572,22 @@
         </form>
       </div>
     </div>
+  <!-- Unified Confirmation Dialog Modal -->
+  <div class="tx-modal-overlay" id="confirm-modal-overlay" style="display:none;" aria-hidden="true">
+    <div class="tx-modal-backdrop" id="confirm-modal-backdrop"></div>
+    <div class="tx-modal-sheet confirm-modal-sheet" role="alertdialog" aria-modal="true" aria-labelledby="confirm-modal-title" aria-describedby="confirm-modal-message">
+      <div class="confirm-modal-body">
+        <div class="confirm-icon-wrap" id="confirm-modal-icon"></div>
+        <div class="confirm-text-wrap">
+          <h3 class="confirm-modal-title" id="confirm-modal-title">Emin misiniz?</h3>
+          <p class="confirm-modal-message" id="confirm-modal-message"></p>
+        </div>
+      </div>
+      <div class="modal-actions-row confirm-actions-row">
+        <button type="button" class="btn-ghost" id="confirm-modal-cancel">İptal</button>
+        <button type="button" class="btn-primary" id="confirm-modal-action">Onayla</button>
+      </div>
+    </div>
   </div>
 
   <div class="toast-container" id="toast-container"></div>
@@ -4467,32 +4682,151 @@ async function apiWrite(path, options, successMessage) {
   }
 }
 
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str == null ? "" : String(str);
+  return div.innerHTML;
+}
+
 function showLoadError(emptyElId, retryFn) {
   const el = document.getElementById(emptyElId);
-  el.innerHTML = "";
-  const text = document.createElement("div");
-  text.textContent = "Yüklenemedi.";
-  text.style.marginBottom = "8px";
-  const retryBtn = document.createElement("button");
-  retryBtn.type = "button";
-  retryBtn.className = "btn-ghost";
-  retryBtn.textContent = "Tekrar dene";
-  retryBtn.addEventListener("click", retryFn);
-  el.appendChild(text);
-  el.appendChild(retryBtn);
+  if (!el) return;
+  el.innerHTML = `
+    <div class="empty-state-error" style="padding:24px 16px; text-align:center;">
+      <div style="font-size:28px; margin-bottom:8px;">⚠️</div>
+      <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px;">Veriler yüklenemedi</div>
+      <div style="font-size:12.5px; color:var(--muted); margin-bottom:14px;">Sunucuya bağlanırken bir sorun oluştu.</div>
+      <button type="button" class="btn-ghost retry-btn" style="border:1px solid var(--border); border-radius:8px; padding:6px 14px; font-size:12.5px; height:32px;">
+        Tekrar dene
+      </button>
+    </div>
+  `;
+  const retryBtn = el.querySelector(".retry-btn");
+  if (retryBtn && typeof retryFn === "function") {
+    retryBtn.addEventListener("click", retryFn);
+  }
   el.style.display = "block";
 }
 
 function showToast(message, type = "error") {
   const container = document.getElementById("toast-container");
+  if (!container) return;
   const toast = document.createElement("div");
-  toast.className = "toast" + (type === "success" ? " success" : "");
-  toast.textContent = message;
-  container.appendChild(toast);
-  setTimeout(() => {
+  toast.className = `toast ${type}`;
+  toast.setAttribute("role", "status");
+  toast.setAttribute("aria-live", "polite");
+
+  let iconSvg = "";
+  if (type === "success") {
+    iconSvg = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+  } else if (type === "warning") {
+    iconSvg = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+  } else if (type === "info") {
+    iconSvg = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+  } else {
+    // error
+    iconSvg = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+  }
+
+  toast.innerHTML = `
+    <span class="toast-icon">${iconSvg}</span>
+    <span class="toast-msg">${escapeHtml(message)}</span>
+    <button type="button" class="toast-close" aria-label="Kapat">&times;</button>
+  `;
+
+  let dismissed = false;
+  const dismiss = () => {
+    if (dismissed) return;
+    dismissed = true;
     toast.classList.add("hide");
-    setTimeout(() => toast.remove(), 300);
-  }, 3500);
+    setTimeout(() => {
+      if (toast.parentNode) toast.remove();
+    }, 250);
+  };
+
+  const closeBtn = toast.querySelector(".toast-close");
+  if (closeBtn) closeBtn.addEventListener("click", dismiss);
+  toast.addEventListener("click", (e) => {
+    if (e.target !== closeBtn) dismiss();
+  });
+
+  container.appendChild(toast);
+  setTimeout(dismiss, 3800);
+}
+
+function showConfirmDialog({
+  title = "Emin misiniz?",
+  message = "Bu işlem geri alınamaz.",
+  confirmText = "Sil",
+  cancelText = "İptal",
+  danger = true
+} = {}) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById("confirm-modal-overlay");
+    const backdrop = document.getElementById("confirm-modal-backdrop");
+    const titleEl = document.getElementById("confirm-modal-title");
+    const messageEl = document.getElementById("confirm-modal-message");
+    const actionBtn = document.getElementById("confirm-modal-action");
+    const cancelBtn = document.getElementById("confirm-modal-cancel");
+    const iconWrap = document.getElementById("confirm-modal-icon");
+
+    if (!overlay || !actionBtn || !cancelBtn) {
+      resolve(window.confirm(message));
+      return;
+    }
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    actionBtn.textContent = confirmText;
+    cancelBtn.textContent = cancelText;
+
+    if (danger) {
+      actionBtn.className = "btn-primary btn-danger-action";
+      iconWrap.className = "confirm-icon-wrap danger";
+      iconWrap.innerHTML = `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+    } else {
+      actionBtn.className = "btn-primary";
+      iconWrap.className = "confirm-icon-wrap info";
+      iconWrap.innerHTML = `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+    }
+
+    const cleanup = () => {
+      overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      actionBtn.removeEventListener("click", onConfirm);
+      cancelBtn.removeEventListener("click", onCancel);
+      backdrop.removeEventListener("click", onCancel);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+
+    const onConfirm = () => {
+      cleanup();
+      resolve(true);
+    };
+
+    const onCancel = () => {
+      cleanup();
+      resolve(false);
+    };
+
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onCancel();
+      }
+    };
+
+    actionBtn.addEventListener("click", onConfirm);
+    cancelBtn.addEventListener("click", onCancel);
+    backdrop.addEventListener("click", onCancel);
+    document.addEventListener("keydown", onKeyDown);
+
+    overlay.style.display = "flex";
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    cancelBtn.focus();
+  });
 }
 
 const SUN_ICON = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
@@ -4529,12 +4863,6 @@ if (themeCardLight) {
 const themeCardDark = document.getElementById("theme-card-dark");
 if (themeCardDark) {
   themeCardDark.addEventListener("click", () => applyTheme("dark"));
-}
-
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str == null ? "" : String(str);
-  return div.innerHTML;
 }
 function formatMoney(n) {
   return new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
@@ -5472,7 +5800,13 @@ function renderTransactionsList(transactions) {
       deleteBtn.addEventListener("click", async (e) => {
         e.stopPropagation();
         closeAllActivityMenus();
-        if (!confirm("Bu işlem silinsin mi?")) return;
+        const confirmed = await showConfirmDialog({
+          title: "İşlemi Sil",
+          message: "Bu işlemi kalıcı olarak silmek istediğinizden emin misiniz?",
+          confirmText: "Sil",
+          danger: true,
+        });
+        if (!confirmed) return;
         const ok = await apiWrite(`/transactions/${tx.id}`, { method: "DELETE" }, "İşlem silindi.");
         if (!ok) return;
         if (editingTxId === tx.id) closeTxModal();
@@ -5726,15 +6060,7 @@ if (advancedToggleBtn) {
   });
 }
 
-window.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    closeAllActivityMenus();
-    const overlay = document.getElementById("tx-modal-overlay");
-    if (overlay && overlay.style.display === "flex") {
-      closeTxModal();
-    }
-  }
-});
+
 
 async function loadTransactions(reset = true) {
   const category = document.getElementById("tx-filter-category") ? document.getElementById("tx-filter-category").value : "";
@@ -5886,6 +6212,7 @@ function openRecurringModal(rec = null) {
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
+    closeAllActivityMenus();
     closeTxModal();
     closeSubModal();
     closeCardModal();
@@ -6130,7 +6457,14 @@ async function loadSubscriptions() {
     const payBtn = card.querySelector(".sub-pay-btn");
     if (payBtn) {
       payBtn.addEventListener("click", async () => {
-        if (!confirm(`"${sub.name}" için ${formatMoney(sub.amount)} tutarında gider işlemi kaydedilsin mi?`)) return;
+        const confirmed = await showConfirmDialog({
+          title: "Ödemeyi Kaydet",
+          message: `"${sub.name}" aboneliği için ${formatMoney(sub.amount)} tutarında gider işlemi kaydedilsin mi?`,
+          confirmText: "Ödemeyi Kaydet",
+          cancelText: "Vazgeç",
+          danger: false,
+        });
+        if (!confirmed) return;
         const ok = await apiWrite(`/subscriptions/${sub.id}/pay`, { method: "POST" }, "Abonelik ödemesi kaydedildi.");
         if (!ok) return;
         loadSubscriptions();
@@ -6164,7 +6498,13 @@ async function loadSubscriptions() {
     const deleteBtn = card.querySelector(".sub-delete-btn");
     if (deleteBtn) {
       deleteBtn.addEventListener("click", async () => {
-        if (!confirm(`"${sub.name}" aboneliği silinsin mi?`)) return;
+        const confirmed = await showConfirmDialog({
+          title: "Aboneliği Sil",
+          message: `"${sub.name}" aboneliğini silmek istediğinizden emin misiniz? Gelecek ödeme hatırlatıcıları kaldırılacaktır.`,
+          confirmText: "Sil",
+          danger: true,
+        });
+        if (!confirmed) return;
         const ok = await apiWrite(`/subscriptions/${sub.id}`, { method: "DELETE" }, "Abonelik silindi.");
         if (!ok) return;
         if (editingSubId === sub.id) closeSubModal();
@@ -6282,7 +6622,13 @@ async function loadRecurring() {
       const deleteBtn = card.querySelector(".rec-delete-btn");
       if (deleteBtn) {
         deleteBtn.addEventListener("click", async () => {
-          if (!confirm(`"${r.name}" silinsin mi? Daha önce oluşturulan işlemler silinmeyecek.`)) return;
+          const confirmed = await showConfirmDialog({
+            title: "Sabit İşlemi Sil",
+            message: `"${r.name}" tanımını silmek istediğinizden emin misiniz? Daha önce oluşturulan geçmiş işlemler silinmeyecektir.`,
+            confirmText: "Sil",
+            danger: true,
+          });
+          if (!confirmed) return;
           const ok = await apiWrite(`/recurring-transactions/${r.id}`, { method: "DELETE" }, "Sabit işlem silindi.");
           if (!ok) return;
           if (editingRecurringId === r.id) closeTxModal();
@@ -6338,7 +6684,13 @@ async function loadRecurring() {
       }
       if (deleteBtn) {
         deleteBtn.addEventListener("click", async () => {
-          if (!confirm(`"${r.name}" silinsin mi? Daha önce oluşturulan işlemler silinmeyecek.`)) return;
+          const confirmed = await showConfirmDialog({
+            title: "Sabit İşlemi Sil",
+            message: `"${r.name}" tanımını silmek istediğinizden emin misiniz? Daha önce oluşturulan geçmiş işlemler silinmeyecektir.`,
+            confirmText: "Sil",
+            danger: true,
+          });
+          if (!confirmed) return;
           const ok = await apiWrite(`/recurring-transactions/${r.id}`, { method: "DELETE" }, "Sabit işlem silindi.");
           if (!ok) return;
           if (editingRecurringId === r.id) closeTxModal();
@@ -6587,7 +6939,14 @@ async function loadCards() {
     const deleteBtn = cardEl.querySelector(".card-delete-btn");
     if (deleteBtn) {
       deleteBtn.addEventListener("click", async () => {
-        if (!confirm(`"${card.bank_name}" kartı silinsin mi?`)) return;
+        const cardTitle = `${card.bank_name}${card.name ? " (" + card.name + ")" : ""}`;
+        const confirmed = await showConfirmDialog({
+          title: "Kartı Sil",
+          message: `"${cardTitle}" kredi kartını silmek istediğinizden emin misiniz?`,
+          confirmText: "Sil",
+          danger: true,
+        });
+        if (!confirmed) return;
         const ok = await apiWrite(`/credit-cards/${card.id}`, { method: "DELETE" }, "Kart silindi.");
         if (!ok) return;
         if (editingCardId === card.id) closeCardModal();
@@ -6797,7 +7156,13 @@ function renderCategoriesGrid() {
     const deleteBtn = card.querySelector(".cat-delete-btn");
     if (deleteBtn) {
       deleteBtn.addEventListener("click", async () => {
-        if (!confirm(`"${category.name}" kategorisi silinsin mi? Bu kategoriye ait işlemlerin kategori bilgisi kaldırılacaktır.`)) return;
+        const confirmed = await showConfirmDialog({
+          title: "Kategoriyi Sil",
+          message: `"${category.name}" kategorisini silmek istediğinizden emin misiniz? Bu kategoriye ait işlemlerin kategori bilgisi kaldırılacaktır.`,
+          confirmText: "Sil",
+          danger: true,
+        });
+        if (!confirmed) return;
         const ok = await apiWrite(`/categories/${category.id}`, { method: "DELETE" }, "Kategori silindi.");
         if (!ok) return;
         if (editingCategoryId === category.id) closeCategoryModal();
@@ -7021,7 +7386,13 @@ async function loadBudgets() {
     const deleteBtn = card.querySelector(".btn-delete");
     if (deleteBtn) {
       deleteBtn.addEventListener("click", async () => {
-        if (!confirm(`"${title}" bütçe limiti silinsin mi?`)) return;
+        const confirmed = await showConfirmDialog({
+          title: "Bütçe Limitini Sil",
+          message: `"${title}" bütçe limitini kaldırmak istediğinizden emin misiniz?`,
+          confirmText: "Sil",
+          danger: true,
+        });
+        if (!confirmed) return;
         const ok = await apiWrite(`/budgets/${budget.id}`, { method: "DELETE" }, "Bütçe limiti silindi.");
         if (!ok) return;
         if (editingBudgetId === budget.id) closeBudgetModal();
@@ -7066,6 +7437,17 @@ if (importBackupInput) {
   importBackupInput.addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    const confirmed = await showConfirmDialog({
+      title: "Yedeği Geri Yükle",
+      message: "Seçilen JSON yedek dosyasındaki veriler hesabınıza aktarılacaktır. Devam etmek istiyor musunuz?",
+      confirmText: "İçe Aktar",
+      cancelText: "Vazgeç",
+      danger: false,
+    });
+    if (!confirmed) {
+      e.target.value = "";
+      return;
+    }
     try {
       const backup = JSON.parse(await file.text());
       const response = await apiFetch("/account/import", {
