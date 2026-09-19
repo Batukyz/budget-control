@@ -101,3 +101,34 @@ def test_account_reset_isolation_does_not_affect_other_users(make_authed_client)
     bob_txs = bob.get("/transactions").json()
     assert len(bob_txs) == 1
     assert bob_txs[0]["amount"] == 250.0
+
+
+def test_account_reset_frontend_elements_and_modal_structure():
+    import re
+    from pathlib import Path
+
+    html_path = Path("app/static/index.html")
+    assert html_path.exists()
+    content = html_path.read_text(encoding="utf-8")
+
+    # Verify reset button and modal elements exist
+    assert 'id="reset-account-btn"' in content
+    assert 'id="confirm-modal-overlay"' in content
+    assert 'id="confirm-modal-input"' in content
+    assert 'id="confirm-modal-action"' in content
+    assert 'SIFIRLA' in content
+
+    # Verify div tags are balanced
+    opens = len(re.findall(r"<div[\s>]", content, re.IGNORECASE))
+    closes = len(re.findall(r"</div>", content, re.IGNORECASE))
+    assert opens == closes, f"Unbalanced div tags in index.html: {opens} opens vs {closes} closes"
+
+    # Verify confirm-modal-overlay is not nested inside category-modal-overlay
+    cat_start = content.find('id="category-modal-overlay"')
+    confirm_start = content.find('id="confirm-modal-overlay"')
+    assert cat_start != -1 and confirm_start != -1
+
+    cat_chunk = content[cat_start:confirm_start]
+    cat_opens = len(re.findall(r"<div[\s>]", cat_chunk, re.IGNORECASE))
+    cat_closes = len(re.findall(r"</div>", cat_chunk, re.IGNORECASE))
+    assert cat_closes >= cat_opens, "confirm-modal-overlay is erroneously nested inside category-modal-overlay"
