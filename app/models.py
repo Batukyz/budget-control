@@ -20,6 +20,7 @@ class User(Base):
     )
     credit_cards = relationship("CreditCard", back_populates="owner", cascade="all, delete-orphan")
     categories = relationship("Category", back_populates="owner", cascade="all, delete-orphan")
+    installment_plans = relationship("InstallmentPlan", back_populates="owner", cascade="all, delete-orphan")
 
 
 class Transaction(Base):
@@ -46,8 +47,10 @@ class Transaction(Base):
         Integer, ForeignKey("recurring_transactions.id"), nullable=True
     )
     credit_card_id = Column(Integer, ForeignKey("credit_cards.id"), nullable=True)
+    installment_plan_id = Column(Integer, ForeignKey("installment_plans.id"), nullable=True)
 
     owner = relationship("User", back_populates="transactions")
+    installment_plan = relationship("InstallmentPlan", back_populates="transactions", foreign_keys=[installment_plan_id])
 
 
 class RecurringTransaction(Base):
@@ -116,6 +119,7 @@ class CreditCard(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     owner = relationship("User", back_populates="credit_cards")
+    installment_plans = relationship("InstallmentPlan", back_populates="credit_card", cascade="all, delete-orphan")
 
 
 class Category(Base):
@@ -148,6 +152,61 @@ class BudgetLimit(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     owner = relationship("User", back_populates="budget_limits")
+
+
+class InstallmentPlan(Base):
+    """A multi-month credit card installment purchase plan (e.g. 6 installments of 1,000 TL for a 6,000 TL phone)."""
+
+    __tablename__ = "installment_plans"
+    __table_args__ = (
+        Index("ix_installment_plans_owner_status", "owner_id", "status"),
+        Index("ix_installment_plans_card", "credit_card_id"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    credit_card_id = Column(Integer, ForeignKey("credit_cards.id"), nullable=False)
+    description = Column(String, nullable=False)
+    category = Column(String, nullable=True)
+    total_amount = Column(Float, nullable=False)
+    installment_count = Column(Integer, nullable=False)
+    installment_amount = Column(Float, nullable=False)
+    first_due_date = Column(Date, nullable=False)
+    status = Column(String, nullable=False, default="active")  # "active" | "completed" | "cancelled"
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    owner = relationship("User", back_populates="installment_plans")
+    credit_card = relationship("CreditCard", back_populates="installment_plans")
+    payments = relationship(
+        "InstallmentPayment",
+        back_populates="installment_plan",
+        cascade="all, delete-orphan",
+        order_by="InstallmentPayment.installment_number",
+    )
+    transactions = relationship("Transaction", back_populates="installment_plan")
+
+
+class InstallmentPayment(Base):
+    """An individual installment payment obligation belonging to an InstallmentPlan."""
+
+    __tablename__ = "installment_payments"
+    __table_args__ = (
+        Index("ix_installment_payments_plan_status", "installment_plan_id", "status"),
+        Index("ix_installment_payments_due_date", "due_date"),
+        UniqueConstraint("installment_plan_id", "installment_number", name="uq_installment_plan_number"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    installment_plan_id = Column(Integer, ForeignKey("installment_plans.id"), nullable=False)
+    installment_number = Column(Integer, nullable=False)  # 1 to N
+    amount = Column(Float, nullable=False)
+    due_date = Column(Date, nullable=False)
+    paid_at = Column(DateTime(timezone=True), nullable=True)
+    status = Column(String, nullable=False, default="pending")  # "pending" | "paid"
+    transaction_id = Column(Integer, ForeignKey("transactions.id"), nullable=True)
+
+    installment_plan = relationship("InstallmentPlan", back_populates="payments")
+    transaction = relationship("Transaction", foreign_keys=[transaction_id])
 
 
 class RefreshToken(Base):

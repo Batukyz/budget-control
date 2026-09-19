@@ -50,6 +50,7 @@ class TransactionCreate(BaseModel):
     note: Optional[str] = Field(default=None, max_length=1000)
     occurred_on: Optional[date] = None
     credit_card_id: Optional[int] = None
+    installment_plan_id: Optional[int] = None
 
 
 class TransactionUpdate(BaseModel):
@@ -59,6 +60,7 @@ class TransactionUpdate(BaseModel):
     note: Optional[str] = Field(default=None, max_length=1000)
     occurred_on: Optional[date] = None
     credit_card_id: Optional[int] = None
+    installment_plan_id: Optional[int] = None
 
 
 class TransactionOut(BaseModel):
@@ -73,6 +75,7 @@ class TransactionOut(BaseModel):
     created_at: datetime
     recurring_transaction_id: Optional[int] = None
     credit_card_id: Optional[int] = None
+    installment_plan_id: Optional[int] = None
 
 
 class TransactionImportResult(BaseModel):
@@ -265,6 +268,67 @@ class CreditCardOut(BaseModel):
     available_limit: float
     next_statement_date: date
     next_due_date: date
+    total_installment_debt: float = 0.0
+    active_installment_count: int = 0
+
+
+class InstallmentPlanCreate(BaseModel):
+    credit_card_id: int
+    description: str = Field(min_length=1, max_length=200)
+    category: Optional[str] = Field(default=None, max_length=100)
+    total_amount: float = Field(gt=0)
+    installment_count: int = Field(ge=1, le=60)
+    first_due_date: Optional[date] = None
+
+
+class InstallmentPlanUpdate(BaseModel):
+    description: Optional[str] = Field(default=None, min_length=1, max_length=200)
+    category: Optional[str] = Field(default=None, max_length=100)
+
+
+class InstallmentPaymentOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    installment_plan_id: int
+    installment_number: int
+    amount: float
+    due_date: date
+    paid_at: Optional[datetime] = None
+    status: str
+    transaction_id: Optional[int] = None
+
+
+class InstallmentPlanOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    credit_card_id: int
+    description: str
+    category: Optional[str] = None
+    total_amount: float
+    installment_count: int
+    installment_amount: float
+    first_due_date: date
+    status: str
+    created_at: datetime
+    payments: list[InstallmentPaymentOut] = []
+    paid_count: int = 0
+    paid_amount: float = 0.0
+    remaining_amount: float = 0.0
+    card_name: Optional[str] = None
+    bank_name: Optional[str] = None
+
+
+class InstallmentPaymentPayOut(BaseModel):
+    payment: InstallmentPaymentOut
+    plan: InstallmentPlanOut
+    transaction: TransactionOut
+
+
+class AccountResetResponse(BaseModel):
+    message: str
+    detail: Optional[str] = None
 
 
 class AccountBackupTransaction(BaseModel):
@@ -276,6 +340,7 @@ class AccountBackupTransaction(BaseModel):
     occurred_on: date
     credit_card_source_id: Optional[int] = None
     recurring_transaction_source_id: Optional[int] = None
+    installment_plan_source_id: Optional[int] = None
 
 
 class AccountBackupSubscription(BaseModel):
@@ -322,6 +387,29 @@ class AccountBackupBudget(BaseModel):
     monthly_limit: float = Field(gt=0)
 
 
+class AccountBackupInstallmentPayment(BaseModel):
+    plan_source_id: Optional[int] = None
+    installment_number: int
+    amount: float = Field(gt=0)
+    due_date: date
+    paid_at: Optional[datetime] = None
+    status: str = "pending"
+    transaction_source_id: Optional[int] = None
+
+
+class AccountBackupInstallmentPlan(BaseModel):
+    source_id: Optional[int] = None
+    credit_card_source_id: Optional[int] = None
+    description: str = Field(min_length=1, max_length=200)
+    category: Optional[str] = Field(default=None, max_length=100)
+    total_amount: float = Field(gt=0)
+    installment_count: int = Field(ge=1, le=60)
+    installment_amount: float = Field(gt=0)
+    first_due_date: date
+    status: str = "active"
+    created_at: Optional[datetime] = None
+
+
 class AccountBackup(BaseModel):
     exported_at: Optional[datetime] = None
     transactions: list[AccountBackupTransaction] = []
@@ -330,6 +418,8 @@ class AccountBackup(BaseModel):
     credit_cards: list[AccountBackupCreditCard] = []
     categories: list[AccountBackupCategory] = []
     budgets: list[AccountBackupBudget] = []
+    installment_plans: list[AccountBackupInstallmentPlan] = []
+    installment_payments: list[AccountBackupInstallmentPayment] = []
 
 
 class AccountImportResult(BaseModel):
@@ -339,3 +429,5 @@ class AccountImportResult(BaseModel):
     credit_cards: int
     categories: int
     budgets: int
+    installment_plans: Optional[int] = None
+    installment_payments: Optional[int] = None

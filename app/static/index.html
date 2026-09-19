@@ -3367,6 +3367,243 @@
       justify-content: center;
     }
   }
+
+  /* ==========================================================================
+     Milestone 6: Credit Card Installments & Account Reset Styles
+     ========================================================================== */
+  .settings-card-danger {
+    border-color: rgba(232, 17, 74, 0.3) !important;
+  }
+  .settings-card-icon.danger {
+    background: var(--danger-bg);
+    color: var(--danger);
+  }
+  .danger-text {
+    color: var(--danger) !important;
+  }
+  .settings-warning-notice.danger {
+    background: var(--danger-bg);
+    border-color: rgba(232, 17, 74, 0.25);
+    color: var(--danger);
+  }
+
+  /* Installment Plan Cards */
+  .wallet-installments-section {
+    margin-top: 36px;
+  }
+  .wallet-installments-grid, #plan-installments-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 14px;
+  }
+  .installment-plan-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg, 16px);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .installment-plan-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent);
+  }
+  .installment-plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .installment-plan-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .installment-plan-card-tag {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .installment-plan-amounts {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 4px;
+  }
+  .installment-plan-total {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .installment-plan-remaining {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--danger);
+  }
+  .installment-progress-bar {
+    height: 6px;
+    border-radius: 99px;
+    background: var(--input-bg);
+    overflow: hidden;
+  }
+  .installment-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+  .installment-progress-fill.completed {
+    background: var(--success);
+  }
+  .installment-plan-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11.5px;
+    color: var(--muted);
+    padding-top: 4px;
+  }
+  .installment-badge {
+    display: inline-block;
+    padding: 2.5px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .installment-badge.active {
+    background: rgba(59, 130, 246, 0.12);
+    color: #2563eb;
+  }
+  .installment-badge.completed {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+  .tx-tag.installment {
+    background: rgba(147, 51, 234, 0.12);
+    color: #9333ea;
+    border-color: rgba(147, 51, 234, 0.25);
+  }
+
+  /* Installment Modal Schedule Table */
+  .installment-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .installment-detail-cell {
+    background: var(--input-bg);
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .installment-detail-cell-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .installment-detail-cell-val {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .installment-schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 14px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .installment-schedule-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    font-size: 13px;
+    gap: 10px;
+  }
+  .installment-schedule-item.paid {
+    background: var(--input-bg);
+    border-color: transparent;
+  }
+  .installment-schedule-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .installment-num-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    background: var(--input-bg);
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .installment-schedule-item.paid .installment-num-circle {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+  .installment-schedule-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .installment-schedule-num {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text);
+  }
+  .installment-schedule-date {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .installment-schedule-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .installment-schedule-amount {
+    font-weight: 800;
+    font-size: 13.5px;
+    color: var(--text);
+  }
+  .installment-pay-action-btn {
+    padding: 4px 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+    border-radius: 6px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .installment-pay-action-btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+  }
 </style>
 </head>
 <body>
@@ -3777,6 +4014,7 @@
         <button type="button" class="sub-tab-btn active" data-subtab="budgets">🎯 Bütçeler</button>
         <button type="button" class="sub-tab-btn" data-subtab="subscriptions">🔁 Abonelikler</button>
         <button type="button" class="sub-tab-btn" data-subtab="recurring">⚡ Sabit İşlemler</button>
+        <button type="button" class="sub-tab-btn" data-subtab="installments">💳 Taksitler</button>
       </div>
 
       <!-- 3A. Bütçeler -->
@@ -3910,6 +4148,44 @@
           </div>
         </div>
       </div>
+
+      <!-- 3D. Taksitler -->
+      <div class="sub-panel" id="tab-installments" data-subpanel="installments">
+        <div class="subpanel-action-bar">
+          <div class="subpanel-heading">
+            <h3 class="subpanel-title">Taksitli Harcamalar</h3>
+            <p class="subpanel-desc">Kredi kartı taksit planları, kalan borçlar ve ödeme takvimi</p>
+          </div>
+        </div>
+
+        <div class="planning-summary-grid" id="installment-summary-banner">
+          <div class="planning-summary-card">
+            <div class="planning-summary-label">Kalan Taksit Borcu</div>
+            <div class="planning-summary-val expense-text" id="inst-sum-remaining">₺0,00</div>
+            <div class="planning-summary-sub" id="inst-sum-plans-count">0 aktif plan</div>
+          </div>
+          <div class="planning-summary-card">
+            <div class="planning-summary-label">Bu Ayki Taksit Yükü</div>
+            <div class="planning-summary-val accent-text" id="inst-sum-this-month">₺0,00</div>
+            <div class="planning-summary-sub" id="inst-sum-due-count">0 taksit vadesi</div>
+          </div>
+          <div class="planning-summary-card">
+            <div class="planning-summary-label">Tamamlanan Taksitler</div>
+            <div class="planning-summary-val" id="inst-sum-paid">₺0,00</div>
+            <div class="planning-summary-sub" id="inst-sum-completed-pct">%0 tamamlandı</div>
+          </div>
+        </div>
+
+        <div class="plan-cards-container">
+          <div id="plan-installments-list" class="cards-grid"></div>
+          <div class="empty plan-empty" id="plan-installments-empty" style="display:none">
+            <div class="empty-icon">💳</div>
+            <div class="empty-title">Aktif taksit planı bulunmuyor</div>
+            <div class="empty-desc">Kredi kartı ile taksitli harcama yaptığınızda planlarınız burada listelenir.</div>
+            <button type="button" class="btn-primary btn-small" id="plan-empty-add-tx-btn">+ Hızlı Harcama Ekle</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 4. Wallet -->
@@ -3970,6 +4246,18 @@
           <span class="wallet-badge info">Yaklaşan Tarihler</span>
         </div>
         <div class="wallet-due-grid" id="wallet-due-grid"></div>
+      </div>
+
+      <!-- Installments Section in Wallet (Section 13) -->
+      <div class="wallet-installments-section" id="wallet-installments-section" style="display:none">
+        <div class="wallet-section-header">
+          <div>
+            <h3 class="wallet-section-title">Taksitli Harcamalar</h3>
+            <p class="wallet-section-subtitle">Kartlarınıza bağlı aktif taksit planları ve sıradaki ödemeler</p>
+          </div>
+          <span class="wallet-badge accent" id="wallet-installments-badge">0 Plan</span>
+        </div>
+        <div id="wallet-installments-list" class="wallet-installments-grid"></div>
       </div>
     </div>
 
@@ -4156,6 +4444,30 @@
               </label>
             </div>
           </div>
+
+          <!-- Hesabı Sıfırla (Tehlikeli Bölge) -->
+          <div class="card settings-card settings-card-danger">
+            <div class="settings-card-header">
+              <div class="settings-card-icon danger">⚠️</div>
+              <div>
+                <h3 class="settings-card-title danger-text">Hesabı Sıfırla</h3>
+                <p class="settings-card-subtitle">Tüm finansal verileri ve ayarlarınızı kalıcı olarak sıfırlayın</p>
+              </div>
+            </div>
+            <div class="settings-data-desc">
+              Tüm finansal verileriniz ve ayarlarınız sıfırlanır. Kullanıcı hesabınız silinmez. Bu işlem geri alınamaz.
+            </div>
+            <div class="settings-warning-notice danger">
+              <span class="warning-icon">🚨</span>
+              <span>İşlemler, taksitler, kartlar, bütçeler ve abonelikler kalıcı olarak temizlenir. Bu işlem geri alınamaz!</span>
+            </div>
+            <div class="settings-data-actions">
+              <button type="button" class="btn-primary btn-danger-action" id="reset-account-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>Hesabı Sıfırla</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -4326,6 +4638,30 @@
                 <select id="tx-credit-card">
                   <option value="">Krediye bağlama</option>
                 </select>
+              </div>
+
+              <!-- Installment Option (visible when a credit card is selected and type is expense) -->
+              <div id="tx-installment-container" style="display:none;">
+                <div class="form-group-row">
+                  <div class="form-group" style="flex:1;">
+                    <label for="tx-installments">Taksit Sayısı</label>
+                    <select id="tx-installments">
+                      <option value="1">Peşin (1 Taksit)</option>
+                      <option value="2">2 Taksit</option>
+                      <option value="3">3 Taksit</option>
+                      <option value="4">4 Taksit</option>
+                      <option value="5">5 Taksit</option>
+                      <option value="6">6 Taksit</option>
+                      <option value="9">9 Taksit</option>
+                      <option value="12">12 Taksit</option>
+                    </select>
+                  </div>
+                  <div class="form-group" id="tx-first-due-date-group" style="flex:1; display:none;">
+                    <label for="tx-first-due-date">İlk Taksit Tarihi</label>
+                    <input type="date" id="tx-first-due-date">
+                  </div>
+                </div>
+                <div id="tx-installment-calc-preview" style="display:none; font-size: 12px; color: var(--accent); background: var(--input-bg); padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; border: 1px dashed var(--accent);"></div>
               </div>
 
               <!-- Nature Toggle: Variable vs Fixed (Recurring) -->
@@ -4582,10 +4918,63 @@
           <h3 class="confirm-modal-title" id="confirm-modal-title">Emin misiniz?</h3>
           <p class="confirm-modal-message" id="confirm-modal-message"></p>
         </div>
+        <div class="confirm-input-wrap" id="confirm-modal-input-wrap" style="display:none; width: 100%; margin-top: 14px;">
+          <p class="confirm-input-hint" id="confirm-modal-input-hint" style="font-size: 12px; color: var(--muted); margin-bottom: 6px;">Onaylamak için lütfen kutuya <strong id="confirm-modal-input-keyword" class="danger-text">SIFIRLA</strong> yazın:</p>
+          <input type="text" id="confirm-modal-input" class="form-input" style="width: 100%; text-align: center; font-weight: 700; text-transform: uppercase;" autocomplete="off" placeholder="SIFIRLA">
+        </div>
       </div>
       <div class="modal-actions-row confirm-actions-row">
         <button type="button" class="btn-ghost" id="confirm-modal-cancel">İptal</button>
         <button type="button" class="btn-primary" id="confirm-modal-action">Onayla</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Installment Detail Modal / Bottom Sheet -->
+  <div class="tx-modal-overlay" id="installment-modal-overlay" style="display:none;" aria-hidden="true">
+    <div class="tx-modal-backdrop" id="installment-modal-backdrop"></div>
+    <div class="tx-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="installment-detail-title" style="max-width: 520px;">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="tx-modal-header">
+        <div class="tx-modal-title-group">
+          <h3 class="tx-modal-title" id="installment-detail-title">Taksit Planı Detayı</h3>
+          <p class="tx-modal-subtitle" id="installment-detail-subtitle">Ödeme planı ve kalan vadeler</p>
+        </div>
+        <button type="button" class="tx-modal-close" id="installment-modal-close-btn" aria-label="Pencereyi kapat">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="tx-modal-body">
+        <div class="installment-detail-grid">
+          <div class="installment-detail-cell">
+            <div class="installment-detail-cell-lbl">Toplam Tutar</div>
+            <div class="installment-detail-cell-val" id="inst-detail-total">–</div>
+          </div>
+          <div class="installment-detail-cell">
+            <div class="installment-detail-cell-lbl">Kalan Borç</div>
+            <div class="installment-detail-cell-val expense-text" id="inst-detail-remaining">–</div>
+          </div>
+          <div class="installment-detail-cell">
+            <div class="installment-detail-cell-lbl">Kredi Kartı</div>
+            <div class="installment-detail-cell-val" id="inst-detail-card">–</div>
+          </div>
+          <div class="installment-detail-cell">
+            <div class="installment-detail-cell-lbl">İlerleme / Durum</div>
+            <div class="installment-detail-cell-val" id="inst-detail-progress">–</div>
+          </div>
+        </div>
+
+        <div style="font-size: 13px; font-weight: 700; margin: 12px 0 6px; color: var(--text);">Ödeme Takvimi</div>
+        <div class="installment-schedule-list" id="installment-detail-schedule"></div>
+
+        <div class="modal-actions-row" style="margin-top: 20px;">
+          <button type="button" class="btn-ghost btn-danger-action" id="installment-detail-delete-btn" style="color: var(--danger);">Planı Sil</button>
+          <button type="button" class="btn-primary" id="installment-detail-close-btn">Kapat</button>
+        </div>
       </div>
     </div>
   </div>
@@ -4759,7 +5148,10 @@ function showConfirmDialog({
   message = "Bu işlem geri alınamaz.",
   confirmText = "Sil",
   cancelText = "İptal",
-  danger = true
+  danger = true,
+  requiredInput = null,
+  inputHint = null,
+  inputPlaceholder = "SIFIRLA"
 } = {}) {
   return new Promise((resolve) => {
     const overlay = document.getElementById("confirm-modal-overlay");
@@ -4769,6 +5161,10 @@ function showConfirmDialog({
     const actionBtn = document.getElementById("confirm-modal-action");
     const cancelBtn = document.getElementById("confirm-modal-cancel");
     const iconWrap = document.getElementById("confirm-modal-icon");
+    const inputWrap = document.getElementById("confirm-modal-input-wrap");
+    const inputEl = document.getElementById("confirm-modal-input");
+    const inputHintEl = document.getElementById("confirm-modal-input-hint");
+    const inputKeywordEl = document.getElementById("confirm-modal-input-keyword");
 
     if (!overlay || !actionBtn || !cancelBtn) {
       resolve(window.confirm(message));
@@ -4790,10 +5186,39 @@ function showConfirmDialog({
       iconWrap.innerHTML = `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
     }
 
+    let onInputChange = null;
+    if (requiredInput && inputWrap && inputEl) {
+      inputWrap.style.display = "block";
+      inputEl.value = "";
+      inputEl.placeholder = inputPlaceholder;
+      if (inputKeywordEl) inputKeywordEl.textContent = requiredInput;
+      if (inputHint && inputHintEl) inputHintEl.innerHTML = inputHint;
+      actionBtn.disabled = true;
+
+      onInputChange = () => {
+        actionBtn.disabled = (inputEl.value.trim().toUpperCase() !== requiredInput.toUpperCase());
+      };
+      inputEl.addEventListener("input", onInputChange);
+      inputEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !actionBtn.disabled) {
+          e.preventDefault();
+          onConfirm();
+        }
+      });
+    } else if (inputWrap) {
+      inputWrap.style.display = "none";
+      actionBtn.disabled = false;
+    }
+
     const cleanup = () => {
       overlay.style.display = "none";
       overlay.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
+      actionBtn.disabled = false;
+      if (inputWrap) inputWrap.style.display = "none";
+      if (inputEl && onInputChange) {
+        inputEl.removeEventListener("input", onInputChange);
+      }
       actionBtn.removeEventListener("click", onConfirm);
       cancelBtn.removeEventListener("click", onCancel);
       backdrop.removeEventListener("click", onCancel);
@@ -4825,7 +5250,11 @@ function showConfirmDialog({
     overlay.style.display = "flex";
     overlay.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
-    cancelBtn.focus();
+    if (requiredInput && inputEl) {
+      inputEl.focus();
+    } else {
+      cancelBtn.focus();
+    }
   });
 }
 
@@ -4885,6 +5314,7 @@ const TAB_MAP = {
   budgets: { primary: "plan", subpanel: "budgets" },
   subscriptions: { primary: "plan", subpanel: "subscriptions" },
   recurring: { primary: "plan", subpanel: "recurring" },
+  installments: { primary: "plan", subpanel: "installments" },
   wallet: { primary: "wallet" },
   bank: { primary: "wallet" },
   cards: { primary: "wallet" },
@@ -5001,6 +5431,7 @@ async function showApp() {
   loadCategoryChart();
   loadTrendChart();
   loadBudgets();
+  loadInstallments();
   loadAccount();
 }
 
@@ -5009,6 +5440,7 @@ let cachedCreditCards = [];
 let cachedBudgets = [];
 let cachedRecurring = [];
 let latestTransactions = [];
+let cachedInstallments = [];
 
 function renderAlerts() {
   const card = document.getElementById("alerts-card");
@@ -5181,6 +5613,26 @@ function renderUpcomingPayments() {
     }
   }
 
+  for (const plan of (cachedInstallments || [])) {
+    if (plan.status !== "active" || !plan.payments) continue;
+    for (const p of plan.payments) {
+      if (p.status !== "pending" || !p.due_date) continue;
+      const daysUntil = Math.round((new Date(p.due_date) - today) / 86400000);
+      if (daysUntil <= 7) {
+        items.push({
+          title: `${plan.description} (${p.installment_number}/${plan.installment_count} Taksit)`,
+          category: plan.category || "Taksit",
+          amount: p.amount,
+          dueDate: p.due_date,
+          daysUntil,
+          icon: "💳",
+          tab: "installments",
+          plan: plan,
+        });
+      }
+    }
+  }
+
   items.sort((a, b) => a.daysUntil - b.daysUntil);
 
   if (metricBadge) {
@@ -5225,7 +5677,13 @@ function renderUpcomingPayments() {
       </div>
     `;
     row.style.cursor = "pointer";
-    row.addEventListener("click", () => setActiveTab(item.tab));
+    row.addEventListener("click", () => {
+      if (item.plan) {
+        openInstallmentDetailModal(item.plan);
+      } else {
+        setActiveTab(item.tab);
+      }
+    });
     container.appendChild(row);
   }
 }
@@ -5327,9 +5785,65 @@ async function loadOverview() {
 
 function updateCreditCardFieldVisibility() {
   const show = currentTxType === "expense" && currentTxNature === "variable";
+  const group = document.getElementById("tx-credit-card-group");
   const select = document.getElementById("tx-credit-card");
-  select.style.display = show ? "block" : "none";
-  if (!show) select.value = "";
+  if (group) group.style.display = show ? "block" : "none";
+  if (select) {
+    select.style.display = show ? "block" : "none";
+    if (!show) select.value = "";
+  }
+  updateInstallmentFieldVisibility();
+}
+
+function updateInstallmentFieldVisibility() {
+  const container = document.getElementById("tx-installment-container");
+  const ccSelect = document.getElementById("tx-credit-card");
+  const installmentsSelect = document.getElementById("tx-installments");
+  const firstDueGroup = document.getElementById("tx-first-due-date-group");
+  const preview = document.getElementById("tx-installment-calc-preview");
+  const natureGroup = document.getElementById("tx-nature-group");
+
+  if (!container || !ccSelect) return;
+
+  const hasCard = Boolean(ccSelect.value) && currentTxType === "expense" && editingTxId === null;
+  container.style.display = hasCard ? "block" : "none";
+
+  if (!hasCard) {
+    if (installmentsSelect) installmentsSelect.value = "1";
+    if (firstDueGroup) firstDueGroup.style.display = "none";
+    if (preview) preview.style.display = "none";
+    if (natureGroup) natureGroup.style.display = "block";
+    return;
+  }
+
+  const count = installmentsSelect ? parseInt(installmentsSelect.value, 10) : 1;
+  if (count > 1) {
+    if (firstDueGroup) {
+      firstDueGroup.style.display = "block";
+      const firstDueInput = document.getElementById("tx-first-due-date");
+      if (firstDueInput && !firstDueInput.value) {
+        firstDueInput.value = (document.getElementById("tx-date") && document.getElementById("tx-date").value) || todayIsoDate();
+      }
+    }
+    if (natureGroup) natureGroup.style.display = "none";
+
+    const amountInput = document.getElementById("tx-amount");
+    const amountVal = amountInput ? parseFloat(amountInput.value || "0") : 0;
+    if (preview) {
+      if (amountVal > 0) {
+        preview.style.display = "block";
+        const approx = (amountVal / count).toFixed(2);
+        preview.innerHTML = `💳 <strong>${count} Taksit:</strong> Aylık yaklaşık <strong>${formatMoney(approx)}</strong> × ${count} ay (Toplam: ${formatMoney(amountVal)})`;
+      } else {
+        preview.style.display = "block";
+        preview.innerHTML = `💳 <strong>${count} Taksit:</strong> Tutarı girdiğinizde aylık taksit hesaplanacaktır.`;
+      }
+    }
+  } else {
+    if (firstDueGroup) firstDueGroup.style.display = "none";
+    if (preview) preview.style.display = "none";
+    if (natureGroup) natureGroup.style.display = "block";
+  }
 }
 
 function populateCreditCardSelect(cards) {
@@ -5449,12 +5963,17 @@ function setTxFormMode(tx) {
       }
       if (advancedToggleText) advancedToggleText.textContent = "Daha fazla seçenek";
     }
+    updateInstallmentFieldVisibility();
   } else {
     const form = document.getElementById("add-transaction-form");
     if (form) form.reset();
     const dateInput = document.getElementById("tx-date");
     if (dateInput) dateInput.value = todayIsoDate();
     setTxType("expense");
+    const instSelect = document.getElementById("tx-installments");
+    if (instSelect) instSelect.value = "1";
+    const firstDue = document.getElementById("tx-first-due-date");
+    if (firstDue) firstDue.value = todayIsoDate();
     if (advancedFields) {
       advancedFields.style.display = "none";
       if (advancedToggle) {
@@ -5463,6 +5982,7 @@ function setTxFormMode(tx) {
       }
       if (advancedToggleText) advancedToggleText.textContent = "Daha fazla seçenek";
     }
+    updateInstallmentFieldVisibility();
   }
 }
 
@@ -5519,6 +6039,22 @@ function setRecurringFormMode(recurring) {
 const txCancelBtn = document.getElementById("tx-cancel-edit");
 if (txCancelBtn) txCancelBtn.addEventListener("click", () => closeTxModal());
 
+const ccSelectEl = document.getElementById("tx-credit-card");
+if (ccSelectEl) ccSelectEl.addEventListener("change", updateInstallmentFieldVisibility);
+const instSelectEl = document.getElementById("tx-installments");
+if (instSelectEl) instSelectEl.addEventListener("change", updateInstallmentFieldVisibility);
+const txAmountEl = document.getElementById("tx-amount");
+if (txAmountEl) txAmountEl.addEventListener("input", updateInstallmentFieldVisibility);
+const txDateEl = document.getElementById("tx-date");
+if (txDateEl) {
+  txDateEl.addEventListener("change", () => {
+    const firstDueEl = document.getElementById("tx-first-due-date");
+    if (firstDueEl && !firstDueEl.value) {
+      firstDueEl.value = txDateEl.value;
+    }
+  });
+}
+
 const txForm = document.getElementById("add-transaction-form");
 if (txForm) {
   txForm.addEventListener("submit", async (e) => {
@@ -5528,6 +6064,12 @@ if (txForm) {
     const note = document.getElementById("tx-note").value.trim() || null;
     const submitBtn = document.getElementById("tx-submit-btn");
     submitBtn.disabled = true;
+
+    const installmentsEl = document.getElementById("tx-installments");
+    const installmentsVal = installmentsEl ? parseInt(installmentsEl.value, 10) : 1;
+    const creditCardValue = document.getElementById("tx-credit-card") ? document.getElementById("tx-credit-card").value : "";
+    const credit_card_id = creditCardValue ? parseInt(creditCardValue, 10) : null;
+
     let ok;
     if (currentTxNature === "fixed") {
       const name = document.getElementById("tx-name").value.trim();
@@ -5544,10 +6086,32 @@ if (txForm) {
         isEdit ? "Sabit işlem güncellendi." : "Sabit işlem eklendi."
       );
       if (ok) loadRecurring();
+    } else if (currentTxType === "expense" && credit_card_id && installmentsVal > 1 && editingTxId === null) {
+      const firstDueEl = document.getElementById("tx-first-due-date");
+      const first_payment_date = (firstDueEl && firstDueEl.value) || document.getElementById("tx-date").value || todayIsoDate();
+      const description = note || category || "Taksitli Harcama";
+      ok = await apiWrite(
+        "/installments",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            credit_card_id,
+            description,
+            category,
+            total_amount: amount,
+            installment_count: installmentsVal,
+            first_payment_date,
+          }),
+        },
+        `${installmentsVal} taksitli harcama planı oluşturuldu.`
+      );
+      if (ok) {
+        loadCards();
+        loadInstallments();
+      }
     } else {
       const occurred_on = document.getElementById("tx-date").value || todayIsoDate();
-      const creditCardValue = document.getElementById("tx-credit-card") ? document.getElementById("tx-credit-card").value : "";
-      const credit_card_id = creditCardValue ? parseInt(creditCardValue, 10) : null;
       const isEdit = editingTxId !== null;
       ok = await apiWrite(
         isEdit ? `/transactions/${editingTxId}` : "/transactions",
@@ -5568,6 +6132,7 @@ if (txForm) {
     loadCategoryChart();
     loadTrendChart();
     loadBudgets();
+    loadInstallments();
   });
 }
 
@@ -5727,6 +6292,9 @@ function renderTransactionsList(transactions) {
         const card = cachedCreditCards.find((c) => c.id === tx.credit_card_id);
         tagsHtml += `<span class="tx-tag card" title="Kredi kartı">💳 ${card ? escapeHtml(card.card_name ? `${card.bank_name} · ${card.card_name}` : card.bank_name) : "Kredi Kartı"}</span>`;
       }
+      if (tx.installment_plan_id) {
+        tagsHtml += `<span class="tx-tag installment" style="cursor:pointer;" title="Taksitli harcama detayını gör" data-inst-id="${tx.installment_plan_id}">💳 Taksitli</span>`;
+      }
 
       row.innerHTML = `
         <div class="activity-row-left">
@@ -5774,6 +6342,14 @@ function renderTransactionsList(transactions) {
           </div>
         </div>
       `;
+
+      const instTag = row.querySelector(".tx-tag.installment");
+      if (instTag) {
+        instTag.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openInstallmentDetailById(tx.installment_plan_id);
+        });
+      }
 
       const menuBtn = row.querySelector(".activity-menu-btn");
       const menuDropdown = row.querySelector(".activity-dropdown-menu");
@@ -6922,6 +7498,12 @@ async function loadCards() {
         </div>
       </div>
 
+      ${card.total_installment_debt > 0 ? `
+      <div class="cc-installment-indicator" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.1); padding:6px 12px; border-radius:8px; margin: 8px 0; font-size:12px;">
+        <span style="opacity:0.9;">💳 Kalan Taksit Borcu</span>
+        <span style="font-weight:700;">${formatMoney(card.total_installment_debt)} (${card.active_installment_count} Plan)</span>
+      </div>` : ""}
+
       ${card.note ? `<div class="cc-note">📝 ${escapeHtml(card.note)}</div>` : ""}
 
       <div class="cc-footer-actions">
@@ -6939,7 +7521,17 @@ async function loadCards() {
     const deleteBtn = cardEl.querySelector(".card-delete-btn");
     if (deleteBtn) {
       deleteBtn.addEventListener("click", async () => {
-        const cardTitle = `${card.bank_name}${card.name ? " (" + card.name + ")" : ""}`;
+        const cardTitle = `${card.bank_name}${card.card_name ? " (" + card.card_name + ")" : ""}`;
+        if (card.active_installment_count && card.active_installment_count > 0) {
+          await showConfirmDialog({
+            title: "Kart Silinemez",
+            message: `Bu kartın devam eden ${card.active_installment_count} taksit planı bulunuyor. Kartı silmeden önce bu planları yönetmelisiniz.`,
+            confirmText: "Tamam",
+            cancelText: "Kapat",
+            danger: false,
+          });
+          return;
+        }
         const confirmed = await showConfirmDialog({
           title: "Kartı Sil",
           message: `"${cardTitle}" kredi kartını silmek istediğinizden emin misiniz?`,
@@ -6992,6 +7584,8 @@ async function loadCards() {
       dueGrid.appendChild(item);
     }
   }
+
+  renderWalletInstallments();
 }
 
 // ==========================================================================
@@ -7460,8 +8054,9 @@ if (importBackupInput) {
         return;
       }
       const result = await response.json();
+      const instSuffix = result.installment_plans ? `, ${result.installment_plans} taksit planı` : "";
       showToast(
-        `Geri yüklendi: ${result.transactions} işlem, ${result.subscriptions} abonelik, ${result.recurring_transactions} sabit işlem, ${result.credit_cards} kart, ${result.categories} kategori, ${result.budgets} bütçe.`,
+        `Geri yüklendi: ${result.transactions} işlem, ${result.subscriptions} abonelik, ${result.recurring_transactions} sabit işlem, ${result.credit_cards} kart, ${result.categories} kategori, ${result.budgets} bütçe${instSuffix}.`,
         "success"
       );
       loadTransactions();
@@ -7473,6 +8068,7 @@ if (importBackupInput) {
       loadBudgets();
       loadCategoryChart();
       loadTrendChart();
+      loadInstallments();
     } catch (err) {
       showToast(err.message || "Geçersiz yedek dosyası.");
     } finally {
@@ -7480,6 +8076,373 @@ if (importBackupInput) {
     }
   });
 }
+
+// ==========================================================================
+// Account Reset (Hesabı Sıfırla - M6)
+// ==========================================================================
+const resetAccountBtn = document.getElementById("reset-account-btn");
+if (resetAccountBtn) {
+  resetAccountBtn.addEventListener("click", async () => {
+    const confirmed = await showConfirmDialog({
+      title: "Hesabı Sıfırla",
+      message: "Tüm finansal verileriniz ve ayarlarınız sıfırlanır. Kullanıcı hesabınız silinmez. Bu işlem geri alınamaz.",
+      confirmText: "Tüm Verileri Sıfırla",
+      cancelText: "Vazgeç",
+      danger: true,
+      requiredInput: "SIFIRLA",
+      inputHint: 'Onaylamak için lütfen kutuya <strong class="danger-text">SIFIRLA</strong> yazın:',
+      inputPlaceholder: "SIFIRLA",
+    });
+    if (!confirmed) return;
+
+    resetAccountBtn.disabled = true;
+    try {
+      const response = await apiFetch("/account/reset", { method: "POST" });
+      if (!response.ok) {
+        showToast(await extractErrorMessage(response));
+        return;
+      }
+      const res = await response.json();
+      showToast(res.message || "Hesabınız başarıyla sıfırlandı.", "success");
+
+      // Reset cached states
+      cachedSubscriptions = [];
+      cachedCreditCards = [];
+      cachedBudgets = [];
+      cachedRecurring = [];
+      latestTransactions = [];
+      cachedInstallments = [];
+      allTransactions = [];
+
+      // Reload all views
+      await Promise.all([
+        loadOverview(),
+        loadTransactions(),
+        loadSubscriptions(),
+        loadRecurring(),
+        loadCards(),
+        loadCategories(),
+        loadBudgets(),
+        loadCategoryChart(),
+        loadTrendChart(),
+        loadInstallments(),
+        loadAccount(),
+      ]);
+    } catch (err) {
+      showToast(err.message || "Hesap sıfırlanırken hata oluştu.");
+    } finally {
+      resetAccountBtn.disabled = false;
+    }
+  });
+}
+
+// ==========================================================================
+// Credit Card Installment Plans & Payments (M6)
+// ==========================================================================
+async function loadInstallments() {
+  const plans = await apiRead("/installments");
+  if (!plans) return;
+  cachedInstallments = plans;
+
+  renderPlanInstallments();
+  renderWalletInstallments();
+  renderUpcomingPayments();
+}
+
+function renderPlanInstallments() {
+  const list = document.getElementById("plan-installments-list");
+  const empty = document.getElementById("plan-installments-empty");
+  if (!list) return;
+
+  const plans = cachedInstallments || [];
+  const activePlans = plans.filter((p) => p.status === "active");
+
+  let totalRemainingDebt = 0;
+  let thisMonthBurden = 0;
+  let thisMonthDueCount = 0;
+  let completedAmount = 0;
+  let totalOriginal = 0;
+
+  const now = new Date();
+  const curYear = now.getFullYear();
+  const curMonth = now.getMonth();
+
+  for (const plan of plans) {
+    totalOriginal += plan.total_amount;
+    totalRemainingDebt += plan.remaining_amount;
+    completedAmount += (plan.total_amount - plan.remaining_amount);
+
+    if (plan.status === "active" && plan.payments) {
+      for (const p of plan.payments) {
+        if (p.status === "pending" && p.due_date) {
+          const d = new Date(p.due_date);
+          if (d.getFullYear() === curYear && d.getMonth() === curMonth) {
+            thisMonthBurden += p.amount;
+            thisMonthDueCount++;
+          }
+        }
+      }
+    }
+  }
+
+  const completedPct = totalOriginal > 0 ? Math.min(100, Math.round((completedAmount / totalOriginal) * 100)) : 0;
+
+  const sumRemaining = document.getElementById("inst-sum-remaining");
+  if (sumRemaining) sumRemaining.textContent = formatMoney(totalRemainingDebt);
+  const sumPlans = document.getElementById("inst-sum-plans-count");
+  if (sumPlans) sumPlans.textContent = `${activePlans.length} aktif plan`;
+  const sumMonth = document.getElementById("inst-sum-this-month");
+  if (sumMonth) sumMonth.textContent = formatMoney(thisMonthBurden);
+  const sumDueCount = document.getElementById("inst-sum-due-count");
+  if (sumDueCount) sumDueCount.textContent = `${thisMonthDueCount} taksit vadesi`;
+  const sumPaid = document.getElementById("inst-sum-paid");
+  if (sumPaid) sumPaid.textContent = formatMoney(completedAmount);
+  const sumCompletedPct = document.getElementById("inst-sum-completed-pct");
+  if (sumCompletedPct) sumCompletedPct.textContent = `%${completedPct} tamamlandı`;
+
+  list.innerHTML = "";
+  if (plans.length === 0) {
+    if (empty) empty.style.display = "flex";
+    return;
+  }
+  if (empty) empty.style.display = "none";
+
+  for (const plan of plans) {
+    const cardObj = cachedCreditCards.find((c) => c.id === plan.credit_card_id);
+    const cardTitle = cardObj ? (cardObj.card_name ? `${cardObj.bank_name} · ${cardObj.card_name}` : cardObj.bank_name) : "Kredi Kartı";
+    const pct = plan.installment_count > 0 ? Math.round((plan.completed_installments / plan.installment_count) * 100) : 0;
+    const isCompleted = plan.status === "completed";
+
+    const nextPay = (plan.payments || []).find((p) => p.status === "pending");
+    const nextPayText = nextPay
+      ? `Sıradaki: ${formatDateTr(nextPay.due_date)} (${formatMoney(nextPay.amount)})`
+      : "Tüm taksitler tamamlandı";
+
+    const planEl = document.createElement("div");
+    planEl.className = "installment-plan-card";
+    planEl.innerHTML = `
+      <div class="installment-plan-header">
+        <div>
+          <h4 class="installment-plan-title">${escapeHtml(plan.description)}</h4>
+          <span class="installment-plan-card-name">💳 ${escapeHtml(cardTitle)}${plan.category ? ` · ${escapeHtml(plan.category)}` : ""}</span>
+        </div>
+        <span class="installment-badge ${isCompleted ? "completed" : "active"}">
+          ${isCompleted ? "Tamamlandı" : "Aktif"}
+        </span>
+      </div>
+
+      <div class="installment-plan-metrics">
+        <div>
+          <div class="installment-metric-label">Toplam Tutar</div>
+          <div class="installment-metric-val">${formatMoney(plan.total_amount)}</div>
+        </div>
+        <div>
+          <div class="installment-metric-label">Kalan Borç</div>
+          <div class="installment-metric-val expense-text">${formatMoney(plan.remaining_amount)}</div>
+        </div>
+      </div>
+
+      <div class="installment-progress-wrap">
+        <div class="installment-progress-bar">
+          <div class="installment-progress-fill" style="width: ${pct}%"></div>
+        </div>
+        <div class="installment-progress-labels">
+          <span>${plan.completed_installments} / ${plan.installment_count} Taksit Ödendi</span>
+          <span>%${pct}</span>
+        </div>
+      </div>
+
+      <div class="installment-next-due">
+        <span>⏰ ${nextPayText}</span>
+        <span style="color: var(--accent); font-weight:700;">Detay →</span>
+      </div>
+    `;
+
+    planEl.addEventListener("click", () => openInstallmentDetailModal(plan));
+    list.appendChild(planEl);
+  }
+}
+
+function renderWalletInstallments() {
+  const section = document.getElementById("wallet-installments-section");
+  const list = document.getElementById("wallet-installments-list");
+  const badge = document.getElementById("wallet-installments-badge");
+  if (!section || !list) return;
+
+  const activePlans = (cachedInstallments || []).filter((p) => p.status === "active");
+  if (activePlans.length === 0) {
+    section.style.display = "none";
+    return;
+  }
+
+  section.style.display = "block";
+  if (badge) badge.textContent = `${activePlans.length} Plan`;
+  list.innerHTML = "";
+
+  for (const plan of activePlans) {
+    const cardObj = cachedCreditCards.find((c) => c.id === plan.credit_card_id);
+    const cardTitle = cardObj ? (cardObj.card_name ? `${cardObj.bank_name} · ${cardObj.card_name}` : cardObj.bank_name) : "Kredi Kartı";
+    const nextPay = (plan.payments || []).find((p) => p.status === "pending");
+
+    const itemEl = document.createElement("div");
+    itemEl.className = "wallet-installment-card";
+    itemEl.innerHTML = `
+      <div class="wallet-installment-header">
+        <div>
+          <div class="wallet-installment-title">${escapeHtml(plan.description)}</div>
+          <div class="wallet-installment-card-name">💳 ${escapeHtml(cardTitle)}</div>
+        </div>
+        <div class="wallet-installment-amount">${formatMoney(plan.total_amount)}</div>
+      </div>
+      <div class="wallet-installment-progress-text">
+        <span>${plan.completed_installments}/${plan.installment_count} Taksit</span>
+        <span class="expense-text">Kalan: ${formatMoney(plan.remaining_amount)}</span>
+      </div>
+      ${nextPay ? `<div class="wallet-installment-next">Sıradaki: ${formatDateTr(nextPay.due_date)} · ${formatMoney(nextPay.amount)}</div>` : ""}
+    `;
+    itemEl.addEventListener("click", () => openInstallmentDetailModal(plan));
+    list.appendChild(itemEl);
+  }
+}
+
+let activeDetailPlanId = null;
+
+function openInstallmentDetailById(planId) {
+  const plan = (cachedInstallments || []).find((p) => p.id === planId);
+  if (plan) {
+    openInstallmentDetailModal(plan);
+  } else {
+    apiRead(`/installments/${planId}`).then((fetched) => {
+      if (fetched) openInstallmentDetailModal(fetched);
+    });
+  }
+}
+
+function openInstallmentDetailModal(plan) {
+  activeDetailPlanId = plan.id;
+  const overlay = document.getElementById("installment-modal-overlay");
+  const titleEl = document.getElementById("installment-detail-title");
+  const subtitleEl = document.getElementById("installment-detail-subtitle");
+  const totalEl = document.getElementById("inst-detail-total");
+  const remainingEl = document.getElementById("inst-detail-remaining");
+  const cardEl = document.getElementById("inst-detail-card");
+  const progressEl = document.getElementById("inst-detail-progress");
+  const scheduleList = document.getElementById("installment-detail-schedule");
+  const deleteBtn = document.getElementById("installment-detail-delete-btn");
+
+  if (!overlay) return;
+
+  const cardObj = cachedCreditCards.find((c) => c.id === plan.credit_card_id);
+  const cardTitle = cardObj ? (cardObj.card_name ? `${cardObj.bank_name} · ${cardObj.card_name}` : cardObj.bank_name) : "Kredi Kartı";
+
+  if (titleEl) titleEl.textContent = plan.description;
+  if (subtitleEl) subtitleEl.textContent = `${plan.installment_count} Taksit · ${plan.category || "Genel"}`;
+  if (totalEl) totalEl.textContent = formatMoney(plan.total_amount);
+  if (remainingEl) remainingEl.textContent = formatMoney(plan.remaining_amount);
+  if (cardEl) cardEl.textContent = cardTitle;
+  if (progressEl) {
+    progressEl.textContent = `${plan.completed_installments} / ${plan.installment_count} (${plan.status === "completed" ? "Tamamlandı" : "Aktif"})`;
+  }
+
+  if (scheduleList) {
+    scheduleList.innerHTML = "";
+    const payments = plan.payments || [];
+    payments.forEach((payment) => {
+      const isPaid = payment.status === "paid";
+      const item = document.createElement("div");
+      item.className = `installment-schedule-item ${isPaid ? "paid" : "pending"}`;
+      item.innerHTML = `
+        <div class="installment-schedule-left">
+          <div class="installment-num-circle">${isPaid ? "✓" : payment.installment_number}</div>
+          <div class="installment-schedule-meta">
+            <span class="installment-schedule-num">${payment.installment_number}. Taksit</span>
+            <span class="installment-schedule-date">${formatDateTr(payment.due_date)}${isPaid && payment.paid_at ? ` · Ödendi (${formatDateTr(payment.paid_at.slice(0, 10))})` : ""}</span>
+          </div>
+        </div>
+        <div class="installment-schedule-right">
+          <span class="installment-schedule-amount">${formatMoney(payment.amount)}</span>
+          ${isPaid
+            ? `<span class="installment-badge completed" style="font-size: 11px;">Ödendi</span>`
+            : `<button type="button" class="installment-pay-action-btn" data-payment-id="${payment.id}">Öde</button>`
+          }
+        </div>
+      `;
+
+      if (!isPaid) {
+        const payBtn = item.querySelector(".installment-pay-action-btn");
+        if (payBtn) {
+          payBtn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            payBtn.disabled = true;
+            payBtn.textContent = "Ödeniyor…";
+            const res = await apiWrite(
+              `/installments/${plan.id}/payments/${payment.id}/pay`,
+              { method: "POST" },
+              `${payment.installment_number}. taksit ödendi olarak kaydedildi.`
+            );
+            if (res) {
+              await loadInstallments();
+              await loadCards();
+              await loadTransactions();
+              await loadOverview();
+              await loadBudgets();
+              const updatedPlan = (cachedInstallments || []).find((p) => p.id === plan.id);
+              if (updatedPlan) openInstallmentDetailModal(updatedPlan);
+              else closeInstallmentModal();
+            } else {
+              payBtn.disabled = false;
+              payBtn.textContent = "Öde";
+            }
+          });
+        }
+      }
+
+      scheduleList.appendChild(item);
+    });
+  }
+
+  if (deleteBtn) {
+    deleteBtn.onclick = async () => {
+      const confirmed = await showConfirmDialog({
+        title: "Taksit Planını Sil",
+        message: `"${plan.description}" taksit planını silmek istediğinizden emin misiniz? Yapılan ödeme geçmişi işlemleri korunur.`,
+        confirmText: "Planı Sil",
+        danger: true,
+      });
+      if (!confirmed) return;
+      const ok = await apiWrite(`/installments/${plan.id}`, { method: "DELETE" }, "Taksit planı silindi.");
+      if (ok) {
+        closeInstallmentModal();
+        await loadInstallments();
+        await loadCards();
+      }
+    };
+  }
+
+  overlay.style.display = "flex";
+  overlay.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeInstallmentModal() {
+  const overlay = document.getElementById("installment-modal-overlay");
+  if (overlay) {
+    overlay.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+  activeDetailPlanId = null;
+}
+
+const instCloseBtn = document.getElementById("installment-modal-close-btn");
+if (instCloseBtn) instCloseBtn.addEventListener("click", closeInstallmentModal);
+const instDetailCloseBtn = document.getElementById("installment-detail-close-btn");
+if (instDetailCloseBtn) instDetailCloseBtn.addEventListener("click", closeInstallmentModal);
+const instBackdrop = document.getElementById("installment-modal-backdrop");
+if (instBackdrop) instBackdrop.addEventListener("click", closeInstallmentModal);
+
+const planEmptyBtn = document.getElementById("plan-empty-add-tx-btn");
+if (planEmptyBtn) planEmptyBtn.addEventListener("click", () => openTxModal(null));
 
 async function loadAccount() {
   const me = await apiRead("/me");

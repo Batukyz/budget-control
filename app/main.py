@@ -1019,6 +1019,15 @@ def _next_occurrence_of_day(today: date, day: int) -> date:
 
 def _credit_card_to_out(card: models.CreditCard) -> schemas.CreditCardOut:
     today = date.today()
+    total_installment_debt = 0.0
+    active_installment_count = 0
+    if hasattr(card, "installment_plans") and card.installment_plans:
+        for plan in card.installment_plans:
+            if plan.status == "active":
+                active_installment_count += 1
+                for p in plan.payments:
+                    if p.status == "pending":
+                        total_installment_debt += p.amount
     return schemas.CreditCardOut(
         id=card.id,
         bank_name=card.bank_name,
@@ -1032,6 +1041,8 @@ def _credit_card_to_out(card: models.CreditCard) -> schemas.CreditCardOut:
         available_limit=round(card.limit_amount - card.current_debt, 2),
         next_statement_date=_next_occurrence_of_day(today, card.statement_day),
         next_due_date=_next_occurrence_of_day(today, card.due_day),
+        total_installment_debt=round(total_installment_debt, 2),
+        active_installment_count=active_installment_count,
     )
 
 
@@ -1104,11 +1115,311 @@ def delete_credit_card(
     current_user: models.User = Depends(get_current_user),
 ):
     card = _get_owned_credit_card(card_id, current_user.id, db)
+    unpaid_installments = (
+        db.query(models.InstallmentPayment)
+        .join(models.InstallmentPlan, models.InstallmentPayment.installment_plan_id == models.InstallmentPlan.id)
+        .filter(
+            models.InstallmentPlan.credit_card_id == card.id,
+            models.InstallmentPlan.owner_id == current_user.id,
+            models.InstallmentPayment.status == "pending",
+        )
+        .count()
+    )
+    if unpaid_installments > 0:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Bu kartın devam eden {unpaid_installments} taksit ödemesi bulunuyor. Kartı silmeden önce bu planları yönetmelisiniz.",
+        )
     db.query(models.Transaction).filter(models.Transaction.credit_card_id == card.id).update(
         {"credit_card_id": None}
     )
     db.delete(card)
     db.commit()
+
+
+def _compute_installment_amounts(total_amount: float, count: int) -> list[float]:
+    total_cents = round(total_amount * 100)
+    base_cents = total_cents // count
+    remainder = total_cents % count
+    amounts = []
+    for i in range(count):
+        cents = base_cents + (1 if i >= count - remainder else 0)
+        amounts.append(round(cents / 100.0, 2))
+    return amounts
+
+
+def _advance_by_month(base_date: date, month_offset: int, anchor_day: int) -> date:
+    total_month = (base_date.year * 12 + (base_date.month - 1)) + month_offset
+    year = total_month // 12
+    month = (total_month % 12) + 1
+    max_day = calendar.monthrange(year, month)[1]
+    day = min(anchor_day, max_day)
+    return date(year, month, day)
+
+
+def _get_owned_installment_plan(plan_id: int, owner_id: int, db: Session) -> models.InstallmentPlan:
+    plan = (
+        db.query(models.InstallmentPlan)
+        .filter(models.InstallmentPlan.id == plan_id, models.InstallmentPlan.owner_id == owner_id)
+        .first()
+    )
+    if plan is None:
+        raise HTTPException(status_code=404, detail="Installment plan not found")
+    return plan
+
+
+def _installment_plan_to_out(plan: models.InstallmentPlan) -> schemas.InstallmentPlanOut:
+    payments_out = [
+        schemas.InstallmentPaymentOut(
+            id=p.id,
+            installment_plan_id=p.installment_plan_id,
+            installment_number=p.installment_number,
+            amount=p.amount,
+            due_date=p.due_date,
+            paid_at=p.paid_at,
+            status=p.status,
+            transaction_id=p.transaction_id,
+        )
+        for p in plan.payments
+    ]
+    paid_payments = [p for p in plan.payments if p.status == "paid"]
+    paid_count = len(paid_payments)
+    paid_amount = round(sum(p.amount for p in paid_payments), 2)
+    remaining_amount = round(max(0.0, plan.total_amount - paid_amount), 2)
+    card_name = plan.credit_card.card_name if plan.credit_card else None
+    bank_name = plan.credit_card.bank_name if plan.credit_card else None
+
+    return schemas.InstallmentPlanOut(
+        id=plan.id,
+        credit_card_id=plan.credit_card_id,
+        description=plan.description,
+        category=plan.category,
+        total_amount=plan.total_amount,
+        installment_count=plan.installment_count,
+        installment_amount=plan.installment_amount,
+        first_due_date=plan.first_due_date,
+        status=plan.status,
+        created_at=plan.created_at,
+        payments=payments_out,
+        paid_count=paid_count,
+        paid_amount=paid_amount,
+        remaining_amount=remaining_amount,
+        card_name=card_name,
+        bank_name=bank_name,
+    )
+
+
+@app.post("/installments", response_model=schemas.InstallmentPlanOut, status_code=201)
+def create_installment_plan(
+    payload: schemas.InstallmentPlanCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    card = _get_owned_credit_card(payload.credit_card_id, current_user.id, db)
+    base_date = payload.first_due_date or date.today()
+    amounts = _compute_installment_amounts(payload.total_amount, payload.installment_count)
+
+    plan = models.InstallmentPlan(
+        owner_id=current_user.id,
+        credit_card_id=card.id,
+        description=payload.description.strip(),
+        category=payload.category,
+        total_amount=round(payload.total_amount, 2),
+        installment_count=payload.installment_count,
+        installment_amount=round(payload.total_amount / payload.installment_count, 2),
+        first_due_date=base_date,
+        status="active",
+    )
+    db.add(plan)
+    db.flush()
+
+    for i in range(payload.installment_count):
+        due_date = _advance_by_month(base_date, i, base_date.day)
+        payment = models.InstallmentPayment(
+            installment_plan_id=plan.id,
+            installment_number=i + 1,
+            amount=amounts[i],
+            due_date=due_date,
+            status="pending",
+        )
+        db.add(payment)
+
+    db.commit()
+    db.refresh(plan)
+    return _installment_plan_to_out(plan)
+
+
+@app.get("/installments", response_model=list[schemas.InstallmentPlanOut])
+def list_installment_plans(
+    status: Optional[str] = None,
+    credit_card_id: Optional[int] = None,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    query = db.query(models.InstallmentPlan).filter(models.InstallmentPlan.owner_id == current_user.id)
+    if status is not None:
+        query = query.filter(models.InstallmentPlan.status == status)
+    if credit_card_id is not None:
+        query = query.filter(models.InstallmentPlan.credit_card_id == credit_card_id)
+    plans = query.order_by(models.InstallmentPlan.id.desc()).all()
+    return [_installment_plan_to_out(p) for p in plans]
+
+
+@app.get("/installments/{plan_id}", response_model=schemas.InstallmentPlanOut)
+def get_installment_plan(
+    plan_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    plan = _get_owned_installment_plan(plan_id, current_user.id, db)
+    return _installment_plan_to_out(plan)
+
+
+@app.put("/installments/{plan_id}", response_model=schemas.InstallmentPlanOut)
+def update_installment_plan(
+    plan_id: int,
+    update: schemas.InstallmentPlanUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    plan = _get_owned_installment_plan(plan_id, current_user.id, db)
+    if update.description is not None:
+        plan.description = update.description.strip()
+    if update.category is not None:
+        plan.category = update.category
+    db.commit()
+    db.refresh(plan)
+    return _installment_plan_to_out(plan)
+
+
+@app.delete("/installments/{plan_id}", status_code=204)
+def delete_installment_plan(
+    plan_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    plan = _get_owned_installment_plan(plan_id, current_user.id, db)
+    db.query(models.Transaction).filter(models.Transaction.installment_plan_id == plan.id).update(
+        {"installment_plan_id": None}
+    )
+    db.delete(plan)
+    db.commit()
+
+
+@app.post("/installments/{plan_id}/payments/{payment_id}/pay", response_model=schemas.InstallmentPaymentPayOut)
+def pay_installment_payment(
+    plan_id: int,
+    payment_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    plan = _get_owned_installment_plan(plan_id, current_user.id, db)
+    payment = (
+        db.query(models.InstallmentPayment)
+        .filter(models.InstallmentPayment.id == payment_id, models.InstallmentPayment.installment_plan_id == plan.id)
+        .first()
+    )
+    if payment is None:
+        raise HTTPException(status_code=404, detail="Installment payment not found")
+
+    # Idempotency: If already paid, return existing state
+    if payment.status == "paid" and payment.transaction_id is not None:
+        tx = db.query(models.Transaction).filter(models.Transaction.id == payment.transaction_id).first()
+        if tx:
+            return schemas.InstallmentPaymentPayOut(
+                payment=schemas.InstallmentPaymentOut.model_validate(payment),
+                plan=_installment_plan_to_out(plan),
+                transaction=tx,
+            )
+
+    payment.status = "paid"
+    payment.paid_at = datetime.utcnow()
+
+    # Create transaction in Activity
+    note_text = f"{plan.description} ({payment.installment_number}/{plan.installment_count} Taksit)"
+    tx = models.Transaction(
+        owner_id=current_user.id,
+        amount=payment.amount,
+        type="expense",
+        category=plan.category,
+        note=note_text,
+        occurred_on=date.today(),
+        credit_card_id=plan.credit_card_id,
+        installment_plan_id=plan.id,
+    )
+    db.add(tx)
+    db.flush()
+
+    payment.transaction_id = tx.id
+    _adjust_card_debt(db, plan.credit_card_id, payment.amount)
+
+    pending_count = (
+        db.query(models.InstallmentPayment)
+        .filter(models.InstallmentPayment.installment_plan_id == plan.id, models.InstallmentPayment.status == "pending")
+        .count()
+    )
+    if pending_count == 0:
+        plan.status = "completed"
+
+    db.commit()
+    db.refresh(plan)
+    db.refresh(payment)
+    db.refresh(tx)
+
+    return schemas.InstallmentPaymentPayOut(
+        payment=schemas.InstallmentPaymentOut.model_validate(payment),
+        plan=_installment_plan_to_out(plan),
+        transaction=tx,
+    )
+
+
+@app.post("/account/reset", response_model=schemas.AccountResetResponse)
+def reset_account(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    owner_id = current_user.id
+    try:
+        # 1. Installment payments
+        db.query(models.InstallmentPayment).filter(
+            models.InstallmentPayment.installment_plan_id.in_(
+                db.query(models.InstallmentPlan.id).filter(models.InstallmentPlan.owner_id == owner_id)
+            )
+        ).delete(synchronize_session=False)
+
+        # 2. Transactions
+        db.query(models.Transaction).filter(models.Transaction.owner_id == owner_id).delete(synchronize_session=False)
+
+        # 3. Installment plans
+        db.query(models.InstallmentPlan).filter(models.InstallmentPlan.owner_id == owner_id).delete(synchronize_session=False)
+
+        # 4. Recurring transactions
+        db.query(models.RecurringTransaction).filter(models.RecurringTransaction.owner_id == owner_id).delete(synchronize_session=False)
+
+        # 5. Subscriptions
+        db.query(models.Subscription).filter(models.Subscription.owner_id == owner_id).delete(synchronize_session=False)
+
+        # 6. Budget limits
+        db.query(models.BudgetLimit).filter(models.BudgetLimit.owner_id == owner_id).delete(synchronize_session=False)
+
+        # 7. Credit cards
+        db.query(models.CreditCard).filter(models.CreditCard.owner_id == owner_id).delete(synchronize_session=False)
+
+        # 8. Categories
+        db.query(models.Category).filter(models.Category.owner_id == owner_id).delete(synchronize_session=False)
+
+        # 9. Backup imports
+        db.query(models.BackupImport).filter(models.BackupImport.owner_id == owner_id).delete(synchronize_session=False)
+
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Hesap sıfırlanamadı") from exc
+
+    return schemas.AccountResetResponse(
+        message="Hesabınız başarıyla sıfırlandı.",
+        detail="Tüm finansal verileriniz temizlendi.",
+    )
 
 
 @app.get("/account/export", response_model=schemas.AccountBackup)
@@ -1123,6 +1434,13 @@ def export_account(
     cards = db.query(models.CreditCard).filter(models.CreditCard.owner_id == owner_id).all()
     categories = db.query(models.Category).filter(models.Category.owner_id == owner_id).all()
     budgets = db.query(models.BudgetLimit).filter(models.BudgetLimit.owner_id == owner_id).all()
+    plans = db.query(models.InstallmentPlan).filter(models.InstallmentPlan.owner_id == owner_id).all()
+    payments = (
+        db.query(models.InstallmentPayment)
+        .join(models.InstallmentPlan, models.InstallmentPayment.installment_plan_id == models.InstallmentPlan.id)
+        .filter(models.InstallmentPlan.owner_id == owner_id)
+        .all()
+    )
 
     return schemas.AccountBackup(
         exported_at=datetime.utcnow(),
@@ -1131,6 +1449,7 @@ def export_account(
                 source_id=t.id, amount=t.amount, type=t.type, category=t.category, note=t.note,
                 occurred_on=t.occurred_on, credit_card_source_id=t.credit_card_id,
                 recurring_transaction_source_id=t.recurring_transaction_id,
+                installment_plan_source_id=t.installment_plan_id,
             )
             for t in transactions
         ],
@@ -1174,10 +1493,37 @@ def export_account(
         ],
         categories=[schemas.AccountBackupCategory(name=cat.name, type=cat.type) for cat in categories],
         budgets=[schemas.AccountBackupBudget(category=b.category, monthly_limit=b.monthly_limit) for b in budgets],
+        installment_plans=[
+            schemas.AccountBackupInstallmentPlan(
+                source_id=p.id,
+                credit_card_source_id=p.credit_card_id,
+                description=p.description,
+                category=p.category,
+                total_amount=p.total_amount,
+                installment_count=p.installment_count,
+                installment_amount=p.installment_amount,
+                first_due_date=p.first_due_date,
+                status=p.status,
+                created_at=p.created_at,
+            )
+            for p in plans
+        ],
+        installment_payments=[
+            schemas.AccountBackupInstallmentPayment(
+                plan_source_id=pay.installment_plan_id,
+                installment_number=pay.installment_number,
+                amount=pay.amount,
+                due_date=pay.due_date,
+                paid_at=pay.paid_at,
+                status=pay.status,
+                transaction_source_id=pay.transaction_id,
+            )
+            for pay in payments
+        ],
     )
 
 
-@app.post("/account/import", response_model=schemas.AccountImportResult)
+@app.post("/account/import", response_model=schemas.AccountImportResult, response_model_exclude_none=True)
 def import_account(
     payload: schemas.AccountBackup,
     db: Session = Depends(get_db),
@@ -1193,27 +1539,69 @@ def import_account(
         return schemas.AccountImportResult(
             transactions=0, subscriptions=0, recurring_transactions=0,
             credit_cards=0, categories=0, budgets=0,
+            installment_plans=0 if payload.installment_plans else None,
+            installment_payments=0 if payload.installment_payments else None,
         )
 
     card_map: dict[int, int] = {}
     recurring_map: dict[int, int] = {}
+    plan_map: dict[int, int] = {}
+
     for c in payload.credit_cards:
         card = models.CreditCard(owner_id=owner_id, **c.model_dump(exclude={"source_id"}))
         db.add(card)
         db.flush()
         if c.source_id is not None:
             card_map[c.source_id] = card.id
+
     for r in payload.recurring_transactions:
         recurring = models.RecurringTransaction(owner_id=owner_id, **r.model_dump(exclude={"source_id"}))
         db.add(recurring)
         db.flush()
         if r.source_id is not None:
             recurring_map[r.source_id] = recurring.id
+
+    for p in payload.installment_plans:
+        new_card_id = card_map.get(p.credit_card_source_id)
+        if new_card_id is not None:
+            plan = models.InstallmentPlan(
+                owner_id=owner_id,
+                credit_card_id=new_card_id,
+                description=p.description,
+                category=p.category,
+                total_amount=p.total_amount,
+                installment_count=p.installment_count,
+                installment_amount=p.installment_amount,
+                first_due_date=p.first_due_date,
+                status=p.status,
+            )
+            db.add(plan)
+            db.flush()
+            if p.source_id is not None:
+                plan_map[p.source_id] = plan.id
+
+    for pay in payload.installment_payments:
+        new_plan_id = plan_map.get(pay.plan_source_id)
+        if new_plan_id is not None:
+            payment = models.InstallmentPayment(
+                installment_plan_id=new_plan_id,
+                installment_number=pay.installment_number,
+                amount=pay.amount,
+                due_date=pay.due_date,
+                paid_at=pay.paid_at,
+                status=pay.status,
+            )
+            db.add(payment)
+
     for t in payload.transactions:
-        data = t.model_dump(exclude={"source_id", "credit_card_source_id", "recurring_transaction_source_id"})
+        data = t.model_dump(
+            exclude={"source_id", "credit_card_source_id", "recurring_transaction_source_id", "installment_plan_source_id"}
+        )
         data["credit_card_id"] = card_map.get(t.credit_card_source_id)
         data["recurring_transaction_id"] = recurring_map.get(t.recurring_transaction_source_id)
+        data["installment_plan_id"] = plan_map.get(t.installment_plan_source_id)
         db.add(models.Transaction(owner_id=owner_id, **data))
+
     for s in payload.subscriptions:
         db.add(models.Subscription(owner_id=owner_id, **s.model_dump()))
 
@@ -1249,6 +1637,7 @@ def import_account(
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(status_code=400, detail="Yedek geri yüklenemedi; hiçbir veri değiştirilmedi") from exc
+
     return schemas.AccountImportResult(
         transactions=len(payload.transactions),
         subscriptions=len(payload.subscriptions),
@@ -1256,4 +1645,6 @@ def import_account(
         credit_cards=len(payload.credit_cards),
         categories=categories_created,
         budgets=budgets_created,
+        installment_plans=len(payload.installment_plans) if payload.installment_plans else None,
+        installment_payments=len(payload.installment_payments) if payload.installment_payments else None,
     )
