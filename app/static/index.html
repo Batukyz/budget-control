@@ -1779,6 +1779,1129 @@
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
 
+  /* ==========================================================================
+     Milestone 4: Plan, Wallet & Settings Redesign Styles
+     ========================================================================== */
+
+  /* Common Sub-Nav Tabs & Headers */
+  .plan-header-bar, .wallet-top-bar, .settings-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .plan-title-wrap, .wallet-title-wrap, .settings-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .plan-title, .wallet-title, .settings-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .plan-subtitle, .wallet-subtitle, .settings-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .subpanel-action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .subpanel-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .subpanel-title {
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--text);
+  }
+  .subpanel-desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .subpanel-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .plan-action-btn, .wallet-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 16px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    width: auto;
+    box-shadow: 0 4px 12px rgba(47, 143, 111, 0.2);
+  }
+  .plan-action-btn svg, .wallet-action-btn svg {
+    flex-shrink: 0;
+  }
+  .btn-process-due {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--card);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-process-due:hover {
+    background: var(--input-bg);
+    border-color: var(--text);
+  }
+
+  /* Planning Summary Grid (Budgets, Subscriptions, Recurring) */
+  .planning-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .planning-summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    transition: border-color 0.15s ease;
+  }
+  .planning-summary-card:hover {
+    border-color: var(--accent);
+  }
+  .planning-summary-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .planning-summary-val {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .planning-summary-val.accent-text { color: var(--accent); }
+  .planning-summary-val.income-text { color: var(--accent); }
+  .planning-summary-val.expense-text { color: var(--danger); }
+  .planning-summary-val.warning-text { color: var(--warning); }
+  .planning-summary-sub {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* Empty States */
+  .plan-empty, .wallet-empty, .categories-empty {
+    text-align: center;
+    padding: 40px 20px;
+    background: var(--card);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    margin-top: 8px;
+  }
+  .empty-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  .empty-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .empty-desc {
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 380px;
+    margin: 0 auto 16px;
+    line-height: 1.4;
+  }
+
+  /* Budget Cards & Grid */
+  .budget-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+  }
+  .budget-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .budget-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  }
+  .budget-card.over-budget {
+    border-color: rgba(232, 17, 74, 0.4);
+  }
+  .budget-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .budget-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .budget-category-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .budget-status-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .budget-status-pill.normal {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+  .budget-status-pill.warning {
+    background: var(--warning-bg);
+    color: var(--warning);
+  }
+  .budget-status-pill.exceeded {
+    background: var(--danger-bg);
+    color: var(--danger);
+  }
+  .budget-actions, .sub-card-actions, .recurring-actions, .cat-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-icon-action {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--input-bg);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+  }
+  .btn-icon-action:hover {
+    color: var(--text);
+    border-color: var(--text);
+  }
+  .btn-icon-action.danger:hover {
+    color: var(--danger);
+    border-color: var(--danger);
+    background: var(--danger-bg);
+  }
+  .budget-metrics-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 8px;
+  }
+  .budget-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .metric-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .metric-val {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .metric-val.spent { font-size: 15px; font-weight: 800; }
+  .budget-progress-track {
+    height: 8px;
+    background: var(--input-bg);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .budget-progress-bar {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.4s ease;
+  }
+  .budget-progress-bar.success { background: var(--accent); }
+  .budget-progress-bar.warning { background: var(--warning); }
+  .budget-progress-bar.danger { background: var(--danger); }
+  .budget-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12.5px;
+  }
+  .budget-pct-label {
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .budget-diff-label {
+    font-weight: 700;
+  }
+  .budget-diff-label.remaining { color: var(--accent); }
+  .budget-diff-label.exceeded { color: var(--danger); }
+
+  /* Subscription Cards & Grid */
+  .sub-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+  }
+  .sub-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .sub-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  }
+  .sub-card.sub-inactive {
+    opacity: 0.65;
+  }
+  .sub-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+  .sub-identity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sub-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .sub-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .sub-meta-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 3px;
+    flex-wrap: wrap;
+  }
+  .sub-cycle-badge {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: capitalize;
+    background: var(--input-bg);
+    padding: 2px 7px;
+    border-radius: 6px;
+    color: var(--muted);
+  }
+  .sub-category-tag {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .status-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 6px;
+  }
+  .status-pill.success { background: var(--success-bg); color: var(--success); }
+  .status-pill.warning { background: var(--warning-bg); color: var(--warning); }
+  .status-pill.danger { background: var(--danger-bg); color: var(--danger); }
+  .status-pill.muted { background: var(--input-bg); color: var(--muted); }
+  .sub-amount-group {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .sub-amount {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .sub-amount.paid { color: var(--accent); }
+  .sub-frequency-text {
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .sub-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+  .sub-due-indicator {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .sub-due-indicator b { color: var(--text); }
+  .sub-due-indicator.due-soon { color: var(--danger); font-weight: 700; }
+  .sub-due-indicator.due-soon b { color: var(--danger); }
+  .btn-sub-pay {
+    background: var(--success-bg);
+    color: var(--success);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    font-size: 11.5px;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-sub-pay:hover {
+    background: var(--success);
+    color: var(--on-success);
+  }
+
+  /* Recurring Cards & Grid */
+  .recurring-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+  }
+  .recurring-item-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .recurring-item-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  }
+  .recurring-item-card.item-inactive {
+    opacity: 0.65;
+  }
+  .recurring-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .recurring-item-identity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .recurring-type-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .recurring-type-icon.income { background: var(--success-bg); color: var(--success); }
+  .recurring-type-icon.expense { background: var(--danger-bg); color: var(--danger); }
+  .recurring-item-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .recurring-item-tags {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 3px;
+    flex-wrap: wrap;
+  }
+  .recurring-amount {
+    font-size: 17px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .recurring-amount.income { color: var(--accent); }
+  .recurring-amount.expense { color: var(--danger); }
+  .recurring-item-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+  .recurring-next-date {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .recurring-next-date b { color: var(--text); }
+
+  /* Wallet Summary & Grid */
+  .wallet-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .wallet-summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    transition: border-color 0.15s ease;
+  }
+  .wallet-summary-card:hover { border-color: var(--accent); }
+  .wallet-summary-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .wallet-summary-val {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .wallet-summary-sub {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .wallet-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .wallet-section-title {
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--text);
+  }
+  .wallet-badge {
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: var(--input-bg);
+    color: var(--muted);
+  }
+  .wallet-badge.info {
+    background: var(--info-bg);
+    color: var(--info);
+  }
+
+  /* Digital Credit Card Component (Prompt 8A) */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+  .digital-credit-card {
+    position: relative;
+    border-radius: 20px;
+    padding: 22px 24px;
+    overflow: hidden;
+    color: #ffffff;
+    background: linear-gradient(135deg, #1e2538 0%, #101322 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+  }
+  .digital-credit-card.theme-slate {
+    background: linear-gradient(135deg, #1e2538 0%, #0d111d 100%);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  .digital-credit-card.theme-gold {
+    background: linear-gradient(135deg, #3d2c14 0%, #1c1306 100%);
+    border-color: rgba(212, 175, 55, 0.35);
+  }
+  .digital-credit-card.theme-teal {
+    background: linear-gradient(135deg, #0f3630 0%, #061815 100%);
+    border-color: rgba(45, 212, 191, 0.35);
+  }
+  .digital-credit-card.theme-violet {
+    background: linear-gradient(135deg, #2b1846 0%, #120921 100%);
+    border-color: rgba(168, 85, 247, 0.35);
+  }
+  .cc-gloss-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(125deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.01) 60%);
+    pointer-events: none;
+  }
+  .cc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 2;
+  }
+  .cc-bank-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .cc-bank-name {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+  }
+  .cc-card-name {
+    font-size: 12px;
+    opacity: 0.8;
+    color: #cbd5e1;
+  }
+  .cc-chip-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cc-chip {
+    width: 32px;
+    height: 24px;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #d4af37, #f7e28b, #aa820a);
+    border: 1px solid #997509;
+    box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
+  }
+  .cc-contactless {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .cc-available-block {
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 2;
+  }
+  .cc-avail-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.75;
+    color: #cbd5e1;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .cc-avail-val {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    line-height: 1.1;
+  }
+  .cc-progress-wrap {
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 2;
+  }
+  .cc-progress-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .cc-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ade80, #22c55e);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .cc-progress-fill.high {
+    background: linear-gradient(90deg, #f59e0b, #e8114a);
+  }
+  .cc-progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 4px;
+    font-weight: 600;
+  }
+  .cc-meta-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    font-size: 11.5px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    position: relative;
+    z-index: 2;
+  }
+  .cc-meta-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .cc-meta-lbl {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #94a3b8;
+    letter-spacing: 0.04em;
+  }
+  .cc-meta-val {
+    font-weight: 700;
+    color: #f1f5f9;
+  }
+  .cc-meta-col.highlight-due .cc-meta-val {
+    color: #ff6b85;
+  }
+  .cc-note {
+    font-size: 11.5px;
+    color: #cbd5e1;
+    opacity: 0.85;
+    margin-top: 10px;
+    position: relative;
+    z-index: 2;
+  }
+  .cc-footer-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    z-index: 2;
+  }
+  .cc-due-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+  }
+  .cc-due-badge.due-soon {
+    background: rgba(232, 17, 74, 0.35);
+    color: #ff859f;
+  }
+  .cc-due-badge.normal {
+    background: rgba(74, 222, 128, 0.2);
+    color: #86efac;
+  }
+  .cc-btns {
+    display: flex;
+    gap: 8px;
+  }
+  .btn-card-action {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-card-action:hover {
+    background: rgba(255, 255, 255, 0.22);
+  }
+  .btn-card-action.danger {
+    background: rgba(232, 17, 74, 0.25);
+    border-color: rgba(232, 17, 74, 0.4);
+    color: #ff859f;
+  }
+  .btn-card-action.danger:hover {
+    background: rgba(232, 17, 74, 0.4);
+  }
+
+  /* Due Dates Schedule Section (Prompt 8C) */
+  .wallet-due-section {
+    margin-top: 10px;
+  }
+  .wallet-due-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .wallet-due-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .wallet-due-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .wallet-due-date {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .wallet-due-right {
+    text-align: right;
+  }
+  .wallet-due-amount {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  /* Settings Components (Prompt 9A, 9B, 9C, 9D) */
+  .settings-cards-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .settings-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px 22px;
+  }
+  .settings-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .settings-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .settings-card-icon.danger {
+    background: var(--danger-bg);
+    color: var(--danger);
+  }
+  .settings-card-title {
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--text);
+  }
+  .settings-card-subtitle {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 2px 0 0;
+  }
+  .category-cascade-banner {
+    background: var(--info-bg);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 14px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .cascade-icon { font-size: 18px; flex-shrink: 0; }
+  .category-filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cat-filter-btn {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .cat-filter-btn:hover { color: var(--text); }
+  .cat-filter-btn.active {
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .category-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.15s ease;
+  }
+  .category-card:hover {
+    border-color: var(--accent);
+  }
+  .cat-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cat-icon {
+    font-size: 16px;
+  }
+  .cat-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .cat-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 6px;
+    margin-top: 2px;
+    display: inline-block;
+  }
+  .cat-badge.expense { background: var(--danger-bg); color: var(--danger); }
+  .cat-badge.income { background: var(--success-bg); color: var(--success); }
+  .cat-badge.both { background: var(--info-bg); color: var(--info); }
+  .settings-profile-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .settings-form .form-group {
+    margin-bottom: 14px;
+  }
+  .settings-data-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .settings-warning-notice {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: var(--warning-bg);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  .settings-data-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .file-input-label {
+    cursor: pointer;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logout-action-wrap {
+    margin-top: 4px;
+  }
+  .danger-btn {
+    color: var(--danger) !important;
+    border-color: rgba(232, 17, 74, 0.3) !important;
+  }
+  .danger-btn:hover {
+    background: var(--danger-bg) !important;
+    border-color: var(--danger) !important;
+  }
+
+  /* Theme Cards in Settings */
+  .settings-theme-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .theme-option-card {
+    background: var(--input-bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .theme-option-card:hover {
+    border-color: var(--muted);
+  }
+  .theme-option-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(47, 143, 111, 0.18);
+    background: var(--card);
+  }
+  .theme-card-preview {
+    height: 60px;
+    border-radius: 10px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border: 1px solid var(--border);
+  }
+  .theme-light-preview {
+    background: #eef0f7;
+  }
+  .theme-light-preview .preview-header {
+    height: 12px;
+    background: #ffffff;
+    border-radius: 4px;
+  }
+  .theme-light-preview .preview-body {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .theme-light-preview .preview-pill {
+    width: 24px;
+    height: 14px;
+    background: #2f8f6f;
+    border-radius: 4px;
+  }
+  .theme-light-preview .preview-line {
+    flex: 1;
+    height: 8px;
+    background: #ffffff;
+    border-radius: 3px;
+  }
+  .theme-dark-preview {
+    background: #16171d;
+  }
+  .theme-dark-preview .preview-header {
+    height: 12px;
+    background: #21222c;
+    border-radius: 4px;
+  }
+  .theme-dark-preview .preview-body {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .theme-dark-preview .preview-pill {
+    width: 24px;
+    height: 14px;
+    background: #4bbf98;
+    border-radius: 4px;
+  }
+  .theme-dark-preview .preview-line {
+    flex: 1;
+    height: 8px;
+    background: #21222c;
+    border-radius: 3px;
+  }
+  .theme-card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .theme-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .theme-card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 4px 0 0;
+  }
+  .theme-active-indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: inline-block;
+  }
+  .theme-option-card.active .theme-active-indicator {
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: inset 0 0 0 2px var(--card);
+  }
+
   /* Responsive Breakpoint: Mobile & Tablet */
   @media (max-width: 820px) {
     .sidebar { display: none; }
@@ -1997,6 +3120,64 @@
       border-radius: 2px;
       background: var(--border);
       margin: 10px auto 4px;
+    }
+
+    /* Milestone 4 Mobile Responsive Adjustments */
+    .plan-header-bar, .wallet-top-bar, .settings-top-bar {
+      margin-bottom: 14px;
+    }
+    .planning-summary-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .wallet-summary-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .budget-cards-grid, .sub-cards-grid, .recurring-cards-grid, .cards-grid, .categories-grid, .wallet-due-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .subpanel-action-bar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+    .subpanel-actions-group {
+      width: 100%;
+      display: flex;
+      gap: 8px;
+    }
+    .subpanel-actions-group .btn-process-due {
+      flex: 1;
+      justify-content: center;
+    }
+    .subpanel-actions-group .plan-action-btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .plan-action-btn, .wallet-action-btn {
+      width: 100%;
+      justify-content: center;
+    }
+    .settings-theme-grid {
+      grid-template-columns: 1fr;
+    }
+    .digital-credit-card {
+      padding: 18px 20px;
+      min-height: 200px;
+    }
+    .cc-avail-val {
+      font-size: 23px;
+    }
+    .settings-data-actions {
+      flex-direction: column;
+    }
+    .settings-data-actions button, .settings-data-actions label {
+      width: 100%;
+      justify-content: center;
     }
   }
 </style>
@@ -2413,165 +3594,445 @@
 
     <!-- 3. Plan -->
     <div class="main-tab-panel" id="tab-plan" data-tab="plan">
-      <div class="sub-nav-tabs">
+      <div class="plan-header-bar">
+        <div class="plan-title-wrap">
+          <h2 class="plan-title">Finansal Plan</h2>
+          <p class="plan-subtitle">Bütçe limitleri, düzenli abonelikler ve sabit ödemelerinizi planlayın</p>
+        </div>
+      </div>
+
+      <div class="sub-nav-tabs plan-nav-tabs">
         <button type="button" class="sub-tab-btn active" data-subtab="budgets">🎯 Bütçeler</button>
         <button type="button" class="sub-tab-btn" data-subtab="subscriptions">🔁 Abonelikler</button>
+        <button type="button" class="sub-tab-btn" data-subtab="recurring">⚡ Sabit İşlemler</button>
       </div>
 
+      <!-- 3A. Bütçeler -->
       <div class="sub-panel active" id="tab-budgets" data-subpanel="budgets">
-        <div class="card">
-          <div class="section-title" id="budget-form-title">Bütçe limiti ekle</div>
-          <form id="add-budget-form">
-            <input type="text" id="budget-category" list="category-datalist" placeholder="Kategori (boş bırak = genel bütçe)">
-            <input type="number" step="0.01" min="0.01" id="budget-limit" placeholder="Aylık limit" required>
-            <div class="form-actions-row">
-              <button type="submit" class="btn-primary" id="budget-submit-btn">Ekle</button>
-              <button type="button" class="btn-ghost" id="budget-cancel-edit" style="display:none">İptal</button>
-            </div>
-          </form>
+        <div class="subpanel-action-bar">
+          <div class="subpanel-heading">
+            <h3 class="subpanel-title">Aylık Bütçe Takibi</h3>
+            <p class="subpanel-desc">Kategori bazlı ve genel harcama limitlerinizi kontrol edin</p>
+          </div>
+          <button type="button" class="btn-primary plan-action-btn" id="open-budget-modal-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Yeni Bütçe</span>
+          </button>
         </div>
 
-        <div class="card">
-          <div class="section-title">Bu ayki durum</div>
-          <div id="budgets-list"></div>
-          <div class="empty" id="budgets-empty" style="display:none">Henüz bütçe limiti yok.</div>
+        <div class="planning-summary-grid" id="budget-summary-banner">
+          <div class="planning-summary-card">
+            <div class="planning-summary-label">Toplam Bütçe Limiti</div>
+            <div class="planning-summary-val" id="budget-sum-limit">₺0,00</div>
+            <div class="planning-summary-sub" id="budget-sum-count">0 bütçe aktif</div>
+          </div>
+          <div class="planning-summary-card">
+            <div class="planning-summary-label">Bu Ay Harcanan</div>
+            <div class="planning-summary-val" id="budget-sum-spent">₺0,00</div>
+            <div class="planning-summary-sub" id="budget-sum-pct">%0 kullanım</div>
+          </div>
+          <div class="planning-summary-card">
+            <div class="planning-summary-label">Kalan Kullanılabilir</div>
+            <div class="planning-summary-val accent-text" id="budget-sum-remaining">₺0,00</div>
+            <div class="planning-summary-sub" id="budget-sum-status">Limit dahilinde</div>
+          </div>
+        </div>
+
+        <div class="plan-cards-container">
+          <div id="budgets-list" class="budget-cards-grid"></div>
+          <div class="empty plan-empty" id="budgets-empty" style="display:none">
+            <div class="empty-icon">🎯</div>
+            <div class="empty-title">Henüz bütçe limiti yok</div>
+            <div class="empty-desc">Harcamalarınızı kontrol altında tutmak için kategori veya genel bütçe limiti belirleyin.</div>
+            <button type="button" class="btn-primary btn-small" id="empty-add-budget-btn">+ İlk Bütçeni Ekle</button>
+          </div>
         </div>
       </div>
 
+      <!-- 3B. Abonelikler -->
       <div class="sub-panel" id="tab-subscriptions" data-subpanel="subscriptions">
-        <div class="card">
-          <div class="section-title" id="sub-form-title">Abonelik ekle</div>
-          <form id="add-subscription-form">
-            <input type="text" id="sub-name" placeholder="Abonelik adı (örn. Netflix)" required>
-            <div class="row">
-              <input type="number" step="0.01" min="0.01" id="sub-amount" placeholder="Tutar" required>
-              <select id="sub-cycle" style="flex:none; width:130px;">
-                <option value="monthly">Aylık</option>
-                <option value="yearly">Yıllık</option>
-                <option value="weekly">Haftalık</option>
-              </select>
-            </div>
-            <label>Sonraki ödeme tarihi</label>
-            <input type="date" id="sub-due-date" required>
-            <input type="text" id="sub-category" list="category-datalist" placeholder="Kategori (opsiyonel)">
-            <div class="form-actions-row">
-              <button type="submit" class="btn-primary" id="sub-submit-btn">Ekle</button>
-              <button type="button" class="btn-ghost" id="sub-cancel-edit" style="display:none">İptal</button>
-            </div>
-          </form>
+        <div class="subpanel-action-bar">
+          <div class="subpanel-heading">
+            <h3 class="subpanel-title">Abonelik Yönetimi</h3>
+            <p class="subpanel-desc">Dijital servis ve periyodik abonelik harcamalarınız</p>
+          </div>
+          <button type="button" class="btn-primary plan-action-btn" id="open-sub-modal-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Yeni Abonelik</span>
+          </button>
         </div>
 
-        <div class="card">
-          <div class="section-title">Abonelikler</div>
-          <div id="subscriptions-list"></div>
-          <div class="empty" id="subscriptions-empty" style="display:none">Henüz abonelik yok.</div>
+        <div class="planning-summary-grid" id="sub-summary-banner">
+          <div class="planning-summary-card">
+            <div class="planning-summary-label">Aylık Abonelik Yükü</div>
+            <div class="planning-summary-val accent-text" id="sub-sum-monthly">₺0,00 / ay</div>
+            <div class="planning-summary-sub">Düzenli tekrarlayan maliyet</div>
+          </div>
+          <div class="planning-summary-card">
+            <div class="planning-summary-label">Aktif Servisler</div>
+            <div class="planning-summary-val" id="sub-sum-active">0 aktif</div>
+            <div class="planning-summary-sub" id="sub-sum-total">Toplam 0 servis</div>
+          </div>
+          <div class="planning-summary-card">
+            <div class="planning-summary-label">Sıradaki Ödeme</div>
+            <div class="planning-summary-val" id="sub-sum-next">–</div>
+            <div class="planning-summary-sub" id="sub-sum-next-sub">Yaklaşan ödeme yok</div>
+          </div>
+        </div>
+
+        <div class="plan-cards-container">
+          <div id="subscriptions-list" class="sub-cards-grid"></div>
+          <div class="empty plan-empty" id="subscriptions-empty" style="display:none">
+            <div class="empty-icon">🔁</div>
+            <div class="empty-title">Henüz abonelik yok</div>
+            <div class="empty-desc">Netflix, Spotify veya internet gibi düzenli ödemelerinizi takip edin.</div>
+            <button type="button" class="btn-primary btn-small" id="empty-add-sub-btn">+ İlk Aboneliği Ekle</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3C. Sabit İşlemler -->
+      <div class="sub-panel" id="tab-recurring" data-subpanel="recurring">
+        <div class="subpanel-action-bar">
+          <div class="subpanel-heading">
+            <h3 class="subpanel-title">Sabit & Tekrarlayan İşlemler</h3>
+            <p class="subpanel-desc">Maaş, kira, düzenli faturalar ve periyodik nakit akışı</p>
+          </div>
+          <div class="subpanel-actions-group">
+            <button type="button" class="btn-ghost btn-process-due" id="plan-process-due-btn" title="Günü gelen sabit işlemleri oluştur">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              <span>Bekleyenleri İşle</span>
+            </button>
+            <button type="button" class="btn-primary plan-action-btn" id="open-plan-recurring-modal-btn">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Yeni Sabit İşlem</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="planning-summary-grid" id="recurring-summary-banner">
+          <div class="planning-summary-card">
+            <div class="planning-summary-label">Aylık Sabit Gelir</div>
+            <div class="planning-summary-val income-text" id="rec-sum-income">+₺0,00</div>
+            <div class="planning-summary-sub">Düzenli gelir akışı</div>
+          </div>
+          <div class="planning-summary-card">
+            <div class="planning-summary-label">Aylık Sabit Gider</div>
+            <div class="planning-summary-val expense-text" id="rec-sum-expense">-₺0,00</div>
+            <div class="planning-summary-sub">Sabit taahhütler</div>
+          </div>
+          <div class="planning-summary-card">
+            <div class="planning-summary-label">Net Sabit Akış</div>
+            <div class="planning-summary-val" id="rec-sum-net">₺0,00</div>
+            <div class="planning-summary-sub">Aylık net başlangıç</div>
+          </div>
+        </div>
+
+        <div class="plan-cards-container">
+          <div id="plan-recurring-list" class="recurring-cards-grid"></div>
+          <div class="empty plan-empty" id="plan-recurring-empty" style="display:none">
+            <div class="empty-icon">⚡</div>
+            <div class="empty-title">Henüz sabit işlem yok</div>
+            <div class="empty-desc">Kira, maaş veya düzenli aidat işlemlerinizi tanımlayarak otomatik takibe alın.</div>
+            <button type="button" class="btn-primary btn-small" id="empty-add-rec-btn">+ İlk Sabit İşlemi Ekle</button>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- 4. Wallet -->
     <div class="main-tab-panel" id="tab-bank" data-tab="wallet">
-      <div class="card">
-        <div class="section-title" id="card-form-title">Kredi kartı ekle</div>
-        <form id="add-card-form">
-          <input type="text" id="card-bank-name" placeholder="Banka adı (örn. Garanti BBVA)" required>
-          <input type="text" id="card-name" placeholder="Kart adı (opsiyonel, örn. Bonus)">
-          <div class="row">
-            <input type="number" step="0.01" min="0.01" id="card-limit" placeholder="Kart limiti" required>
-            <input type="number" step="0.01" min="0" id="card-debt" placeholder="Güncel borç" value="0">
-          </div>
-          <div class="row">
-            <div style="flex:1">
-              <label>Ekstre kesim günü</label>
-              <input type="number" min="1" max="31" id="card-statement-day" placeholder="örn. 15" required>
-            </div>
-            <div style="flex:1">
-              <label>Son ödeme günü</label>
-              <input type="number" min="1" max="31" id="card-due-day" placeholder="örn. 25" required>
-            </div>
-          </div>
-          <textarea id="card-note" placeholder="Not (opsiyonel)"></textarea>
-          <div class="form-actions-row">
-            <button type="submit" class="btn-primary" id="card-submit-btn">Ekle</button>
-            <button type="button" class="btn-ghost" id="card-cancel-edit" style="display:none">İptal</button>
-          </div>
-        </form>
+      <div class="wallet-top-bar">
+        <div class="wallet-title-wrap">
+          <h2 class="wallet-title">Cüzdan & Kartlarım</h2>
+          <p class="wallet-subtitle">Kredi kartı limitleri, borç dağılımı ve ekstre ödeme takvimi</p>
+        </div>
+        <button type="button" class="btn-primary wallet-action-btn" id="open-card-modal-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Yeni Kart Ekle</span>
+        </button>
       </div>
 
-      <div class="card">
-        <div class="section-title">Kartlarım</div>
-        <div id="cards-list"></div>
-        <div class="empty" id="cards-empty" style="display:none">Henüz kart eklenmedi.</div>
+      <!-- Wallet Summary (Prompt 8B) -->
+      <div class="wallet-summary-grid">
+        <div class="wallet-summary-card">
+          <div class="wallet-summary-label">Toplam Kredi Limiti</div>
+          <div class="wallet-summary-val" id="wallet-sum-limit">₺0,00</div>
+          <div class="wallet-summary-sub" id="wallet-sum-count">0 kart tanımlı</div>
+        </div>
+        <div class="wallet-summary-card">
+          <div class="wallet-summary-label">Toplam Güncel Borç</div>
+          <div class="wallet-summary-val expense-text" id="wallet-sum-debt">₺0,00</div>
+          <div class="wallet-summary-sub" id="wallet-sum-utilization">%0 genel kullanım</div>
+        </div>
+        <div class="wallet-summary-card">
+          <div class="wallet-summary-label">Kullanılabilir Limit</div>
+          <div class="wallet-summary-val accent-text" id="wallet-sum-available">₺0,00</div>
+          <div class="wallet-summary-sub">Serbest harcama payı</div>
+        </div>
+        <div class="wallet-summary-card">
+          <div class="wallet-summary-label">Yaklaşan Son Ödemeler</div>
+          <div class="wallet-summary-val warning-text" id="wallet-sum-upcoming">₺0,00</div>
+          <div class="wallet-summary-sub" id="wallet-sum-upcoming-sub">Son 7 gün içinde</div>
+        </div>
+      </div>
+
+      <!-- Cards Grid (Prompt 8A) -->
+      <div class="wallet-section-header">
+        <h3 class="wallet-section-title">Kayıtlı Kartlar</h3>
+        <span class="wallet-badge" id="cards-count-badge">0 Kart</span>
+      </div>
+
+      <div id="cards-list" class="cards-grid"></div>
+      <div class="empty wallet-empty" id="cards-empty" style="display:none">
+        <div class="empty-icon">💳</div>
+        <div class="empty-title">Henüz kredi kartı eklenmedi</div>
+        <div class="empty-desc">Kredi kartı limitlerinizi, hesap kesim ve son ödeme günlerinizi takip etmek için bir kart ekleyin.</div>
+        <button type="button" class="btn-primary btn-small" id="empty-add-card-btn">+ İlk Kartını Ekle</button>
+      </div>
+
+      <!-- Due Dates & Statement Schedule (Prompt 8C) -->
+      <div class="wallet-due-section" id="wallet-due-section" style="display:none">
+        <div class="wallet-section-header">
+          <h3 class="wallet-section-title">Ödeme & Ekstre Takvimi</h3>
+          <span class="wallet-badge info">Yaklaşan Tarihler</span>
+        </div>
+        <div class="wallet-due-grid" id="wallet-due-grid"></div>
       </div>
     </div>
 
     <!-- 5. Settings -->
     <div class="main-tab-panel" id="tab-settings" data-tab="settings">
-      <div class="sub-nav-tabs">
+      <div class="settings-top-bar">
+        <div class="settings-title-wrap">
+          <h2 class="settings-title">Ayarlar</h2>
+          <p class="settings-subtitle">Kategori yönetimi, hesap güvenliği, veri yedekleme ve tema tercihleri</p>
+        </div>
+      </div>
+
+      <div class="sub-nav-tabs settings-nav-tabs">
         <button type="button" class="sub-tab-btn active" data-subtab="categories">🏷️ Kategoriler</button>
-        <button type="button" class="sub-tab-btn" data-subtab="account">⚙️ Hesap & Yedekleme</button>
+        <button type="button" class="sub-tab-btn" data-subtab="account">👤 Profil & Güvenlik</button>
+        <button type="button" class="sub-tab-btn" data-subtab="data">💾 Veri Yönetimi</button>
+        <button type="button" class="sub-tab-btn" data-subtab="theme">🎨 Görünüm</button>
       </div>
 
+      <!-- 5A. Kategoriler -->
       <div class="sub-panel active" id="tab-categories" data-subpanel="categories">
-        <div class="card">
-          <div class="section-title" id="category-form-title">Kategori ekle</div>
-          <form id="add-category-form">
-            <input type="text" id="category-name" placeholder="Kategori adı (örn. Market)" required>
-            <select id="category-type">
-              <option value="both">Gider ve gelirde kullan</option>
-              <option value="expense">Sadece gider</option>
-              <option value="income">Sadece gelir</option>
-            </select>
-            <div class="form-actions-row">
-              <button type="submit" class="btn-primary" id="category-submit-btn">Ekle</button>
-              <button type="button" class="btn-ghost" id="category-cancel-edit" style="display:none">İptal</button>
-            </div>
-          </form>
+        <div class="subpanel-action-bar">
+          <div class="subpanel-heading">
+            <h3 class="subpanel-title">Kategori Yönetimi</h3>
+            <p class="subpanel-desc">Harcama ve gelirlerinizi gruplamak için özel kategoriler oluşturun</p>
+          </div>
+          <button type="button" class="btn-primary plan-action-btn" id="open-category-modal-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Yeni Kategori</span>
+          </button>
         </div>
 
-        <div class="card">
-          <div class="section-title">Kategorilerim</div>
-          <div id="categories-list"></div>
-          <div class="empty" id="categories-empty" style="display:none">Henüz kategori yok.</div>
+        <div class="category-cascade-banner">
+          <div class="cascade-icon">💡</div>
+          <div class="cascade-text">
+            <b>Otomatik Güncelleme (Cascade):</b> Bir kategorinin adını değiştirdiğinizde, bu kategoriye bağlı geçmiş ve gelecek tüm işlemleriniz, bütçeleriniz ve abonelikleriniz otomatik olarak güncellenir.
+          </div>
+        </div>
+
+        <div class="category-filter-bar">
+          <button type="button" class="cat-filter-btn active" data-cat-filter="all">Tümü (<span id="cat-count-all">0</span>)</button>
+          <button type="button" class="cat-filter-btn" data-cat-filter="expense">Gider (<span id="cat-count-expense">0</span>)</button>
+          <button type="button" class="cat-filter-btn" data-cat-filter="income">Gelir (<span id="cat-count-income">0</span>)</button>
+          <button type="button" class="cat-filter-btn" data-cat-filter="both">Her İkisi (<span id="cat-count-both">0</span>)</button>
+        </div>
+
+        <div class="categories-cards-container">
+          <div id="categories-list" class="categories-grid"></div>
+          <div class="empty categories-empty" id="categories-empty" style="display:none">
+            <div class="empty-icon">🏷️</div>
+            <div class="empty-title">Henüz kategori yok</div>
+            <div class="empty-desc">İşlemlerinizi düzenlemek için ilk kategorinizi ekleyin.</div>
+            <button type="button" class="btn-primary btn-small" id="empty-add-cat-btn">+ İlk Kategoriyi Ekle</button>
+          </div>
         </div>
       </div>
 
+      <!-- 5B. Profil & Güvenlik -->
       <div class="sub-panel" id="tab-account" data-subpanel="account">
-        <div class="card">
-          <div class="section-title">Hesap bilgileri</div>
-          <div class="stat-row">
-            <div class="stat-label">E-posta</div>
-            <div class="stat-value" id="account-email">–</div>
+        <div class="settings-cards-stack">
+          <!-- Profil Bilgileri -->
+          <div class="card settings-card">
+            <div class="settings-card-header">
+              <div class="settings-card-icon">👤</div>
+              <div>
+                <h3 class="settings-card-title">Hesap Bilgileri</h3>
+                <p class="settings-card-subtitle">Kayıtlı hesap profil detaylarınız</p>
+              </div>
+            </div>
+            <div class="settings-profile-grid">
+              <div class="stat-row">
+                <div class="stat-label">E-posta Adresi</div>
+                <div class="stat-value" id="account-email">–</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Kayıt Tarihi</div>
+                <div class="stat-value" id="account-created">–</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Oturum Güvenliği</div>
+                <div class="stat-value"><span class="status-pill success">🔒 HttpOnly Cookie Aktif</span></div>
+              </div>
+            </div>
           </div>
-          <div class="stat-row">
-            <div class="stat-label">Üyelik tarihi</div>
-            <div class="stat-value" id="account-created">–</div>
+
+          <!-- Güvenlik & Şifre -->
+          <div class="card settings-card">
+            <div class="settings-card-header">
+              <div class="settings-card-icon">🛡️</div>
+              <div>
+                <h3 class="settings-card-title">Hesap ve Şifre Güncelleme</h3>
+                <p class="settings-card-subtitle">E-posta adresinizi ve şifrenizi güvenle değiştirin</p>
+              </div>
+            </div>
+            <form id="account-form" class="settings-form">
+              <div class="form-group">
+                <label for="account-email-input">E-posta</label>
+                <input type="email" id="account-email-input" required autocomplete="email">
+              </div>
+              <div class="form-group">
+                <label for="account-password-input">Yeni Şifre</label>
+                <input type="password" id="account-password-input" minlength="8" placeholder="Değiştirmek istemiyorsanız boş bırakın" autocomplete="new-password">
+                <div class="form-hint">En az 8 karakter olmalıdır.</div>
+              </div>
+              <div class="error" id="account-error"></div>
+              <div class="form-actions-row">
+                <button type="submit" class="btn-primary" id="account-submit-btn">Değişiklikleri Kaydet</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Oturum Kapatma -->
+          <div class="card settings-card">
+            <div class="settings-card-header">
+              <div class="settings-card-icon danger">🚪</div>
+              <div>
+                <h3 class="settings-card-title">Oturum</h3>
+                <p class="settings-card-subtitle">Bu cihazdaki oturumunuzu güvenle sonlandırın</p>
+              </div>
+            </div>
+            <div class="logout-action-wrap">
+              <button type="button" class="btn-ghost logout-trigger danger-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Oturumu Kapat</span>
+              </button>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="card">
-          <div class="section-title">Hesabı güncelle</div>
-          <form id="account-form">
-            <label>E-posta</label>
-            <input type="email" id="account-email-input" required>
-            <label>Yeni şifre</label>
-            <input type="password" id="account-password-input" minlength="8" placeholder="Değiştirmek istemiyorsan boş bırak" autocomplete="new-password">
-            <div class="error" id="account-error"></div>
-            <button type="submit" class="btn-primary" id="account-submit-btn">Kaydet</button>
-          </form>
-        </div>
-
-        <div class="card">
-          <div class="section-title">Yedekleme</div>
-          <div class="entry-meta" style="margin-bottom:14px;">
-            Tüm işlem, abonelik, sabit işlem, kredi kartı, kategori ve bütçe verilerini tek bir dosyada yedekle veya geri yükle.
+      <!-- 5C. Veri Yönetimi -->
+      <div class="sub-panel" id="tab-data" data-subpanel="data">
+        <div class="settings-cards-stack">
+          <!-- CSV Veri Yönetimi -->
+          <div class="card settings-card">
+            <div class="settings-card-header">
+              <div class="settings-card-icon">📁</div>
+              <div>
+                <h3 class="settings-card-title">CSV İşlem Yönetimi</h3>
+                <p class="settings-card-subtitle">İşlemlerinizi CSV dosyası olarak indirin veya harici CSV dökümlerinizi içe aktarın</p>
+              </div>
+            </div>
+            <div class="settings-data-desc">
+              Finansal hareketlerinizi Excel, Google E-Tablolar veya muhasebe programlarında kullanmak üzere CSV tablosu olarak dışa aktarabilir ya da geçmiş işlemlerinizi CSV yükleyerek aktarabilirsiniz.
+            </div>
+            <div class="settings-data-actions">
+              <button type="button" class="btn-ghost" id="settings-export-csv-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>İşlemleri CSV Olarak İndir</span>
+              </button>
+              <label class="btn-ghost file-input-label">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>CSV Dosyası İçe Aktar</span>
+                <input type="file" id="settings-import-csv-input" accept=".csv" style="display:none">
+              </label>
+            </div>
           </div>
-          <div class="form-actions-row">
-            <button type="button" class="btn-ghost" id="export-backup-btn">⬇️ Yedeği indir</button>
-            <label class="btn-ghost" style="cursor:pointer; margin:0;">
-              ⬆️ Yedekten geri yükle
-              <input type="file" id="import-backup-input" accept=".json" style="display:none">
-            </label>
+
+          <!-- Tam Hesap Yedekleme (JSON) -->
+          <div class="card settings-card">
+            <div class="settings-card-header">
+              <div class="settings-card-icon">💾</div>
+              <div>
+                <h3 class="settings-card-title">Tam Hesap Yedeği (.JSON)</h3>
+                <p class="settings-card-subtitle">Tüm finansal verilerinizi tek bir dosyada güvenle yedekleyin veya geri yükleyin</p>
+              </div>
+            </div>
+            <div class="settings-data-desc">
+              Tüm işlemler, abonelikler, sabit işlemler, kredi kartları, kategoriler ve bütçe limitleriniz tek bir JSON dosyasında paketlenir. Yeni bir ortama taşınırken veya düzenli veri güvenliği için kullanabilirsiniz.
+            </div>
+            <div class="settings-warning-notice">
+              <span class="warning-icon">⚠️</span>
+              <span>Yedekten geri yükleme işlemi, dosyadaki tüm verileri hesabınıza aktarır ve mevcut kayıtlarla birleştirir.</span>
+            </div>
+            <div class="settings-data-actions">
+              <button type="button" class="btn-ghost" id="export-backup-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Tam Yedeği İndir (.json)</span>
+              </button>
+              <label class="btn-ghost file-input-label">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>Yedekten Geri Yükle (.json)</span>
+                <input type="file" id="import-backup-input" accept=".json" style="display:none">
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5D. Görünüm & Tema -->
+      <div class="sub-panel" id="tab-theme" data-subpanel="theme">
+        <div class="settings-cards-stack">
+          <div class="card settings-card">
+            <div class="settings-card-header">
+              <div class="settings-card-icon">🎨</div>
+              <div>
+                <h3 class="settings-card-title">Görünüm & Tema Tercihi</h3>
+                <p class="settings-card-subtitle">Uygulamanın renk temasını kişiselleştirin</p>
+              </div>
+            </div>
+            <div class="settings-theme-grid">
+              <div class="theme-option-card" id="theme-card-light" data-theme-val="soft">
+                <div class="theme-card-preview theme-light-preview">
+                  <div class="preview-header"></div>
+                  <div class="preview-body">
+                    <div class="preview-pill"></div>
+                    <div class="preview-line"></div>
+                  </div>
+                </div>
+                <div class="theme-card-info">
+                  <div class="theme-card-header-row">
+                    <span class="theme-card-title">☀️ Aydınlık Tema</span>
+                    <span class="theme-active-indicator" id="indicator-light"></span>
+                  </div>
+                  <p class="theme-card-desc">Ferah, net ve yüksek kontrastlı standart görünüm</p>
+                </div>
+              </div>
+
+              <div class="theme-option-card" id="theme-card-dark" data-theme-val="dark">
+                <div class="theme-card-preview theme-dark-preview">
+                  <div class="preview-header"></div>
+                  <div class="preview-body">
+                    <div class="preview-pill"></div>
+                    <div class="preview-line"></div>
+                  </div>
+                </div>
+                <div class="theme-card-info">
+                  <div class="theme-card-header-row">
+                    <span class="theme-card-title">🌙 Karanlık Tema</span>
+                    <span class="theme-active-indicator" id="indicator-dark"></span>
+                  </div>
+                  <p class="theme-card-desc">Göz yormayan, düşük ışık ortamları için optimize koyu tonlar</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2732,6 +4193,215 @@
     </div>
   </div>
 
+  <!-- Budget Modal / Bottom Sheet -->
+  <div class="tx-modal-overlay" id="budget-modal-overlay" style="display:none;" aria-hidden="true">
+    <div class="tx-modal-backdrop" id="budget-modal-backdrop"></div>
+    <div class="tx-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="budget-form-title">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="tx-modal-header">
+        <div class="tx-modal-title-group">
+          <h3 class="tx-modal-title" id="budget-form-title">Bütçe Limiti Ekle</h3>
+          <p class="tx-modal-subtitle">Aylık harcama sınırınızı belirleyin</p>
+        </div>
+        <button type="button" class="tx-modal-close" id="budget-modal-close-btn" aria-label="Pencereyi kapat">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="tx-modal-body">
+        <form id="add-budget-form">
+          <div class="form-group">
+            <label for="budget-category">Kategori</label>
+            <input type="text" id="budget-category" list="category-datalist" placeholder="Kategori (boş bırak = genel bütçe)">
+            <div class="form-hint" style="font-size:12px; color:var(--muted); margin-top:4px;">Boş bırakırsanız tüm harcamalarınız için genel bütçe uygulanır.</div>
+          </div>
+          <div class="form-group amount-group">
+            <label for="budget-limit">Aylık Limit Tutarı</label>
+            <div class="amount-input-wrap">
+              <span class="currency-symbol">₺</span>
+              <input type="number" step="0.01" min="0.01" id="budget-limit" placeholder="0,00" inputmode="decimal" required>
+            </div>
+          </div>
+          <div class="modal-actions-row">
+            <button type="button" class="btn-ghost" id="budget-cancel-edit">İptal</button>
+            <button type="submit" class="btn-primary" id="budget-submit-btn">Ekle</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subscription Modal / Bottom Sheet -->
+  <div class="tx-modal-overlay" id="sub-modal-overlay" style="display:none;" aria-hidden="true">
+    <div class="tx-modal-backdrop" id="sub-modal-backdrop"></div>
+    <div class="tx-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="sub-form-title">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="tx-modal-header">
+        <div class="tx-modal-title-group">
+          <h3 class="tx-modal-title" id="sub-form-title">Abonelik Ekle</h3>
+          <p class="tx-modal-subtitle">Tekrarlayan dijital servis veya abonelik kaydı</p>
+        </div>
+        <button type="button" class="tx-modal-close" id="sub-modal-close-btn" aria-label="Pencereyi kapat">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="tx-modal-body">
+        <form id="add-subscription-form">
+          <div class="form-group">
+            <label for="sub-name">Abonelik Adı</label>
+            <input type="text" id="sub-name" placeholder="Servis adı (örn. Netflix, Spotify, iCloud)" required>
+          </div>
+          <div class="form-group-row">
+            <div class="form-group" style="flex: 2;">
+              <label for="sub-amount">Tutar</label>
+              <div class="amount-input-wrap">
+                <span class="currency-symbol">₺</span>
+                <input type="number" step="0.01" min="0.01" id="sub-amount" placeholder="0,00" inputmode="decimal" required>
+              </div>
+            </div>
+            <div class="form-group" style="flex: 1.2;">
+              <label for="sub-cycle">Periyot</label>
+              <select id="sub-cycle">
+                <option value="monthly">Aylık</option>
+                <option value="yearly">Yıllık</option>
+                <option value="weekly">Haftalık</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="sub-due-date">Sonraki Ödeme Tarihi</label>
+            <input type="date" id="sub-due-date" required>
+          </div>
+          <div class="form-group">
+            <label for="sub-category">Kategori</label>
+            <input type="text" id="sub-category" list="category-datalist" placeholder="Kategori (opsiyonel)">
+          </div>
+          <div class="modal-actions-row">
+            <button type="button" class="btn-ghost" id="sub-cancel-edit">İptal</button>
+            <button type="submit" class="btn-primary" id="sub-submit-btn">Ekle</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Credit Card Modal / Bottom Sheet -->
+  <div class="tx-modal-overlay" id="card-modal-overlay" style="display:none;" aria-hidden="true">
+    <div class="tx-modal-backdrop" id="card-modal-backdrop"></div>
+    <div class="tx-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="card-form-title">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="tx-modal-header">
+        <div class="tx-modal-title-group">
+          <h3 class="tx-modal-title" id="card-form-title">Kredi Kartı Ekle</h3>
+          <p class="tx-modal-subtitle">Kart limitleri ve hesap kesim günlerini tanımlayın</p>
+        </div>
+        <button type="button" class="tx-modal-close" id="card-modal-close-btn" aria-label="Pencereyi kapat">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="tx-modal-body">
+        <form id="add-card-form">
+          <div class="form-group-row">
+            <div class="form-group" style="flex:1.2;">
+              <label for="card-bank-name">Banka Adı</label>
+              <input type="text" id="card-bank-name" placeholder="örn. Garanti BBVA, İş Bankası" required>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label for="card-name">Kart Adı (opsiyonel)</label>
+              <input type="text" id="card-name" placeholder="örn. Bonus, Maximum">
+            </div>
+          </div>
+          <div class="form-group-row">
+            <div class="form-group" style="flex:1;">
+              <label for="card-limit">Kart Limiti</label>
+              <div class="amount-input-wrap">
+                <span class="currency-symbol">₺</span>
+                <input type="number" step="0.01" min="0.01" id="card-limit" placeholder="0,00" inputmode="decimal" required>
+              </div>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label for="card-debt">Güncel Borç</label>
+              <div class="amount-input-wrap">
+                <span class="currency-symbol">₺</span>
+                <input type="number" step="0.01" min="0" id="card-debt" placeholder="0,00" value="0" inputmode="decimal">
+              </div>
+            </div>
+          </div>
+          <div class="form-group-row">
+            <div class="form-group" style="flex:1;">
+              <label for="card-statement-day">Ekstre Kesim Günü</label>
+              <input type="number" min="1" max="31" id="card-statement-day" placeholder="örn. 15" required>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label for="card-due-day">Son Ödeme Günü</label>
+              <input type="number" min="1" max="31" id="card-due-day" placeholder="örn. 25" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="card-note">Not (opsiyonel)</label>
+            <textarea id="card-note" placeholder="Kart hakkında hatırlatıcı not..." rows="2"></textarea>
+          </div>
+          <div class="modal-actions-row">
+            <button type="button" class="btn-ghost" id="card-cancel-edit">İptal</button>
+            <button type="submit" class="btn-primary" id="card-submit-btn">Ekle</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Modal / Bottom Sheet -->
+  <div class="tx-modal-overlay" id="category-modal-overlay" style="display:none;" aria-hidden="true">
+    <div class="tx-modal-backdrop" id="category-modal-backdrop"></div>
+    <div class="tx-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="category-form-title">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="tx-modal-header">
+        <div class="tx-modal-title-group">
+          <h3 class="tx-modal-title" id="category-form-title">Kategori Ekle</h3>
+          <p class="tx-modal-subtitle">Yeni bir gelir veya gider kategorisi tanımlayın</p>
+        </div>
+        <button type="button" class="tx-modal-close" id="category-modal-close-btn" aria-label="Pencereyi kapat">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="tx-modal-body">
+        <form id="add-category-form">
+          <div class="form-group">
+            <label for="category-name">Kategori Adı</label>
+            <input type="text" id="category-name" placeholder="örn. Market, Maaş, Kira, Ulaşım" required>
+          </div>
+          <div class="form-group">
+            <label for="category-type">Kullanım Türü</label>
+            <select id="category-type">
+              <option value="both">Gider ve Gelirde Kullan</option>
+              <option value="expense">Sadece Gider</option>
+              <option value="income">Sadece Gelir</option>
+            </select>
+          </div>
+          <div class="modal-actions-row">
+            <button type="button" class="btn-ghost" id="category-cancel-edit">İptal</button>
+            <button type="submit" class="btn-primary" id="category-submit-btn">Ekle</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div class="toast-container" id="toast-container"></div>
 
 <script>
@@ -2865,6 +4535,10 @@ function applyTheme(theme) {
   document.querySelectorAll(".theme-toggle-btn").forEach((btn) => {
     btn.innerHTML = isDark ? SUN_ICON : MOON_ICON;
   });
+  const lightCard = document.getElementById("theme-card-light");
+  const darkCard = document.getElementById("theme-card-dark");
+  if (lightCard) lightCard.classList.toggle("active", !isDark);
+  if (darkCard) darkCard.classList.toggle("active", isDark);
   localStorage.setItem("theme", theme);
 }
 applyTheme(localStorage.getItem("theme") === "dark" ? "dark" : "soft");
@@ -2874,6 +4548,15 @@ document.querySelectorAll(".theme-toggle-btn").forEach((btn) => {
     applyTheme(isDark ? "soft" : "dark");
   });
 });
+
+const themeCardLight = document.getElementById("theme-card-light");
+if (themeCardLight) {
+  themeCardLight.addEventListener("click", () => applyTheme("soft"));
+}
+const themeCardDark = document.getElementById("theme-card-dark");
+if (themeCardDark) {
+  themeCardDark.addEventListener("click", () => applyTheme("dark"));
+}
 
 function escapeHtml(str) {
   const div = document.createElement("div");
@@ -2900,11 +4583,18 @@ const TAB_MAP = {
   plan: { primary: "plan" },
   budgets: { primary: "plan", subpanel: "budgets" },
   subscriptions: { primary: "plan", subpanel: "subscriptions" },
+  recurring: { primary: "plan", subpanel: "recurring" },
   wallet: { primary: "wallet" },
   bank: { primary: "wallet" },
+  cards: { primary: "wallet" },
   settings: { primary: "settings" },
   categories: { primary: "settings", subpanel: "categories" },
   account: { primary: "settings", subpanel: "account" },
+  profile: { primary: "settings", subpanel: "account" },
+  security: { primary: "settings", subpanel: "account" },
+  data: { primary: "settings", subpanel: "data" },
+  backup: { primary: "settings", subpanel: "data" },
+  theme: { primary: "settings", subpanel: "theme" },
 };
 
 function setSubTab(containerId, subtabKey) {
@@ -4150,14 +5840,178 @@ async function loadTransactions(reset = true) {
   }
 }
 
-const CYCLE_LABELS = { monthly: "aylık", yearly: "yıllık", weekly: "haftalık" };
+// ==========================================================================
+// Milestone 4: Modal Helpers & Event Triggers
+// ==========================================================================
+function openModal(overlayId, focusInputId) {
+  const overlay = document.getElementById(overlayId);
+  if (overlay) {
+    overlay.style.display = "flex";
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+  if (focusInputId) {
+    setTimeout(() => {
+      const el = document.getElementById(focusInputId);
+      if (el) el.focus();
+    }, 100);
+  }
+}
+
+function closeModal(overlayId) {
+  const overlay = document.getElementById(overlayId);
+  if (overlay) {
+    overlay.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+}
+
+function openSubModal(sub = null) {
+  setSubFormMode(sub);
+  openModal("sub-modal-overlay", "sub-name");
+}
+function closeSubModal() {
+  closeModal("sub-modal-overlay");
+  setSubFormMode(null);
+}
+
+function openCardModal(card = null) {
+  setCardFormMode(card);
+  openModal("card-modal-overlay", "card-bank-name");
+}
+function closeCardModal() {
+  closeModal("card-modal-overlay");
+  setCardFormMode(null);
+}
+
+function openCategoryModal(cat = null) {
+  setCategoryFormMode(cat);
+  openModal("category-modal-overlay", "category-name");
+}
+function closeCategoryModal() {
+  closeModal("category-modal-overlay");
+  setCategoryFormMode(null);
+}
+
+function openBudgetModal(budget = null) {
+  setBudgetFormMode(budget);
+  openModal("budget-modal-overlay", "budget-limit");
+}
+function closeBudgetModal() {
+  closeModal("budget-modal-overlay");
+  setBudgetFormMode(null);
+}
+
+function openRecurringModal(rec = null) {
+  closeAllActivityMenus();
+  if (rec) {
+    setRecurringFormMode(rec);
+  } else {
+    setTxFormMode(null);
+    setTxNature("fixed");
+    const natureToggle = document.getElementById("tx-nature-toggle");
+    if (natureToggle) natureToggle.style.display = "none";
+    const formTitle = document.getElementById("tx-form-title");
+    const formSubtitle = document.getElementById("tx-form-subtitle");
+    if (formTitle) formTitle.textContent = "Yeni Sabit İşlem";
+    if (formSubtitle) formSubtitle.textContent = "Maaş, kira veya düzenli aidat gibi sabit işlem kaydı";
+    const advancedFields = document.getElementById("tx-advanced-fields");
+    if (advancedFields) {
+      advancedFields.style.display = "block";
+      const advancedToggle = document.getElementById("tx-advanced-toggle");
+      if (advancedToggle) {
+        advancedToggle.classList.add("open");
+        advancedToggle.setAttribute("aria-expanded", "true");
+      }
+      const advancedToggleText = document.getElementById("tx-advanced-toggle-text");
+      if (advancedToggleText) advancedToggleText.textContent = "Daha az seçenek";
+    }
+    const overlay = document.getElementById("tx-modal-overlay");
+    if (overlay) {
+      overlay.style.display = "flex";
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+    setTimeout(() => {
+      const amountInput = document.getElementById("tx-amount");
+      if (amountInput) amountInput.focus();
+    }, 100);
+  }
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeTxModal();
+    closeSubModal();
+    closeCardModal();
+    closeCategoryModal();
+    closeBudgetModal();
+  }
+});
+
+// Modal Close & Cancel triggers
+const budgetCloseBtn = document.getElementById("budget-modal-close-btn");
+if (budgetCloseBtn) budgetCloseBtn.addEventListener("click", closeBudgetModal);
+const budgetBackdrop = document.getElementById("budget-modal-backdrop");
+if (budgetBackdrop) budgetBackdrop.addEventListener("click", closeBudgetModal);
+const budgetCancelBtn = document.getElementById("budget-cancel-edit");
+if (budgetCancelBtn) budgetCancelBtn.addEventListener("click", closeBudgetModal);
+const openBudgetBtn = document.getElementById("open-budget-modal-btn");
+if (openBudgetBtn) openBudgetBtn.addEventListener("click", () => openBudgetModal(null));
+const emptyAddBudgetBtn = document.getElementById("empty-add-budget-btn");
+if (emptyAddBudgetBtn) emptyAddBudgetBtn.addEventListener("click", () => openBudgetModal(null));
+
+const subCloseBtn = document.getElementById("sub-modal-close-btn");
+if (subCloseBtn) subCloseBtn.addEventListener("click", closeSubModal);
+const subBackdrop = document.getElementById("sub-modal-backdrop");
+if (subBackdrop) subBackdrop.addEventListener("click", closeSubModal);
+const subCancelBtn = document.getElementById("sub-cancel-edit");
+if (subCancelBtn) subCancelBtn.addEventListener("click", closeSubModal);
+const openSubBtn = document.getElementById("open-sub-modal-btn");
+if (openSubBtn) openSubBtn.addEventListener("click", () => openSubModal(null));
+const emptyAddSubBtn = document.getElementById("empty-add-sub-btn");
+if (emptyAddSubBtn) emptyAddSubBtn.addEventListener("click", () => openSubModal(null));
+
+const cardCloseBtn = document.getElementById("card-modal-close-btn");
+if (cardCloseBtn) cardCloseBtn.addEventListener("click", closeCardModal);
+const cardBackdrop = document.getElementById("card-modal-backdrop");
+if (cardBackdrop) cardBackdrop.addEventListener("click", closeCardModal);
+const cardCancelBtn = document.getElementById("card-cancel-edit");
+if (cardCancelBtn) cardCancelBtn.addEventListener("click", closeCardModal);
+const openCardBtn = document.getElementById("open-card-modal-btn");
+if (openCardBtn) openCardBtn.addEventListener("click", () => openCardModal(null));
+const emptyAddCardBtn = document.getElementById("empty-add-card-btn");
+if (emptyAddCardBtn) emptyAddCardBtn.addEventListener("click", () => openCardModal(null));
+
+const catCloseBtn = document.getElementById("category-modal-close-btn");
+if (catCloseBtn) catCloseBtn.addEventListener("click", closeCategoryModal);
+const catBackdrop = document.getElementById("category-modal-backdrop");
+if (catBackdrop) catBackdrop.addEventListener("click", closeCategoryModal);
+const catCancelBtn = document.getElementById("category-cancel-edit");
+if (catCancelBtn) catCancelBtn.addEventListener("click", closeCategoryModal);
+const openCatBtn = document.getElementById("open-category-modal-btn");
+if (openCatBtn) openCatBtn.addEventListener("click", () => openCategoryModal(null));
+const emptyAddCatBtn = document.getElementById("empty-add-cat-btn");
+if (emptyAddCatBtn) emptyAddCatBtn.addEventListener("click", () => openCategoryModal(null));
+
+const openPlanRecBtn = document.getElementById("open-plan-recurring-modal-btn");
+if (openPlanRecBtn) openPlanRecBtn.addEventListener("click", () => openRecurringModal(null));
+const emptyAddRecBtn = document.getElementById("empty-add-rec-btn");
+if (emptyAddRecBtn) emptyAddRecBtn.addEventListener("click", () => openRecurringModal(null));
+
+// ==========================================================================
+// Subscriptions
+// ==========================================================================
+const CYCLE_LABELS = { monthly: "Aylık", yearly: "Yıllık", weekly: "Haftalık" };
 
 let editingSubId = null;
 function setSubFormMode(sub) {
   editingSubId = sub ? sub.id : null;
-  document.getElementById("sub-form-title").textContent = sub ? "Aboneliği düzenle" : "Abonelik ekle";
-  document.getElementById("sub-submit-btn").textContent = sub ? "Güncelle" : "Ekle";
-  document.getElementById("sub-cancel-edit").style.display = sub ? "inline-block" : "none";
+  const titleEl = document.getElementById("sub-form-title");
+  if (titleEl) titleEl.textContent = sub ? "Aboneliği Düzenle" : "Abonelik Ekle";
+  const submitBtn = document.getElementById("sub-submit-btn");
+  if (submitBtn) submitBtn.textContent = sub ? "Güncelle" : "Ekle";
   if (sub) {
     document.getElementById("sub-name").value = sub.name;
     document.getElementById("sub-amount").value = sub.amount;
@@ -4165,38 +6019,43 @@ function setSubFormMode(sub) {
     document.getElementById("sub-due-date").value = sub.next_due_date;
     document.getElementById("sub-category").value = sub.category || "";
   } else {
-    document.getElementById("add-subscription-form").reset();
-    document.getElementById("sub-due-date").value = todayIsoDate();
-    document.getElementById("sub-cycle").value = "monthly";
+    const form = document.getElementById("add-subscription-form");
+    if (form) form.reset();
+    const dateInput = document.getElementById("sub-due-date");
+    if (dateInput) dateInput.value = todayIsoDate();
+    const cycleInput = document.getElementById("sub-cycle");
+    if (cycleInput) cycleInput.value = "monthly";
   }
 }
-document.getElementById("sub-cancel-edit").addEventListener("click", () => setSubFormMode(null));
 
-document.getElementById("add-subscription-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const name = document.getElementById("sub-name").value.trim();
-  const amount = parseFloat(document.getElementById("sub-amount").value);
-  const billing_cycle = document.getElementById("sub-cycle").value;
-  const next_due_date = document.getElementById("sub-due-date").value;
-  const category = document.getElementById("sub-category").value.trim() || null;
-  const isEdit = editingSubId !== null;
-  const submitBtn = document.getElementById("sub-submit-btn");
-  submitBtn.disabled = true;
-  const ok = await apiWrite(
-    isEdit ? `/subscriptions/${editingSubId}` : "/subscriptions",
-    {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, amount, billing_cycle, next_due_date, category }),
-    },
-    isEdit ? "Abonelik güncellendi." : null
-  );
-  submitBtn.disabled = false;
-  if (!ok) return;
-  setSubFormMode(null);
-  loadSubscriptions();
-  loadOverview();
-});
+const addSubForm = document.getElementById("add-subscription-form");
+if (addSubForm) {
+  addSubForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("sub-name").value.trim();
+    const amount = parseFloat(document.getElementById("sub-amount").value);
+    const billing_cycle = document.getElementById("sub-cycle").value;
+    const next_due_date = document.getElementById("sub-due-date").value;
+    const category = document.getElementById("sub-category").value.trim() || null;
+    const isEdit = editingSubId !== null;
+    const submitBtn = document.getElementById("sub-submit-btn");
+    submitBtn.disabled = true;
+    const ok = await apiWrite(
+      isEdit ? `/subscriptions/${editingSubId}` : "/subscriptions",
+      {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, amount, billing_cycle, next_due_date, category }),
+      },
+      isEdit ? "Abonelik güncellendi." : "Abonelik eklendi."
+    );
+    submitBtn.disabled = false;
+    if (!ok) return;
+    closeSubModal();
+    loadSubscriptions();
+    loadOverview();
+  });
+}
 
 async function loadSubscriptions() {
   const subscriptions = await apiRead("/subscriptions");
@@ -4207,46 +6066,128 @@ async function loadSubscriptions() {
   cachedSubscriptions = subscriptions;
   renderAlerts();
   renderUpcomingPayments();
+
   const list = document.getElementById("subscriptions-list");
   const empty = document.getElementById("subscriptions-empty");
-  list.innerHTML = "";
-  empty.textContent = "Henüz abonelik yok.";
-  empty.style.display = subscriptions.length ? "none" : "block";
+  if (list) list.innerHTML = "";
+  if (empty) empty.style.display = subscriptions.length ? "none" : "block";
 
+  let totalMonthly = 0;
+  let activeCount = 0;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const upcomingSubs = [];
 
   for (const sub of subscriptions) {
-    const row = document.createElement("div");
-    row.className = "entry-row";
+    if (sub.is_active) {
+      activeCount++;
+      let m = sub.amount;
+      if (sub.billing_cycle === "yearly") m = sub.amount / 12;
+      else if (sub.billing_cycle === "weekly") m = (sub.amount * 52) / 12;
+      totalMonthly += m;
+
+      const due = new Date(sub.next_due_date);
+      const diffDays = Math.round((due - today) / 86400000);
+      if (!sub.is_paid_this_cycle) {
+        upcomingSubs.push({ sub, diffDays });
+      }
+    }
+  }
+
+  // Update Subscription Summary Banner
+  const subSumMonthly = document.getElementById("sub-sum-monthly");
+  if (subSumMonthly) subSumMonthly.textContent = `${formatMoney(totalMonthly)} / ay`;
+  const subSumActive = document.getElementById("sub-sum-active");
+  if (subSumActive) subSumActive.textContent = `${activeCount} aktif`;
+  const subSumTotal = document.getElementById("sub-sum-total");
+  if (subSumTotal) subSumTotal.textContent = `Toplam ${subscriptions.length} servis`;
+
+  upcomingSubs.sort((a, b) => a.diffDays - b.diffDays);
+  const subSumNext = document.getElementById("sub-sum-next");
+  const subSumNextSub = document.getElementById("sub-sum-next-sub");
+  if (subSumNext && subSumNextSub) {
+    if (upcomingSubs.length > 0) {
+      const first = upcomingSubs[0];
+      subSumNext.textContent = first.sub.name;
+      const statusText = first.diffDays < 0 ? `${Math.abs(first.diffDays)} gün gecikti` : first.diffDays === 0 ? "Bugün" : `${first.diffDays} gün kaldı`;
+      subSumNextSub.textContent = `${formatDateTr(first.sub.next_due_date)} (${statusText})`;
+    } else {
+      subSumNext.textContent = "–";
+      subSumNextSub.textContent = "Yaklaşan ödeme yok";
+    }
+  }
+
+  if (!list) return;
+
+  for (const sub of subscriptions) {
+    const card = document.createElement("div");
+    card.className = `sub-card${!sub.is_active ? " sub-inactive" : ""}`;
+
     const dueDate = new Date(sub.next_due_date);
     const daysUntil = Math.round((dueDate - today) / 86400000);
     const paid = sub.is_active && sub.is_paid_this_cycle;
     const dueSoon = sub.is_active && !paid && daysUntil >= 0 && daysUntil <= 7;
-    const metaParts = [`${CYCLE_LABELS[sub.billing_cycle] || sub.billing_cycle} · ${formatDateTr(sub.next_due_date)}`];
-    if (sub.category) metaParts.push(escapeHtml(sub.category));
-    if (paid) metaParts.push("✅ ödendi");
-    if (!sub.is_active) metaParts.push("pasif");
-    const amountClass = sub.is_active ? (paid ? "income" : "expense") : "expense";
-    row.innerHTML = `
-      <div>
-        <div class="entry-title">${escapeHtml(sub.name)}</div>
-        <div class="entry-meta">${metaParts.join(" · ")}</div>
+    const overdue = sub.is_active && !paid && daysUntil < 0;
+
+    let dueText = "";
+    if (!sub.is_active) {
+      dueText = "Pasif servis";
+    } else if (paid) {
+      dueText = "✅ Bu periyot ödendi";
+    } else if (overdue) {
+      dueText = `⚠️ Son ödeme ${Math.abs(daysUntil)} gün gecikti (${formatDateTr(sub.next_due_date)})`;
+    } else if (dueSoon) {
+      dueText = `⏰ ${daysUntil === 0 ? "Bugün son gün!" : `${daysUntil} gün kaldı (${formatDateTr(sub.next_due_date)})`}`;
+    } else {
+      dueText = `Sonraki: <b>${formatDateTr(sub.next_due_date)}</b> (${daysUntil} gün)`;
+    }
+
+    const cycleUnit = sub.billing_cycle === "yearly" ? "/ yıl" : sub.billing_cycle === "weekly" ? "/ hft" : "/ ay";
+    const avatarLetter = (sub.name || "A").trim().charAt(0).toUpperCase();
+
+    card.innerHTML = `
+      <div class="sub-card-header">
+        <div class="sub-identity">
+          <div class="sub-avatar">${escapeHtml(avatarLetter)}</div>
+          <div>
+            <div class="sub-name" title="${escapeHtml(sub.name)}">${escapeHtml(sub.name)}</div>
+            <div class="sub-meta-line">
+              <span class="sub-cycle-badge">${CYCLE_LABELS[sub.billing_cycle] || sub.billing_cycle}</span>
+              ${sub.category ? `<span class="sub-category-tag">${escapeHtml(sub.category)}</span>` : ""}
+            </div>
+          </div>
+        </div>
+        <div class="sub-amount-group">
+          <div class="sub-amount${paid ? " paid" : ""}">${formatMoney(sub.amount)}</div>
+          <div class="sub-frequency-text">${cycleUnit}</div>
+        </div>
       </div>
-      <div class="actions">
-        <div class="entry-amount ${amountClass}${dueSoon ? " due-soon" : ""}">${formatMoney(sub.amount)}</div>
-        ${sub.is_active && !paid ? '<button class="btn-edit btn-small">Ödendi</button>' : ""}
-        <button class="btn-edit btn-small">Düzenle</button>
-        <button class="btn-archive btn-small">${sub.is_active ? "Pasifleştir" : "Aktifleştir"}</button>
-        <button class="btn-archive btn-small">Sil</button>
+      <div class="sub-card-footer">
+        <div class="sub-due-indicator${dueSoon || overdue ? " due-soon" : ""}">
+          ${dueText}
+        </div>
+        <div class="sub-card-actions">
+          ${sub.is_active && !paid ? `
+            <button type="button" class="btn-sub-pay sub-pay-btn" title="Ödemeyi kaydet">Ödendi Yap</button>
+          ` : ""}
+          <button type="button" class="btn-icon-action sub-edit-btn" title="Düzenle">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button type="button" class="btn-icon-action sub-toggle-btn" title="${sub.is_active ? "Pasifleştir" : "Aktifleştir"}">
+            ${sub.is_active ? "⏸" : "▶"}
+          </button>
+          <button type="button" class="btn-icon-action danger sub-delete-btn" title="Sil">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
       </div>
     `;
-    const buttons = row.querySelectorAll(".actions button");
-    const [payBtn, editBtn, toggleBtn, deleteBtn] = sub.is_active && !paid ? buttons : [null, ...buttons];
+
+    const payBtn = card.querySelector(".sub-pay-btn");
     if (payBtn) {
       payBtn.addEventListener("click", async () => {
-        if (!confirm(`"${sub.name}" için ${formatMoney(sub.amount)} tutarında gider kaydedilsin mi?`)) return;
-        const ok = await apiWrite(`/subscriptions/${sub.id}/pay`, { method: "POST" }, "Ödeme kaydedildi.");
+        if (!confirm(`"${sub.name}" için ${formatMoney(sub.amount)} tutarında gider işlemi kaydedilsin mi?`)) return;
+        const ok = await apiWrite(`/subscriptions/${sub.id}/pay`, { method: "POST" }, "Abonelik ödemesi kaydedildi.");
         if (!ok) return;
         loadSubscriptions();
         loadOverview();
@@ -4256,32 +6197,45 @@ async function loadSubscriptions() {
         loadBudgets();
       });
     }
-    editBtn.addEventListener("click", () => {
-      setSubFormMode(sub);
-      document.getElementById("sub-form-title").scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-    toggleBtn.addEventListener("click", async () => {
-      const ok = await apiWrite(`/subscriptions/${sub.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_active: !sub.is_active }),
+
+    const editBtn = card.querySelector(".sub-edit-btn");
+    if (editBtn) {
+      editBtn.addEventListener("click", () => openSubModal(sub));
+    }
+
+    const toggleBtn = card.querySelector(".sub-toggle-btn");
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", async () => {
+        const ok = await apiWrite(`/subscriptions/${sub.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ is_active: !sub.is_active }),
+        });
+        if (!ok) return;
+        loadSubscriptions();
+        loadOverview();
       });
-      if (!ok) return;
-      loadSubscriptions();
-      loadOverview();
-    });
-    deleteBtn.addEventListener("click", async () => {
-      if (!confirm(`"${sub.name}" silinsin mi?`)) return;
-      const ok = await apiWrite(`/subscriptions/${sub.id}`, { method: "DELETE" }, "Abonelik silindi.");
-      if (!ok) return;
-      if (editingSubId === sub.id) setSubFormMode(null);
-      loadSubscriptions();
-      loadOverview();
-    });
-    list.appendChild(row);
+    }
+
+    const deleteBtn = card.querySelector(".sub-delete-btn");
+    if (deleteBtn) {
+      deleteBtn.addEventListener("click", async () => {
+        if (!confirm(`"${sub.name}" aboneliği silinsin mi?`)) return;
+        const ok = await apiWrite(`/subscriptions/${sub.id}`, { method: "DELETE" }, "Abonelik silindi.");
+        if (!ok) return;
+        if (editingSubId === sub.id) closeSubModal();
+        loadSubscriptions();
+        loadOverview();
+      });
+    }
+
+    list.appendChild(card);
   }
 }
 
+// ==========================================================================
+// Recurring Transactions (Plan & Activity sync)
+// ==========================================================================
 async function loadRecurring() {
   const recurring = await apiRead("/recurring-transactions");
   if (!recurring) {
@@ -4290,61 +6244,206 @@ async function loadRecurring() {
   }
   cachedRecurring = recurring;
   renderUpcomingPayments();
-  const list = document.getElementById("recurring-list");
-  const empty = document.getElementById("recurring-empty");
-  list.innerHTML = "";
-  empty.textContent = "Henüz sabit işlem yok.";
-  empty.style.display = recurring.length ? "none" : "block";
 
+  // 1. Recurring Summary Metrics in Plan Tab
+  let recIncome = 0;
+  let recExpense = 0;
   for (const r of recurring) {
-    const row = document.createElement("div");
-    row.className = "entry-row";
-    const metaParts = [`${CYCLE_LABELS[r.frequency] || r.frequency} · sıradaki: ${formatDateTr(r.next_due_date)}`];
-    if (r.category) metaParts.push(escapeHtml(r.category));
-    if (!r.is_active) metaParts.push("pasif");
-    row.innerHTML = `
-      <div>
-        <div class="entry-title">${escapeHtml(r.name)}</div>
-        <div class="entry-meta">${metaParts.join(" · ")}</div>
-      </div>
-      <div class="actions">
-        <div class="entry-amount ${r.type}">${r.type === "income" ? "+" : "-"}${formatMoney(r.amount)}</div>
-        <button class="btn-edit btn-small">Düzenle</button>
-        <button class="btn-archive btn-small">${r.is_active ? "Pasifleştir" : "Aktifleştir"}</button>
-        <button class="btn-archive btn-small">Sil</button>
-      </div>
-    `;
-    const [editBtn, toggleBtn, deleteBtn] = row.querySelectorAll(".actions button");
-    editBtn.addEventListener("click", () => {
-      setRecurringFormMode(r);
-    });
-    toggleBtn.addEventListener("click", async () => {
-      const ok = await apiWrite(`/recurring-transactions/${r.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_active: !r.is_active }),
-      });
-      if (!ok) return;
-      loadRecurring();
-    });
-    deleteBtn.addEventListener("click", async () => {
-      if (!confirm(`"${r.name}" silinsin mi? Daha önce oluşturulan işlemler silinmeyecek.`)) return;
-      const ok = await apiWrite(`/recurring-transactions/${r.id}`, { method: "DELETE" }, "Sabit işlem silindi.");
-      if (!ok) return;
-      if (editingRecurringId === r.id) closeTxModal();
-      loadRecurring();
-      loadTransactions();
-    });
-    list.appendChild(row);
+    if (r.is_active) {
+      let m = r.amount;
+      if (r.frequency === "weekly") m = (r.amount * 52) / 12;
+      else if (r.frequency === "yearly") m = r.amount / 12;
+      if (r.type === "income") recIncome += m;
+      else recExpense += m;
+    }
+  }
+
+  const recSumIncome = document.getElementById("rec-sum-income");
+  if (recSumIncome) recSumIncome.textContent = `+${formatMoney(recIncome)}`;
+  const recSumExpense = document.getElementById("rec-sum-expense");
+  if (recSumExpense) recSumExpense.textContent = `-${formatMoney(recExpense)}`;
+  const recSumNet = document.getElementById("rec-sum-net");
+  if (recSumNet) {
+    const net = recIncome - recExpense;
+    recSumNet.textContent = `${net >= 0 ? "+" : ""}${formatMoney(net)}`;
+    recSumNet.className = `planning-summary-val ${net >= 0 ? "income-text" : "expense-text"}`;
+  }
+
+  // 2. Render to Plan recurring cards grid (#plan-recurring-list)
+  const planList = document.getElementById("plan-recurring-list");
+  const planEmpty = document.getElementById("plan-recurring-empty");
+  if (planList) {
+    planList.innerHTML = "";
+    if (planEmpty) planEmpty.style.display = recurring.length ? "none" : "block";
+
+    for (const r of recurring) {
+      const card = document.createElement("div");
+      card.className = `recurring-item-card${!r.is_active ? " item-inactive" : ""}`;
+      const isIncome = r.type === "income";
+
+      card.innerHTML = `
+        <div class="recurring-item-header">
+          <div class="recurring-item-identity">
+            <div class="recurring-type-icon ${r.type}">
+              ${isIncome ? "↗" : "↘"}
+            </div>
+            <div>
+              <div class="recurring-item-title" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
+              <div class="recurring-item-tags">
+                <span class="status-pill ${r.is_active ? "success" : "muted"}">${r.is_active ? "Aktif" : "Pasif"}</span>
+                <span class="sub-cycle-badge">${CYCLE_LABELS[r.frequency] || r.frequency}</span>
+                ${r.category ? `<span class="sub-category-tag">${escapeHtml(r.category)}</span>` : ""}
+              </div>
+            </div>
+          </div>
+          <div class="recurring-amount ${r.type}">
+            ${isIncome ? "+" : "-"}${formatMoney(r.amount)}
+          </div>
+        </div>
+        ${r.note ? `<div style="font-size:12px; color:var(--muted); margin-bottom:10px;">📝 ${escapeHtml(r.note)}</div>` : ""}
+        <div class="recurring-item-footer">
+          <div class="recurring-next-date">
+            Sıradaki: <b>${formatDateTr(r.next_due_date)}</b>
+          </div>
+          <div class="recurring-actions">
+            <button type="button" class="btn-icon-action rec-edit-btn" title="Düzenle">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button type="button" class="btn-icon-action rec-toggle-btn" title="${r.is_active ? "Pasifleştir" : "Aktifleştir"}">
+              ${r.is_active ? "⏸" : "▶"}
+            </button>
+            <button type="button" class="btn-icon-action danger rec-delete-btn" title="Sil">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+
+      const editBtn = card.querySelector(".rec-edit-btn");
+      if (editBtn) editBtn.addEventListener("click", () => setRecurringFormMode(r));
+
+      const toggleBtn = card.querySelector(".rec-toggle-btn");
+      if (toggleBtn) {
+        toggleBtn.addEventListener("click", async () => {
+          const ok = await apiWrite(`/recurring-transactions/${r.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ is_active: !r.is_active }),
+          });
+          if (!ok) return;
+          loadRecurring();
+        });
+      }
+
+      const deleteBtn = card.querySelector(".rec-delete-btn");
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", async () => {
+          if (!confirm(`"${r.name}" silinsin mi? Daha önce oluşturulan işlemler silinmeyecek.`)) return;
+          const ok = await apiWrite(`/recurring-transactions/${r.id}`, { method: "DELETE" }, "Sabit işlem silindi.");
+          if (!ok) return;
+          if (editingRecurringId === r.id) closeTxModal();
+          loadRecurring();
+          loadTransactions();
+        });
+      }
+
+      planList.appendChild(card);
+    }
+  }
+
+  // 3. Render to Activity drawer list (#recurring-list)
+  const actList = document.getElementById("recurring-list");
+  const actEmpty = document.getElementById("recurring-empty");
+  if (actList) {
+    actList.innerHTML = "";
+    if (actEmpty) {
+      actEmpty.textContent = "Henüz sabit işlem yok.";
+      actEmpty.style.display = recurring.length ? "none" : "block";
+    }
+
+    for (const r of recurring) {
+      const row = document.createElement("div");
+      row.className = "entry-row";
+      const metaParts = [`${CYCLE_LABELS[r.frequency] || r.frequency} · sıradaki: ${formatDateTr(r.next_due_date)}`];
+      if (r.category) metaParts.push(escapeHtml(r.category));
+      if (!r.is_active) metaParts.push("pasif");
+      row.innerHTML = `
+        <div>
+          <div class="entry-title">${escapeHtml(r.name)}</div>
+          <div class="entry-meta">${metaParts.join(" · ")}</div>
+        </div>
+        <div class="actions">
+          <div class="entry-amount ${r.type}">${r.type === "income" ? "+" : "-"}${formatMoney(r.amount)}</div>
+          <button class="btn-edit btn-small">Düzenle</button>
+          <button class="btn-archive btn-small">${r.is_active ? "Pasifleştir" : "Aktifleştir"}</button>
+          <button class="btn-archive btn-small">Sil</button>
+        </div>
+      `;
+      const [editBtn, toggleBtn, deleteBtn] = row.querySelectorAll(".actions button");
+      if (editBtn) editBtn.addEventListener("click", () => setRecurringFormMode(r));
+      if (toggleBtn) {
+        toggleBtn.addEventListener("click", async () => {
+          const ok = await apiWrite(`/recurring-transactions/${r.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ is_active: !r.is_active }),
+          });
+          if (!ok) return;
+          loadRecurring();
+        });
+      }
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", async () => {
+          if (!confirm(`"${r.name}" silinsin mi? Daha önce oluşturulan işlemler silinmeyecek.`)) return;
+          const ok = await apiWrite(`/recurring-transactions/${r.id}`, { method: "DELETE" }, "Sabit işlem silindi.");
+          if (!ok) return;
+          if (editingRecurringId === r.id) closeTxModal();
+          loadRecurring();
+          loadTransactions();
+        });
+      }
+      actList.appendChild(row);
+    }
   }
 }
 
+// Wire Plan "Bekleyenleri İşle" Button
+const planProcessBtn = document.getElementById("plan-process-due-btn");
+if (planProcessBtn) {
+  planProcessBtn.addEventListener("click", async () => {
+    planProcessBtn.disabled = true;
+    try {
+      const res = await apiFetch("/recurring-transactions/process-due", { method: "POST" });
+      if (!res.ok) {
+        showToast(await extractErrorMessage(res));
+        return;
+      }
+      const data = await res.json();
+      const count = data.created != null ? data.created : data.count || 0;
+      showToast(`${count} sabit işlem otomatik oluşturuldu.`, "success");
+      loadRecurring();
+      loadTransactions();
+      loadOverview();
+      loadBudgets();
+      loadCards();
+    } catch (err) {
+      showToast(err.message || "İşlem sırasında hata oluştu.");
+    } finally {
+      planProcessBtn.disabled = false;
+    }
+  });
+}
+
+// ==========================================================================
+// Credit Cards & Due Schedule (Wallet Redesign)
+// ==========================================================================
 let editingCardId = null;
 function setCardFormMode(card) {
   editingCardId = card ? card.id : null;
-  document.getElementById("card-form-title").textContent = card ? "Kartı düzenle" : "Kredi kartı ekle";
-  document.getElementById("card-submit-btn").textContent = card ? "Güncelle" : "Ekle";
-  document.getElementById("card-cancel-edit").style.display = card ? "inline-block" : "none";
+  const titleEl = document.getElementById("card-form-title");
+  if (titleEl) titleEl.textContent = card ? "Kartı Düzenle" : "Kredi Kartı Ekle";
+  const submitBtn = document.getElementById("card-submit-btn");
+  if (submitBtn) submitBtn.textContent = card ? "Güncelle" : "Ekle";
   if (card) {
     document.getElementById("card-bank-name").value = card.bank_name;
     document.getElementById("card-name").value = card.card_name || "";
@@ -4354,38 +6453,42 @@ function setCardFormMode(card) {
     document.getElementById("card-due-day").value = card.due_day;
     document.getElementById("card-note").value = card.note || "";
   } else {
-    document.getElementById("add-card-form").reset();
-    document.getElementById("card-debt").value = 0;
+    const form = document.getElementById("add-card-form");
+    if (form) form.reset();
+    const debtInput = document.getElementById("card-debt");
+    if (debtInput) debtInput.value = 0;
   }
 }
-document.getElementById("card-cancel-edit").addEventListener("click", () => setCardFormMode(null));
 
-document.getElementById("add-card-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const bank_name = document.getElementById("card-bank-name").value.trim();
-  const card_name = document.getElementById("card-name").value.trim() || null;
-  const limit_amount = parseFloat(document.getElementById("card-limit").value);
-  const current_debt = parseFloat(document.getElementById("card-debt").value || "0");
-  const statement_day = parseInt(document.getElementById("card-statement-day").value, 10);
-  const due_day = parseInt(document.getElementById("card-due-day").value, 10);
-  const note = document.getElementById("card-note").value.trim() || null;
-  const isEdit = editingCardId !== null;
-  const submitBtn = document.getElementById("card-submit-btn");
-  submitBtn.disabled = true;
-  const ok = await apiWrite(
-    isEdit ? `/credit-cards/${editingCardId}` : "/credit-cards",
-    {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bank_name, card_name, limit_amount, current_debt, statement_day, due_day, note }),
-    },
-    isEdit ? "Kart güncellendi." : "Kart eklendi."
-  );
-  submitBtn.disabled = false;
-  if (!ok) return;
-  setCardFormMode(null);
-  loadCards();
-});
+const addCardForm = document.getElementById("add-card-form");
+if (addCardForm) {
+  addCardForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const bank_name = document.getElementById("card-bank-name").value.trim();
+    const card_name = document.getElementById("card-name").value.trim() || null;
+    const limit_amount = parseFloat(document.getElementById("card-limit").value);
+    const current_debt = parseFloat(document.getElementById("card-debt").value || "0");
+    const statement_day = parseInt(document.getElementById("card-statement-day").value, 10);
+    const due_day = parseInt(document.getElementById("card-due-day").value, 10);
+    const note = document.getElementById("card-note").value.trim() || null;
+    const isEdit = editingCardId !== null;
+    const submitBtn = document.getElementById("card-submit-btn");
+    submitBtn.disabled = true;
+    const ok = await apiWrite(
+      isEdit ? `/credit-cards/${editingCardId}` : "/credit-cards",
+      {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bank_name, card_name, limit_amount, current_debt, statement_day, due_day, note }),
+      },
+      isEdit ? "Kart güncellendi." : "Kart eklendi."
+    );
+    submitBtn.disabled = false;
+    if (!ok) return;
+    closeCardModal();
+    loadCards();
+  });
+}
 
 async function loadCards() {
   const cards = await apiRead("/credit-cards");
@@ -4397,59 +6500,201 @@ async function loadCards() {
   renderAlerts();
   renderUpcomingPayments();
   populateCreditCardSelect(cards);
+
   const list = document.getElementById("cards-list");
   const empty = document.getElementById("cards-empty");
-  list.innerHTML = "";
-  empty.textContent = "Henüz kart eklenmedi.";
-  empty.style.display = cards.length ? "none" : "block";
+  const dueSection = document.getElementById("wallet-due-section");
+  const dueGrid = document.getElementById("wallet-due-grid");
+
+  if (list) list.innerHTML = "";
+  if (dueGrid) dueGrid.innerHTML = "";
+  if (empty) empty.style.display = cards.length ? "none" : "block";
+  if (dueSection) dueSection.style.display = cards.length ? "block" : "none";
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  // 1. Calculate Wallet Summary Metrics (Prompt 8B)
+  let totalLimit = 0;
+  let totalDebt = 0;
+  let totalAvailable = 0;
+  let upcomingDebtSum = 0;
+  let dueSoonCount = 0;
+
   for (const card of cards) {
-    const row = document.createElement("div");
-    row.className = "card-entry";
-    const usagePct = card.limit_amount > 0 ? Math.min(100, (card.current_debt / card.limit_amount) * 100) : 0;
+    totalLimit += card.limit_amount;
+    totalDebt += card.current_debt;
+    totalAvailable += card.available_limit;
+
+    const dueDate = new Date(card.next_due_date);
+    const daysUntilDue = Math.round((dueDate - today) / 86400000);
+    if (daysUntilDue >= 0 && daysUntilDue <= 7 && card.current_debt > 0) {
+      upcomingDebtSum += card.current_debt;
+      dueSoonCount++;
+    }
+  }
+
+  const utilPct = totalLimit > 0 ? Math.round((totalDebt / totalLimit) * 100) : 0;
+  const walletSumLimit = document.getElementById("wallet-sum-limit");
+  if (walletSumLimit) walletSumLimit.textContent = formatMoney(totalLimit);
+  const walletSumCount = document.getElementById("wallet-sum-count");
+  if (walletSumCount) walletSumCount.textContent = `${cards.length} kart tanımlı`;
+  const walletSumDebt = document.getElementById("wallet-sum-debt");
+  if (walletSumDebt) walletSumDebt.textContent = formatMoney(totalDebt);
+  const walletSumUtil = document.getElementById("wallet-sum-utilization");
+  if (walletSumUtil) walletSumUtil.textContent = `%${utilPct} genel kullanım`;
+  const walletSumAvail = document.getElementById("wallet-sum-available");
+  if (walletSumAvail) walletSumAvail.textContent = formatMoney(totalAvailable);
+  const walletSumUpcoming = document.getElementById("wallet-sum-upcoming");
+  if (walletSumUpcoming) walletSumUpcoming.textContent = formatMoney(upcomingDebtSum);
+  const walletSumUpSub = document.getElementById("wallet-sum-upcoming-sub");
+  if (walletSumUpSub) {
+    walletSumUpSub.textContent = dueSoonCount > 0 ? `${dueSoonCount} kartın son ödemesi yaklaşıyor` : "Yaklaşan borç yok";
+  }
+  const cardsCountBadge = document.getElementById("cards-count-badge");
+  if (cardsCountBadge) cardsCountBadge.textContent = `${cards.length} Kart`;
+
+  if (!list) return;
+
+  // 2. Render Digital Credit Cards (Prompt 8A)
+  const cardThemes = ["theme-slate", "theme-gold", "theme-teal", "theme-violet"];
+  cards.forEach((card, idx) => {
+    const themeClass = cardThemes[idx % cardThemes.length];
+    const usagePct = card.limit_amount > 0 ? Math.min(100, Math.round((card.current_debt / card.limit_amount) * 100)) : 0;
     const highUsage = usagePct >= 80;
     const dueDate = new Date(card.next_due_date);
     const daysUntilDue = Math.round((dueDate - today) / 86400000);
-    const dueSoon = daysUntilDue <= 7;
-    const title = card.card_name ? `${escapeHtml(card.bank_name)} · ${escapeHtml(card.card_name)}` : escapeHtml(card.bank_name);
-    row.innerHTML = `
-      <div class="card-entry-top">
-        <div class="entry-title">${title}</div>
-        <div class="actions">
-          <button class="btn-edit btn-small">Düzenle</button>
-          <button class="btn-archive btn-small">Sil</button>
+    const dueSoon = daysUntilDue >= 0 && daysUntilDue <= 7;
+    const overdue = daysUntilDue < 0;
+
+    let dueBadgeText = "";
+    let dueBadgeClass = "normal";
+    if (overdue) {
+      dueBadgeText = `⚠️ ${Math.abs(daysUntilDue)} gün gecikti`;
+      dueBadgeClass = "due-soon";
+    } else if (dueSoon) {
+      dueBadgeText = `⏰ ${daysUntilDue === 0 ? "Bugün son gün" : `${daysUntilDue} gün kaldı`}`;
+      dueBadgeClass = "due-soon";
+    } else {
+      dueBadgeText = `${daysUntilDue} gün kaldı`;
+    }
+
+    const cardEl = document.createElement("div");
+    cardEl.className = `digital-credit-card ${themeClass}`;
+    cardEl.innerHTML = `
+      <div class="cc-gloss-overlay"></div>
+      <div class="cc-header">
+        <div class="cc-bank-info">
+          <div class="cc-bank-name">${escapeHtml(card.bank_name)}</div>
+          ${card.card_name ? `<div class="cc-card-name">${escapeHtml(card.card_name)}</div>` : ""}
+        </div>
+        <div class="cc-chip-wrap">
+          <div class="cc-chip" aria-label="EMV Çip"></div>
+          <div class="cc-contactless" title="Temassız Özellik">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M8.5 16.5a5 5 0 0 1 0-9"/><path d="M12 19a8.5 8.5 0 0 0 0-14"/><path d="M15.5 21.5a12 12 0 0 0 0-19"/></svg>
+          </div>
         </div>
       </div>
-      <div class="card-usage-track"><div class="card-usage-fill${highUsage ? " high" : ""}" style="width:${usagePct}%"></div></div>
-      <div class="card-meta-grid">
-        <div>Limit: <b>${formatMoney(card.limit_amount)}</b></div>
-        <div>Kullanılabilir: <b>${formatMoney(card.available_limit)}</b></div>
-        <div>Güncel borç: <b>${formatMoney(card.current_debt)}</b></div>
-        <div>Ekstre tarihi: <b>${formatDateTr(card.next_statement_date)}</b></div>
-        <div class="${dueSoon ? "due-soon" : ""}">Son ödeme: <b>${formatDateTr(card.next_due_date)}</b></div>
+
+      <div class="cc-available-block">
+        <span class="cc-avail-label">Kullanılabilir Limit</span>
+        <span class="cc-avail-val">${formatMoney(card.available_limit)}</span>
       </div>
-      ${card.note ? `<div class="entry-meta">${escapeHtml(card.note)}</div>` : ""}
+
+      <div class="cc-progress-wrap">
+        <div class="cc-progress-bar">
+          <div class="cc-progress-fill${highUsage ? " high" : ""}" style="width: ${usagePct}%"></div>
+        </div>
+        <div class="cc-progress-labels">
+          <span>Borç: ${formatMoney(card.current_debt)}</span>
+          <span>%${usagePct}</span>
+        </div>
+      </div>
+
+      <div class="cc-meta-row">
+        <div class="cc-meta-col">
+          <span class="cc-meta-lbl">Toplam Limit</span>
+          <span class="cc-meta-val">${formatMoney(card.limit_amount)}</span>
+        </div>
+        <div class="cc-meta-col">
+          <span class="cc-meta-lbl">Ekstre Kesim</span>
+          <span class="cc-meta-val">${formatDateTr(card.next_statement_date)}</span>
+        </div>
+        <div class="cc-meta-col${dueSoon || overdue ? " highlight-due" : ""}">
+          <span class="cc-meta-lbl">Son Ödeme</span>
+          <span class="cc-meta-val">${formatDateTr(card.next_due_date)}</span>
+        </div>
+      </div>
+
+      ${card.note ? `<div class="cc-note">📝 ${escapeHtml(card.note)}</div>` : ""}
+
+      <div class="cc-footer-actions">
+        <span class="cc-due-badge ${dueBadgeClass}">${dueBadgeText}</span>
+        <div class="cc-btns">
+          <button type="button" class="btn-card-action card-edit-btn">Düzenle</button>
+          <button type="button" class="btn-card-action danger card-delete-btn">Sil</button>
+        </div>
+      </div>
     `;
-    const [editBtn, deleteBtn] = row.querySelectorAll(".actions button");
-    editBtn.addEventListener("click", () => {
-      setCardFormMode(card);
-      document.getElementById("card-form-title").scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-    deleteBtn.addEventListener("click", async () => {
-      if (!confirm(`"${card.bank_name}" kartı silinsin mi?`)) return;
-      const ok = await apiWrite(`/credit-cards/${card.id}`, { method: "DELETE" }, "Kart silindi.");
-      if (!ok) return;
-      if (editingCardId === card.id) setCardFormMode(null);
-      loadCards();
-    });
-    list.appendChild(row);
+
+    const editBtn = cardEl.querySelector(".card-edit-btn");
+    if (editBtn) editBtn.addEventListener("click", () => openCardModal(card));
+
+    const deleteBtn = cardEl.querySelector(".card-delete-btn");
+    if (deleteBtn) {
+      deleteBtn.addEventListener("click", async () => {
+        if (!confirm(`"${card.bank_name}" kartı silinsin mi?`)) return;
+        const ok = await apiWrite(`/credit-cards/${card.id}`, { method: "DELETE" }, "Kart silindi.");
+        if (!ok) return;
+        if (editingCardId === card.id) closeCardModal();
+        loadCards();
+      });
+    }
+
+    list.appendChild(cardEl);
+  });
+
+  // 3. Render Due Dates Schedule (Prompt 8C)
+  if (dueGrid) {
+    const sortedCards = [...cards].sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date));
+    for (const card of sortedCards) {
+      const dueDate = new Date(card.next_due_date);
+      const daysUntilDue = Math.round((dueDate - today) / 86400000);
+      const dueSoon = daysUntilDue >= 0 && daysUntilDue <= 7;
+      const overdue = daysUntilDue < 0;
+
+      let pillClass = "info";
+      let pillText = `${daysUntilDue} gün`;
+      if (overdue) {
+        pillClass = "danger";
+        pillText = `Gecikti (${Math.abs(daysUntilDue)} gün)`;
+      } else if (dueSoon) {
+        pillClass = "warning";
+        pillText = daysUntilDue === 0 ? "Bugün!" : `${daysUntilDue} gün kaldı`;
+      }
+
+      const item = document.createElement("div");
+      item.className = "wallet-due-item";
+      const cardTitle = card.card_name ? `${escapeHtml(card.bank_name)} · ${escapeHtml(card.card_name)}` : escapeHtml(card.bank_name);
+      item.innerHTML = `
+        <div>
+          <div class="wallet-due-title">${cardTitle}</div>
+          <div class="wallet-due-date">Son Ödeme: <b>${formatDateTr(card.next_due_date)}</b> · Ekstre: her ayın ${card.statement_day}. günü</div>
+        </div>
+        <div class="wallet-due-right">
+          <div class="wallet-due-amount">${formatMoney(card.current_debt)}</div>
+          <span class="status-pill ${pillClass}">${pillText}</span>
+        </div>
+      `;
+      dueGrid.appendChild(item);
+    }
   }
 }
 
-document.getElementById("export-csv-btn").addEventListener("click", async () => {
+// ==========================================================================
+// CSV Data Management
+// ==========================================================================
+async function handleExportCsv() {
   try {
     const response = await apiFetch("/transactions/export");
     if (!response.ok) {
@@ -4468,10 +6713,10 @@ document.getElementById("export-csv-btn").addEventListener("click", async () => 
   } catch (err) {
     showToast(err.message || "Bağlantı hatası.");
   }
-});
+}
 
-document.getElementById("import-csv-input").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
+async function handleImportCsv(fileInput) {
+  const file = fileInput.files[0];
   if (!file) return;
   const formData = new FormData();
   formData.append("file", file);
@@ -4492,48 +6737,138 @@ document.getElementById("import-csv-input").addEventListener("change", async (e)
   } catch (err) {
     showToast(err.message || "Bağlantı hatası.");
   } finally {
-    e.target.value = "";
+    fileInput.value = "";
   }
-});
+}
 
-const CATEGORY_TYPE_LABELS = { expense: "sadece gider", income: "sadece gelir", both: "gider ve gelir" };
+// Wire Activity CSV buttons
+const exportCsvBtn = document.getElementById("export-csv-btn");
+if (exportCsvBtn) exportCsvBtn.addEventListener("click", handleExportCsv);
+const importCsvInput = document.getElementById("import-csv-input");
+if (importCsvInput) importCsvInput.addEventListener("change", (e) => handleImportCsv(e.target));
+
+// Wire Settings CSV buttons
+const settingsExportCsvBtn = document.getElementById("settings-export-csv-btn");
+if (settingsExportCsvBtn) settingsExportCsvBtn.addEventListener("click", handleExportCsv);
+const settingsImportCsvInput = document.getElementById("settings-import-csv-input");
+if (settingsImportCsvInput) settingsImportCsvInput.addEventListener("change", (e) => handleImportCsv(e.target));
+
+// ==========================================================================
+// Categories Management (Settings Redesign & Filter Pills)
+// ==========================================================================
+const CATEGORY_TYPE_LABELS = { expense: "Gider", income: "Gelir", both: "Gider & Gelir" };
 
 let editingCategoryId = null;
+let activeCatFilter = "all";
+let cachedCategoriesList = [];
+
 function setCategoryFormMode(category) {
   editingCategoryId = category ? category.id : null;
-  document.getElementById("category-form-title").textContent = category ? "Kategoriyi düzenle" : "Kategori ekle";
-  document.getElementById("category-submit-btn").textContent = category ? "Güncelle" : "Ekle";
-  document.getElementById("category-cancel-edit").style.display = category ? "inline-block" : "none";
+  const titleEl = document.getElementById("category-form-title");
+  if (titleEl) titleEl.textContent = category ? "Kategoriyi Düzenle" : "Kategori Ekle";
+  const submitBtn = document.getElementById("category-submit-btn");
+  if (submitBtn) submitBtn.textContent = category ? "Güncelle" : "Ekle";
   if (category) {
     document.getElementById("category-name").value = category.name;
     document.getElementById("category-type").value = category.type;
   } else {
-    document.getElementById("add-category-form").reset();
+    const form = document.getElementById("add-category-form");
+    if (form) form.reset();
+    const typeSelect = document.getElementById("category-type");
+    if (typeSelect) typeSelect.value = "both";
   }
 }
-document.getElementById("category-cancel-edit").addEventListener("click", () => setCategoryFormMode(null));
 
-document.getElementById("add-category-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const name = document.getElementById("category-name").value.trim();
-  const type = document.getElementById("category-type").value;
-  const isEdit = editingCategoryId !== null;
-  const submitBtn = document.getElementById("category-submit-btn");
-  submitBtn.disabled = true;
-  const ok = await apiWrite(
-    isEdit ? `/categories/${editingCategoryId}` : "/categories",
-    {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, type }),
-    },
-    isEdit ? "Kategori güncellendi." : "Kategori eklendi."
-  );
-  submitBtn.disabled = false;
-  if (!ok) return;
-  setCategoryFormMode(null);
-  loadCategories();
-});
+const addCategoryForm = document.getElementById("add-category-form");
+if (addCategoryForm) {
+  addCategoryForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("category-name").value.trim();
+    const type = document.getElementById("category-type").value;
+    const isEdit = editingCategoryId !== null;
+    const submitBtn = document.getElementById("category-submit-btn");
+    submitBtn.disabled = true;
+    const ok = await apiWrite(
+      isEdit ? `/categories/${editingCategoryId}` : "/categories",
+      {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, type }),
+      },
+      isEdit ? "Kategori güncellendi (İlgili tüm kayıtlar güncellendi)." : "Kategori eklendi."
+    );
+    submitBtn.disabled = false;
+    if (!ok) return;
+    closeCategoryModal();
+    loadCategories();
+    loadTransactions();
+    loadBudgets();
+    loadSubscriptions();
+    loadOverview();
+    loadCategoryChart();
+  });
+}
+
+function renderCategoriesGrid() {
+  const list = document.getElementById("categories-list");
+  const empty = document.getElementById("categories-empty");
+  if (!list) return;
+
+  const filtered = activeCatFilter === "all"
+    ? cachedCategoriesList
+    : cachedCategoriesList.filter((c) => c.type === activeCatFilter || (activeCatFilter === "both" && c.type === "both"));
+
+  list.innerHTML = "";
+  if (empty) empty.style.display = filtered.length ? "none" : "block";
+
+  for (const category of filtered) {
+    const card = document.createElement("div");
+    card.className = "category-card";
+
+    let catIcon = "🏷️";
+    if (category.type === "income") catIcon = "💰";
+    else if (category.type === "expense") catIcon = "💳";
+
+    card.innerHTML = `
+      <div class="cat-info">
+        <div class="cat-icon">${catIcon}</div>
+        <div>
+          <div class="cat-name">${escapeHtml(category.name)}</div>
+          <span class="cat-badge ${category.type}">${CATEGORY_TYPE_LABELS[category.type] || category.type}</span>
+        </div>
+      </div>
+      <div class="cat-actions">
+        <button type="button" class="btn-icon-action cat-edit-btn" title="Düzenle">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button type="button" class="btn-icon-action danger cat-delete-btn" title="Sil">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>
+    `;
+
+    const editBtn = card.querySelector(".cat-edit-btn");
+    if (editBtn) editBtn.addEventListener("click", () => openCategoryModal(category));
+
+    const deleteBtn = card.querySelector(".cat-delete-btn");
+    if (deleteBtn) {
+      deleteBtn.addEventListener("click", async () => {
+        if (!confirm(`"${category.name}" kategorisi silinsin mi? Bu kategoriye ait işlemlerin kategori bilgisi kaldırılacaktır.`)) return;
+        const ok = await apiWrite(`/categories/${category.id}`, { method: "DELETE" }, "Kategori silindi.");
+        if (!ok) return;
+        if (editingCategoryId === category.id) closeCategoryModal();
+        loadCategories();
+        loadTransactions();
+        loadBudgets();
+        loadSubscriptions();
+        loadOverview();
+        loadCategoryChart();
+      });
+    }
+
+    list.appendChild(card);
+  }
+}
 
 async function loadCategories() {
   const categories = await apiRead("/categories");
@@ -4541,85 +6876,84 @@ async function loadCategories() {
     showLoadError("categories-empty", loadCategories);
     return;
   }
+  cachedCategoriesList = categories;
 
   const datalist = document.getElementById("category-datalist");
-  datalist.innerHTML = categories.map((c) => `<option value="${escapeHtml(c.name)}">`).join("");
+  if (datalist) {
+    datalist.innerHTML = categories.map((c) => `<option value="${escapeHtml(c.name)}">`).join("");
+  }
   populateCategoryFilter(categories);
 
-  const list = document.getElementById("categories-list");
-  const empty = document.getElementById("categories-empty");
-  list.innerHTML = "";
-  empty.textContent = "Henüz kategori yok.";
-  empty.style.display = categories.length ? "none" : "block";
+  // Update filter pill counts
+  const countAll = document.getElementById("cat-count-all");
+  if (countAll) countAll.textContent = String(categories.length);
+  const countExpense = document.getElementById("cat-count-expense");
+  if (countExpense) countExpense.textContent = String(categories.filter((c) => c.type === "expense").length);
+  const countIncome = document.getElementById("cat-count-income");
+  if (countIncome) countIncome.textContent = String(categories.filter((c) => c.type === "income").length);
+  const countBoth = document.getElementById("cat-count-both");
+  if (countBoth) countBoth.textContent = String(categories.filter((c) => c.type === "both").length);
 
-  for (const category of categories) {
-    const row = document.createElement("div");
-    row.className = "entry-row";
-    row.innerHTML = `
-      <div>
-        <div class="entry-title">${escapeHtml(category.name)}</div>
-        <div class="entry-meta">${CATEGORY_TYPE_LABELS[category.type] || category.type}</div>
-      </div>
-      <div class="actions">
-        <button class="btn-edit btn-small">Düzenle</button>
-        <button class="btn-archive btn-small">Sil</button>
-      </div>
-    `;
-    const [editBtn, deleteBtn] = row.querySelectorAll(".actions button");
-    editBtn.addEventListener("click", () => {
-      setCategoryFormMode(category);
-      document.getElementById("category-form-title").scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-    deleteBtn.addEventListener("click", async () => {
-      if (!confirm(`"${category.name}" kategorisi silinsin mi?`)) return;
-      const ok = await apiWrite(`/categories/${category.id}`, { method: "DELETE" }, "Kategori silindi.");
-      if (!ok) return;
-      if (editingCategoryId === category.id) setCategoryFormMode(null);
-      loadCategories();
-    });
-    list.appendChild(row);
-  }
+  renderCategoriesGrid();
 }
 
+// Wire Category Filter Buttons
+document.querySelectorAll(".cat-filter-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".cat-filter-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeCatFilter = btn.dataset.catFilter || "all";
+    renderCategoriesGrid();
+  });
+});
+
+// ==========================================================================
+// Budgets Management (Plan Redesign)
+// ==========================================================================
 let editingBudgetId = null;
 function setBudgetFormMode(budget) {
   editingBudgetId = budget ? budget.id : null;
-  document.getElementById("budget-form-title").textContent = budget ? "Bütçe limitini düzenle" : "Bütçe limiti ekle";
-  document.getElementById("budget-submit-btn").textContent = budget ? "Güncelle" : "Ekle";
-  document.getElementById("budget-cancel-edit").style.display = budget ? "inline-block" : "none";
+  const titleEl = document.getElementById("budget-form-title");
+  if (titleEl) titleEl.textContent = budget ? "Bütçe Limitini Düzenle" : "Bütçe Limiti Ekle";
+  const submitBtn = document.getElementById("budget-submit-btn");
+  if (submitBtn) submitBtn.textContent = budget ? "Güncelle" : "Ekle";
   const categoryInput = document.getElementById("budget-category");
   if (budget) {
     categoryInput.value = budget.category || "";
     categoryInput.disabled = true;
     document.getElementById("budget-limit").value = budget.monthly_limit;
   } else {
-    document.getElementById("add-budget-form").reset();
+    const form = document.getElementById("add-budget-form");
+    if (form) form.reset();
     categoryInput.disabled = false;
   }
 }
-document.getElementById("budget-cancel-edit").addEventListener("click", () => setBudgetFormMode(null));
 
-document.getElementById("add-budget-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const category = document.getElementById("budget-category").value.trim() || null;
-  const monthly_limit = parseFloat(document.getElementById("budget-limit").value);
-  const isEdit = editingBudgetId !== null;
-  const submitBtn = document.getElementById("budget-submit-btn");
-  submitBtn.disabled = true;
-  const ok = await apiWrite(
-    isEdit ? `/budgets/${editingBudgetId}` : "/budgets",
-    {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(isEdit ? { monthly_limit } : { category, monthly_limit }),
-    },
-    isEdit ? "Bütçe güncellendi." : "Bütçe eklendi."
-  );
-  submitBtn.disabled = false;
-  if (!ok) return;
-  setBudgetFormMode(null);
-  loadBudgets();
-});
+const addBudgetForm = document.getElementById("add-budget-form");
+if (addBudgetForm) {
+  addBudgetForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const category = document.getElementById("budget-category").value.trim() || null;
+    const monthly_limit = parseFloat(document.getElementById("budget-limit").value);
+    const isEdit = editingBudgetId !== null;
+    const submitBtn = document.getElementById("budget-submit-btn");
+    submitBtn.disabled = true;
+    const ok = await apiWrite(
+      isEdit ? `/budgets/${editingBudgetId}` : "/budgets",
+      {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(isEdit ? { monthly_limit } : { category, monthly_limit }),
+      },
+      isEdit ? "Bütçe güncellendi." : "Bütçe eklendi."
+    );
+    submitBtn.disabled = false;
+    if (!ok) return;
+    closeBudgetModal();
+    loadBudgets();
+    loadOverview();
+  });
+}
 
 async function loadBudgets() {
   const budgets = await apiRead("/budgets");
@@ -4630,103 +6964,196 @@ async function loadBudgets() {
   cachedBudgets = budgets;
   renderAlerts();
   updateBudgetMetric();
+
+  // 1. Budget Summary Banner in Plan Tab
+  let totalLimit = 0;
+  let totalSpent = 0;
+  for (const b of budgets) {
+    totalLimit += b.monthly_limit;
+    totalSpent += b.spent_this_month;
+  }
+
+  const budgetSumLimit = document.getElementById("budget-sum-limit");
+  if (budgetSumLimit) budgetSumLimit.textContent = formatMoney(totalLimit);
+  const budgetSumCount = document.getElementById("budget-sum-count");
+  if (budgetSumCount) budgetSumCount.textContent = `${budgets.length} bütçe aktif`;
+  const budgetSumSpent = document.getElementById("budget-sum-spent");
+  if (budgetSumSpent) budgetSumSpent.textContent = formatMoney(totalSpent);
+  const budgetSumPct = document.getElementById("budget-sum-pct");
+  const overallPct = totalLimit > 0 ? Math.round((totalSpent / totalLimit) * 100) : 0;
+  if (budgetSumPct) budgetSumPct.textContent = `%${overallPct} kullanım`;
+
+  const budgetSumRemaining = document.getElementById("budget-sum-remaining");
+  const budgetSumStatus = document.getElementById("budget-sum-status");
+  if (budgetSumRemaining && budgetSumStatus) {
+    const diff = totalLimit - totalSpent;
+    if (diff < 0) {
+      budgetSumRemaining.textContent = `+${formatMoney(Math.abs(diff))} aşım`;
+      budgetSumRemaining.className = "planning-summary-val expense-text";
+      budgetSumStatus.textContent = "Bütçe limiti aşıldı!";
+    } else {
+      budgetSumRemaining.textContent = formatMoney(diff);
+      budgetSumRemaining.className = "planning-summary-val accent-text";
+      budgetSumStatus.textContent = overallPct >= 80 ? "Kritik seviyeye yaklaştı" : "Limit dahilinde";
+    }
+  }
+
+  // 2. Render Budget Cards Grid
   const list = document.getElementById("budgets-list");
   const empty = document.getElementById("budgets-empty");
-  list.innerHTML = "";
-  empty.textContent = "Henüz bütçe limiti yok.";
-  empty.style.display = budgets.length ? "none" : "block";
+  if (list) list.innerHTML = "";
+  if (empty) empty.style.display = budgets.length ? "none" : "block";
+
+  if (!list) return;
 
   for (const budget of budgets) {
-    const row = document.createElement("div");
-    row.className = "card-entry";
-    const usagePct = budget.monthly_limit > 0 ? Math.min(100, (budget.spent_this_month / budget.monthly_limit) * 100) : 0;
-    const title = budget.category ? escapeHtml(budget.category) : "Genel bütçe";
-    row.innerHTML = `
-      <div class="card-entry-top">
-        <div class="entry-title">${title}</div>
-        <div class="actions">
-          <button class="btn-edit btn-small">Düzenle</button>
-          <button class="btn-archive btn-small">Sil</button>
+    const card = document.createElement("div");
+    card.className = `budget-card${budget.is_over_limit ? " over-budget" : ""}`;
+
+    const rawPct = budget.monthly_limit > 0 ? (budget.spent_this_month / budget.monthly_limit) * 100 : 0;
+    const usagePct = Math.min(100, Math.max(2, rawPct));
+    const isWarning = rawPct >= 80 && !budget.is_over_limit;
+
+    let statusClass = "normal";
+    let statusLabel = "Normal";
+    let barClass = "success";
+    if (budget.is_over_limit) {
+      statusClass = "exceeded";
+      statusLabel = "Aşıldı";
+      barClass = "danger";
+    } else if (isWarning) {
+      statusClass = "warning";
+      statusLabel = "Kritik (%80+)";
+      barClass = "warning";
+    }
+
+    const title = budget.category ? escapeHtml(budget.category) : "Genel Bütçe";
+    const diffText = budget.is_over_limit
+      ? `+${formatMoney(Math.abs(budget.remaining))} aşım`
+      : `${formatMoney(budget.remaining)} kaldı`;
+
+    card.innerHTML = `
+      <div class="budget-card-header">
+        <div class="budget-info">
+          <div class="budget-category-tag">
+            <span>🎯</span>
+            <span>${title}</span>
+          </div>
+          <span class="budget-status-pill ${statusClass}">${statusLabel}</span>
+        </div>
+        <div class="budget-actions">
+          <button type="button" class="btn-icon-action btn-edit" title="Düzenle">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button type="button" class="btn-icon-action danger btn-delete" title="Sil">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
         </div>
       </div>
-      <div class="card-usage-track"><div class="card-usage-fill${budget.is_over_limit ? " high" : ""}" style="width:${usagePct}%"></div></div>
-      <div class="card-meta-grid">
-        <div>Harcanan: <b>${formatMoney(budget.spent_this_month)}</b></div>
-        <div>Limit: <b>${formatMoney(budget.monthly_limit)}</b></div>
-        <div class="${budget.is_over_limit ? "due-soon" : ""}">${budget.is_over_limit ? "Aşım" : "Kalan"}: <b>${formatMoney(Math.abs(budget.remaining))}</b></div>
+      <div class="budget-metrics-row">
+        <div class="budget-metric">
+          <span class="metric-lbl">Harcanan</span>
+          <span class="metric-val spent">${formatMoney(budget.spent_this_month)}</span>
+        </div>
+        <div class="budget-metric" style="text-align: right;">
+          <span class="metric-lbl">Aylık Limit</span>
+          <span class="metric-val">${formatMoney(budget.monthly_limit)}</span>
+        </div>
+      </div>
+      <div class="budget-progress-track">
+        <div class="budget-progress-bar ${barClass}" style="width:${usagePct}%"></div>
+      </div>
+      <div class="budget-footer">
+        <span class="budget-pct-label">%${Math.round(rawPct)} kullanım</span>
+        <span class="budget-diff-label ${budget.is_over_limit ? "exceeded" : "remaining"}">
+          ${diffText}
+        </span>
       </div>
     `;
-    const [editBtn, deleteBtn] = row.querySelectorAll(".actions button");
-    editBtn.addEventListener("click", () => {
-      setBudgetFormMode(budget);
-      document.getElementById("budget-form-title").scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-    deleteBtn.addEventListener("click", async () => {
-      if (!confirm(`"${title}" bütçe limiti silinsin mi?`)) return;
-      const ok = await apiWrite(`/budgets/${budget.id}`, { method: "DELETE" }, "Bütçe limiti silindi.");
-      if (!ok) return;
-      if (editingBudgetId === budget.id) setBudgetFormMode(null);
-      loadBudgets();
-    });
-    list.appendChild(row);
+
+    const editBtn = card.querySelector(".btn-edit");
+    if (editBtn) editBtn.addEventListener("click", () => openBudgetModal(budget));
+
+    const deleteBtn = card.querySelector(".btn-delete");
+    if (deleteBtn) {
+      deleteBtn.addEventListener("click", async () => {
+        if (!confirm(`"${title}" bütçe limiti silinsin mi?`)) return;
+        const ok = await apiWrite(`/budgets/${budget.id}`, { method: "DELETE" }, "Bütçe limiti silindi.");
+        if (!ok) return;
+        if (editingBudgetId === budget.id) closeBudgetModal();
+        loadBudgets();
+        loadOverview();
+      });
+    }
+
+    list.appendChild(card);
   }
 }
 
-document.getElementById("export-backup-btn").addEventListener("click", async () => {
-  try {
-    const response = await apiFetch("/account/export");
-    if (!response.ok) {
-      showToast(await extractErrorMessage(response));
-      return;
+// ==========================================================================
+// Backup & Restore
+// ==========================================================================
+const exportBackupBtn = document.getElementById("export-backup-btn");
+if (exportBackupBtn) {
+  exportBackupBtn.addEventListener("click", async () => {
+    try {
+      const response = await apiFetch("/account/export");
+      if (!response.ok) {
+        showToast(await extractErrorMessage(response));
+        return;
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `butce_yedek_${todayIsoDate()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      showToast(err.message || "Bağlantı hatası.");
     }
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `butce_yedek_${todayIsoDate()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  } catch (err) {
-    showToast(err.message || "Bağlantı hatası.");
-  }
-});
+  });
+}
 
-document.getElementById("import-backup-input").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  try {
-    const backup = JSON.parse(await file.text());
-    const response = await apiFetch("/account/import", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(backup),
-    });
-    if (!response.ok) {
-      showToast(await extractErrorMessage(response));
-      return;
+const importBackupInput = document.getElementById("import-backup-input");
+if (importBackupInput) {
+  importBackupInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const backup = JSON.parse(await file.text());
+      const response = await apiFetch("/account/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(backup),
+      });
+      if (!response.ok) {
+        showToast(await extractErrorMessage(response));
+        return;
+      }
+      const result = await response.json();
+      showToast(
+        `Geri yüklendi: ${result.transactions} işlem, ${result.subscriptions} abonelik, ${result.recurring_transactions} sabit işlem, ${result.credit_cards} kart, ${result.categories} kategori, ${result.budgets} bütçe.`,
+        "success"
+      );
+      loadTransactions();
+      loadOverview();
+      loadSubscriptions();
+      loadRecurring();
+      loadCards();
+      loadCategories();
+      loadBudgets();
+      loadCategoryChart();
+      loadTrendChart();
+    } catch (err) {
+      showToast(err.message || "Geçersiz yedek dosyası.");
+    } finally {
+      e.target.value = "";
     }
-    const result = await response.json();
-    showToast(
-      `Geri yüklendi: ${result.transactions} işlem, ${result.subscriptions} abonelik, ${result.recurring_transactions} sabit işlem, ${result.credit_cards} kart, ${result.categories} kategori, ${result.budgets} bütçe.`,
-      "success"
-    );
-    loadTransactions();
-    loadOverview();
-    loadSubscriptions();
-    loadRecurring();
-    loadCards();
-    loadCategories();
-    loadBudgets();
-    loadCategoryChart();
-    loadTrendChart();
-  } catch (err) {
-    showToast(err.message || "Geçersiz yedek dosyası.");
-  } finally {
-    e.target.value = "";
-  }
-});
+  });
+}
 
 async function loadAccount() {
   const me = await apiRead("/me");
