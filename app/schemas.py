@@ -322,6 +322,12 @@ class InstallmentPlanCreate(BaseModel):
 class InstallmentPlanUpdate(BaseModel):
     description: Optional[str] = Field(default=None, min_length=1, max_length=200)
     category: Optional[str] = Field(default=None, max_length=100)
+    first_due_date: Optional[date] = None
+
+
+class InstallmentPaymentUpdate(BaseModel):
+    due_date: Optional[date] = None
+    amount: Optional[float] = Field(default=None, gt=0)
 
 
 class InstallmentPaymentOut(BaseModel):

@@ -321,6 +321,59 @@ def test_installment_edge_cases_1_and_12(client):
     assert dates[11] == "2028-09-30"
 
 
+def test_update_installment_plan_dates_and_payment_dates(client):
+    card = _make_card(client)
+    res = client.post(
+        "/installments",
+        json={
+            "credit_card_id": card["id"],
+            "description": "Bilgisayar",
+            "total_amount": 9000.0,
+            "installment_count": 3,
+            "first_due_date": "2026-05-10",
+        },
+    )
+    assert res.status_code == 201
+    plan = res.json()
+    assert plan["first_due_date"] == "2026-05-10"
+    assert plan["payments"][0]["due_date"] == "2026-05-10"
+    assert plan["payments"][1]["due_date"] == "2026-06-10"
+    assert plan["payments"][2]["due_date"] == "2026-07-10"
+
+    # 1. Update plan description and shift first_due_date
+    up_res = client.put(
+        f"/installments/{plan['id']}",
+        json={
+            "description": "Gaming Bilgisayar",
+            "first_due_date": "2026-06-15",
+        },
+    )
+    assert up_res.status_code == 200
+    up_plan = up_res.json()
+    assert up_plan["description"] == "Gaming Bilgisayar"
+    assert up_plan["first_due_date"] == "2026-06-15"
+    assert up_plan["payments"][0]["due_date"] == "2026-06-15"
+    assert up_plan["payments"][1]["due_date"] == "2026-07-15"
+    assert up_plan["payments"][2]["due_date"] == "2026-08-15"
+
+    # 2. Update individual payment due_date
+    p2_id = up_plan["payments"][1]["id"]
+    p2_up = client.put(
+        f"/installments/{plan['id']}/payments/{p2_id}",
+        json={"due_date": "2026-07-20"},
+    )
+    assert p2_up.status_code == 200
+    assert p2_up.json()["due_date"] == "2026-07-20"
+
+    # Cannot update a paid payment
+    client.post(f"/installments/{plan['id']}/payments/{up_plan['payments'][0]['id']}/pay")
+    paid_up = client.put(
+        f"/installments/{plan['id']}/payments/{up_plan['payments'][0]['id']}",
+        json={"due_date": "2026-08-01"},
+    )
+    assert paid_up.status_code == 400
+
+
 def test_frontend_elements_present():
     with open("app/static/index.html", "r", encoding="utf-8") as f:
         html = f.read()

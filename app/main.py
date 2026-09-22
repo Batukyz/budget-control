@@ -1443,9 +1443,42 @@ def update_installment_plan(
         plan.description = update.description.strip()
     if update.category is not None:
         plan.category = update.category
+    if update.first_due_date is not None:
+        plan.first_due_date = update.first_due_date
+        base_date = update.first_due_date
+        for p in plan.payments:
+            if p.status == "pending":
+                p.due_date = _advance_by_month(base_date, p.installment_number - 1, base_date.day)
     db.commit()
     db.refresh(plan)
     return _installment_plan_to_out(plan)
+
+
+@app.put("/installments/{plan_id}/payments/{payment_id}", response_model=schemas.InstallmentPaymentOut)
+def update_installment_payment(
+    plan_id: int,
+    payment_id: int,
+    update: schemas.InstallmentPaymentUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    plan = _get_owned_installment_plan(plan_id, current_user.id, db)
+    payment = (
+        db.query(models.InstallmentPayment)
+        .filter(models.InstallmentPayment.id == payment_id, models.InstallmentPayment.installment_plan_id == plan.id)
+        .first()
+    )
+    if payment is None:
+        raise HTTPException(status_code=404, detail="Taksit ödemesi bulunamadı")
+    if payment.status == "paid":
+        raise HTTPException(status_code=400, detail="Ödenmiş bir taksitin vadesi değiştirilemez")
+    if update.due_date is not None:
+        payment.due_date = update.due_date
+    if update.amount is not None:
+        payment.amount = round(update.amount, 2)
+    db.commit()
+    db.refresh(payment)
+    return payment
 
 
 @app.delete("/installments/{plan_id}", status_code=204)
