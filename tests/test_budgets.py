@@ -111,3 +111,39 @@ def test_budgets_scoped_to_owner(make_authed_client):
 
     assert len(bob.get("/budgets").json()) == 1
     assert bob.put(f"/budgets/{alice_budget['id']}", json={"monthly_limit": 1}).status_code == 404
+
+
+def test_list_budgets_percentage_and_near_limit(client):
+    client.post("/budgets", json={"category": "Restoran", "monthly_limit": 100})
+    # 85 TL spent -> 85%, near limit
+    client.post("/transactions", json={"amount": 85, "type": "expense", "category": "Restoran", "occurred_on": TODAY})
+
+    res = client.get("/budgets").json()
+    b = next(item for item in res if item["category"] == "Restoran")
+    assert b["spent_this_month"] == 85.0
+    assert b["spent_percentage"] == 85.0
+    assert b["is_near_limit"] is True
+    assert b["is_over_limit"] is False
+
+
+def test_list_budgets_with_historical_month(client):
+    client.post("/budgets", json={"category": "Eğlence", "monthly_limit": 200})
+    client.post("/transactions", json={"amount": 75, "type": "expense", "category": "Eğlence", "occurred_on": "2025-06-15"})
+    client.post("/transactions", json={"amount": 50, "type": "expense", "category": "Eğlence", "occurred_on": TODAY})
+
+    # June 2025
+    res_june = client.get("/budgets?month=2025-06").json()
+    b_june = next(item for item in res_june if item["category"] == "Eğlence")
+    assert b_june["spent_this_month"] == 75.0
+    assert b_june["remaining"] == 125.0
+
+    # Current month
+    res_now = client.get("/budgets").json()
+    b_now = next(item for item in res_now if item["category"] == "Eğlence")
+    assert b_now["spent_this_month"] == 50.0
+
+
+def test_list_budgets_invalid_month_format(client):
+    assert client.get("/budgets?month=2025/06").status_code == 400
+    assert client.get("/budgets?month=abc").status_code == 400
+

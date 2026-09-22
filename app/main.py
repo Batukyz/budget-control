@@ -719,6 +719,21 @@ def _month_category_expense(db: Session, owner_id: int, start: date, end: date) 
     return {key: total for key, total in rows}
 
 
+def _resolve_month_range(month: Optional[str] = None) -> tuple[date, date]:
+    if month is not None:
+        try:
+            year, month_num = (int(part) for part in month.split("-"))
+            month_start = date(year, month_num, 1)
+            month_end = date(year, month_num, calendar.monthrange(year, month_num)[1])
+            return month_start, month_end
+        except (ValueError, IndexError):
+            raise HTTPException(status_code=400, detail="month formatı 'YYYY-MM' olmalı")
+    today = date.today()
+    month_start = today.replace(day=1)
+    month_end = date(today.year, today.month, calendar.monthrange(today.year, today.month)[1])
+    return month_start, month_end
+
+
 @app.get("/overview", response_model=schemas.OverviewOut)
 def get_overview(
     db: Session = Depends(get_db),
@@ -726,16 +741,7 @@ def get_overview(
     month: Optional[str] = Query(None, description="Format: YYYY-MM"),
 ):
     today = date.today()
-    if month is not None:
-        try:
-            year, month_num = (int(part) for part in month.split("-"))
-            month_start = date(year, month_num, 1)
-            month_end = date(year, month_num, calendar.monthrange(year, month_num)[1])
-        except (ValueError, IndexError):
-            raise HTTPException(status_code=400, detail="month formatı 'YYYY-MM' olmalı")
-    else:
-        month_start = today.replace(day=1)
-        month_end = date(today.year, today.month, calendar.monthrange(today.year, today.month)[1])
+    month_start, month_end = _resolve_month_range(month)
 
     category_expense = _month_category_expense(db, current_user.id, month_start, month_end)
     month_expense = sum(category_expense.values())
@@ -886,6 +892,7 @@ def create_budget(
 
 @app.get("/budgets", response_model=list[schemas.BudgetStatusOut])
 def list_budgets(
+    month: Optional[str] = Query(None, description="Opsiyonel ay filtresi (YYYY-MM)"),
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
@@ -895,15 +902,16 @@ def list_budgets(
         .order_by(models.BudgetLimit.id.asc())
         .all()
     )
-    today = date.today()
-    month_start = today.replace(day=1)
-    month_end = date(today.year, today.month, calendar.monthrange(today.year, today.month)[1])
+    month_start, month_end = _resolve_month_range(month)
     category_expense = _month_category_expense(db, current_user.id, month_start, month_end)
     total_expense = sum(category_expense.values())
 
     results = []
     for b in budgets:
         spent = total_expense if b.category is None else category_expense.get(_normalize_category(b.category), 0.0)
+        spent_pct = round((spent / b.monthly_limit) * 100, 1) if b.monthly_limit > 0 else 0.0
+        is_over = spent > b.monthly_limit
+        is_near = (spent >= b.monthly_limit * 0.8) and not is_over
         results.append(
             schemas.BudgetStatusOut(
                 id=b.id,
@@ -912,7 +920,9 @@ def list_budgets(
                 created_at=b.created_at,
                 spent_this_month=round(spent, 2),
                 remaining=round(b.monthly_limit - spent, 2),
-                is_over_limit=spent > b.monthly_limit,
+                is_over_limit=is_over,
+                spent_percentage=spent_pct,
+                is_near_limit=is_near,
             )
         )
     return results

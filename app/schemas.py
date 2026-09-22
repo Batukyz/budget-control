@@ -255,6 +255,9 @@ class BudgetStatusOut(BudgetLimitOut):
     spent_this_month: float
     remaining: float
     is_over_limit: bool
+    spent_percentage: float = 0.0
+    is_near_limit: bool = False
+
 
 
 class CreditCardCreate(BaseModel):
