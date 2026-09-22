@@ -269,23 +269,31 @@ def create_transaction(
     return transaction
 
 
-@app.get("/transactions", response_model=list[schemas.TransactionOut])
-def list_transactions(
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user),
+def _build_transactions_query(
+    db: Session,
+    owner_id: int,
     type: Optional[schemas.TransactionType] = None,
     category: Optional[str] = None,
     from_date: Optional[date] = None,
     to_date: Optional[date] = None,
+    credit_card_id: Optional[int] = None,
+    min_amount: Optional[float] = None,
+    max_amount: Optional[float] = None,
     search: Optional[str] = None,
-    skip: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=200),
 ):
-    query = db.query(models.Transaction).filter(models.Transaction.owner_id == current_user.id)
+    if min_amount is not None and max_amount is not None and min_amount > max_amount:
+        raise HTTPException(status_code=400, detail="min_amount, max_amount'tan büyük olamaz")
+    query = db.query(models.Transaction).filter(models.Transaction.owner_id == owner_id)
     if type is not None:
         query = query.filter(models.Transaction.type == type)
     if category is not None:
         query = query.filter(models.Transaction.category == category)
+    if credit_card_id is not None:
+        query = query.filter(models.Transaction.credit_card_id == credit_card_id)
+    if min_amount is not None:
+        query = query.filter(models.Transaction.amount >= min_amount)
+    if max_amount is not None:
+        query = query.filter(models.Transaction.amount <= max_amount)
     if from_date is not None:
         query = query.filter(models.Transaction.occurred_on >= from_date)
     if to_date is not None:
@@ -295,6 +303,36 @@ def list_transactions(
         query = query.filter(
             or_(models.Transaction.note.ilike(like), models.Transaction.category.ilike(like))
         )
+    return query
+
+
+@app.get("/transactions", response_model=list[schemas.TransactionOut])
+def list_transactions(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+    type: Optional[schemas.TransactionType] = None,
+    category: Optional[str] = None,
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
+    credit_card_id: Optional[int] = None,
+    min_amount: Optional[float] = Query(None, ge=0),
+    max_amount: Optional[float] = Query(None, ge=0),
+    search: Optional[str] = None,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+):
+    query = _build_transactions_query(
+        db=db,
+        owner_id=current_user.id,
+        type=type,
+        category=category,
+        from_date=from_date,
+        to_date=to_date,
+        credit_card_id=credit_card_id,
+        min_amount=min_amount,
+        max_amount=max_amount,
+        search=search,
+    )
     return (
         query.order_by(models.Transaction.occurred_on.desc(), models.Transaction.id.desc())
         .offset(skip)
@@ -314,22 +352,23 @@ def export_transactions(
     category: Optional[str] = None,
     from_date: Optional[date] = None,
     to_date: Optional[date] = None,
+    credit_card_id: Optional[int] = None,
+    min_amount: Optional[float] = Query(None, ge=0),
+    max_amount: Optional[float] = Query(None, ge=0),
     search: Optional[str] = None,
 ):
-    query = db.query(models.Transaction).filter(models.Transaction.owner_id == current_user.id)
-    if type is not None:
-        query = query.filter(models.Transaction.type == type)
-    if category is not None:
-        query = query.filter(models.Transaction.category == category)
-    if search:
-        like = f"%{search}%"
-        query = query.filter(
-            or_(models.Transaction.note.ilike(like), models.Transaction.category.ilike(like))
-        )
-    if from_date is not None:
-        query = query.filter(models.Transaction.occurred_on >= from_date)
-    if to_date is not None:
-        query = query.filter(models.Transaction.occurred_on <= to_date)
+    query = _build_transactions_query(
+        db=db,
+        owner_id=current_user.id,
+        type=type,
+        category=category,
+        from_date=from_date,
+        to_date=to_date,
+        credit_card_id=credit_card_id,
+        min_amount=min_amount,
+        max_amount=max_amount,
+        search=search,
+    )
     transactions = query.order_by(models.Transaction.occurred_on.desc(), models.Transaction.id.desc()).all()
 
     buffer = io.StringIO()

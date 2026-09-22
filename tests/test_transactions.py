@@ -158,6 +158,59 @@ def test_transactions_scoped_to_owner(make_authed_client):
 
     alice_tx = alice.post("/transactions", json={"amount": 1, "type": "expense"}).json()
     bob.post("/transactions", json={"amount": 2, "type": "expense"})
-
     assert len(bob.get("/transactions").json()) == 1
     assert bob.get(f"/transactions/{alice_tx['id']}").status_code == 404
+
+
+def test_list_transactions_filters_by_amount_range(client):
+    client.post("/transactions", json={"amount": 50, "type": "expense"})
+    client.post("/transactions", json={"amount": 150, "type": "expense"})
+    client.post("/transactions", json={"amount": 300, "type": "expense"})
+
+    res = client.get("/transactions", params={"min_amount": 100, "max_amount": 200}).json()
+    assert len(res) == 1
+    assert res[0]["amount"] == 150.0
+
+    res_min = client.get("/transactions", params={"min_amount": 150}).json()
+    assert len(res_min) == 2
+
+
+def test_list_transactions_rejects_min_greater_than_max(client):
+    res = client.get("/transactions", params={"min_amount": 300, "max_amount": 100})
+    assert res.status_code == 400
+    assert "min_amount, max_amount'tan büyük olamaz" in res.json()["detail"]
+
+
+def test_list_transactions_filters_by_credit_card(client):
+    card = client.post(
+        "/credit-cards",
+        json={"bank_name": "Garanti", "card_name": "Bonus", "limit_amount": 10000, "statement_day": 15, "due_day": 25},
+    ).json()
+
+    client.post("/transactions", json={"amount": 100, "type": "expense", "credit_card_id": card["id"]})
+    client.post("/transactions", json={"amount": 200, "type": "expense"})
+
+    res = client.get("/transactions", params={"credit_card_id": card["id"]}).json()
+    assert len(res) == 1
+    assert res[0]["amount"] == 100.0
+    assert res[0]["credit_card_id"] == card["id"]
+
+
+def test_export_transactions_with_filters(client):
+    card = client.post(
+        "/credit-cards",
+        json={"bank_name": "Akbank", "card_name": "Axess", "limit_amount": 5000, "statement_day": 10, "due_day": 20},
+    ).json()
+
+    client.post("/transactions", json={"amount": 75, "type": "expense", "credit_card_id": card["id"]})
+    client.post("/transactions", json={"amount": 500, "type": "expense"})
+
+    res = client.get("/transactions/export", params={"credit_card_id": card["id"], "max_amount": 100})
+    assert res.status_code == 200
+    lines = res.text.strip().split("\r\n")
+    if len(lines) == 1:
+        lines = res.text.strip().split("\n")
+    # header + 1 transaction row
+    assert len(lines) == 2
+    assert "75" in lines[1]
+
