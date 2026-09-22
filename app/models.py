@@ -197,7 +197,7 @@ class InstallmentPayment(Base):
     )
 
     id = Column(Integer, primary_key=True, index=True)
-    installment_plan_id = Column(Integer, ForeignKey("installment_plans.id"), nullable=False)
+    installment_plan_id = Column(Integer, ForeignKey("installment_plans.id", ondelete="CASCADE"), nullable=False)
     installment_number = Column(Integer, nullable=False)  # 1 to N
     amount = Column(Float, nullable=False)
     due_date = Column(Date, nullable=False)
