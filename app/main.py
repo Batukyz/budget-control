@@ -1056,7 +1056,7 @@ def _credit_card_to_out(card: models.CreditCard) -> schemas.CreditCardOut:
         due_day=card.due_day,
         note=card.note,
         created_at=card.created_at,
-        available_limit=round(card.limit_amount - card.current_debt, 2),
+        available_limit=max(0.0, round(card.limit_amount - card.current_debt - total_installment_debt, 2)),
         next_statement_date=_next_occurrence_of_day(today, card.statement_day),
         next_due_date=_next_occurrence_of_day(today, card.due_day),
         total_installment_debt=round(total_installment_debt, 2),

@@ -49,6 +49,7 @@ def test_create_installment_plan_basic(client):
     card_info = client.get(f"/credit-cards/{card['id']}").json()
     assert card_info["total_installment_debt"] == 6000.0
     assert card_info["active_installment_count"] == 1
+    assert card_info["available_limit"] == 14000.0
 
 
 def test_deterministic_monetary_rounding_uneven_division(client):
