@@ -930,6 +930,71 @@
   .chart-bar-track { flex: 1; background: var(--input-bg); border-radius: 6px; height: 10px; overflow: hidden; }
   .chart-bar-fill { height: 100%; background: var(--gradient); border-radius: 6px; transition: width 0.4s ease; }
   .chart-value { font-size: 12px; color: var(--muted); width: 66px; flex: none; text-align: right; }
+  .trend-month-row {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .trend-month-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  .trend-month-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .trend-month-net {
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .trend-pair {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .trend-bar-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .trend-bar-label {
+    width: 38px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .trend-track {
+    flex: 1;
+    background: var(--input-bg);
+    border-radius: var(--radius-xs);
+    height: 8px;
+    overflow: hidden;
+  }
+  .trend-fill-inc {
+    height: 100%;
+    background: var(--accent);
+    border-radius: var(--radius-xs);
+    transition: width 0.4s ease;
+  }
+  .trend-fill-exp {
+    height: 100%;
+    background: var(--secondary);
+    border-radius: var(--radius-xs);
+    transition: width 0.4s ease;
+  }
+  .trend-num {
+    width: 75px;
+    text-align: right;
+    font-size: 11px;
+    font-weight: 700;
+  }
   .entry-row {
     display: flex;
     justify-content: space-between;
@@ -3852,6 +3917,18 @@
                 </div>
                 <div id="category-chart"></div>
               </div>
+
+              <!-- Monthly Trend -->
+              <div class="card" id="monthly-trend-card" style="display:none">
+                <div class="section-header-row">
+                  <div class="section-title-wrap">
+                    <span class="section-icon">📈</span>
+                    <h3 class="section-title">6 Aylık Gelir & Gider Trendi</h3>
+                  </div>
+                  <span class="chart-subtitle">Son 6 Ay</span>
+                </div>
+                <div id="monthly-trend-chart"></div>
+              </div>
             </div>
 
           </div>
@@ -6445,7 +6522,70 @@ async function loadCategoryChart() {
 }
 
 async function loadTrendChart() {
-  return;
+  const card = document.getElementById("monthly-trend-card");
+  const container = document.getElementById("monthly-trend-chart");
+  if (!card || !container) return;
+
+  const data = await apiRead("/reports/monthly-trend?months=6");
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    card.style.display = "none";
+    return;
+  }
+
+  const hasActivity = data.some((item) => (item.income || 0) > 0 || (item.expense || 0) > 0);
+  if (!hasActivity) {
+    card.style.display = "none";
+    return;
+  }
+
+  card.style.display = "block";
+
+  const monthNamesTr = {
+    "01": "Oca", "02": "Şub", "03": "Mar", "04": "Nis",
+    "05": "May", "06": "Haz", "07": "Tem", "08": "Ağu",
+    "09": "Eyl", "10": "Eki", "11": "Kas", "12": "Ara"
+  };
+
+  let maxVal = 1;
+  data.forEach((d) => {
+    if ((d.income || 0) > maxVal) maxVal = d.income;
+    if ((d.expense || 0) > maxVal) maxVal = d.expense;
+  });
+
+  container.innerHTML = data
+    .map((item) => {
+      const parts = (item.month || "").split("-");
+      const monthLabel = parts.length === 2 ? `${monthNamesTr[parts[1]] || parts[1]} ${parts[0]}` : item.month;
+      const inc = item.income || 0;
+      const exp = item.expense || 0;
+      const net = inc - exp;
+      const incPct = Math.max(inc > 0 ? 3 : 0, Math.round((inc / maxVal) * 100));
+      const expPct = Math.max(exp > 0 ? 3 : 0, Math.round((exp / maxVal) * 100));
+      const netColor = net >= 0 ? "var(--accent)" : "var(--danger)";
+      const netSign = net > 0 ? "+" : "";
+
+      return `
+        <div class="trend-month-row">
+          <div class="trend-month-header">
+            <span>${escapeHtml(monthLabel)}</span>
+            <span class="trend-month-net" style="color: ${netColor}">Net: ${netSign}${formatMoney(net)}</span>
+          </div>
+          <div class="trend-pair">
+            <div class="trend-bar-line">
+              <span class="trend-bar-label">Gelir</span>
+              <div class="trend-track"><div class="trend-fill-inc" style="width: ${incPct}%"></div></div>
+              <span class="trend-num" style="color: var(--accent);">${formatMoney(inc)}</span>
+            </div>
+            <div class="trend-bar-line">
+              <span class="trend-bar-label">Gider</span>
+              <div class="trend-track"><div class="trend-fill-exp" style="width: ${expPct}%"></div></div>
+              <span class="trend-num" style="color: var(--secondary);">${formatMoney(exp)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
 }
 
 function populateCategoryFilter(categories) {
