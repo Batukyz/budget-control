@@ -77,6 +77,8 @@ def test_category_breakdown_supports_income_type(client):
 def test_category_breakdown_rejects_bad_month_format(client):
     response = client.get("/reports/category-breakdown", params={"month": "not-a-month"})
     assert response.status_code == 400
+    out_of_range = client.get("/reports/category-breakdown", params={"month": "2026-15"})
+    assert out_of_range.status_code == 400
 
 
 def test_category_breakdown_scoped_to_owner(make_authed_client):

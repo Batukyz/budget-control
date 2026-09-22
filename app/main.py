@@ -868,17 +868,7 @@ def category_breakdown(
     month: Optional[str] = None,
     type: schemas.TransactionType = "expense",
 ):
-    if month is not None:
-        try:
-            year, month_num = (int(part) for part in month.split("-"))
-        except ValueError:
-            raise HTTPException(status_code=400, detail="month formatı 'YYYY-MM' olmalı")
-    else:
-        today = date.today()
-        year, month_num = today.year, today.month
-
-    month_start = date(year, month_num, 1)
-    month_end = date(year, month_num, calendar.monthrange(year, month_num)[1])
+    month_start, month_end = _resolve_month_range(month)
 
     rows = (
         db.query(models.Transaction.category, func.sum(models.Transaction.amount))
