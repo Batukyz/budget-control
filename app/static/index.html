@@ -5654,15 +5654,48 @@ function renderAlerts() {
   }
 
   for (const card_ of cachedCreditCards) {
-    const daysUntil = Math.round((new Date(card_.next_due_date) - today) / 86400000);
-    if (daysUntil <= 7) {
-      const when = daysUntil < 0 ? "gecikti" : daysUntil === 0 ? "bugün" : `${daysUntil} gün sonra`;
-      const title = card_.card_name ? `${card_.bank_name} · ${card_.card_name}` : card_.bank_name;
+    const title = card_.card_name ? `${card_.bank_name} · ${card_.card_name}` : card_.bank_name;
+    const debtStr = formatMoney(card_.current_debt);
+    let cardHasAlert = false;
+
+    // 1. Ekstre Kesim Tarihi Uyarısı
+    if (card_.next_statement_date) {
+      const stmtDays = Math.round((new Date(card_.next_statement_date) - today) / 86400000);
+      if (stmtDays <= 7 && stmtDays >= -2) {
+        cardHasAlert = true;
+        const when = stmtDays < 0 ? `${Math.abs(stmtDays)} gün önce kesildi` : stmtDays === 0 ? "bugün kesiliyor" : `${stmtDays} gün sonra`;
+        alerts.push({
+          tab: "wallet",
+          text: `📄 ${title} ekstre kesimi: ${when} (Borç: ${debtStr})`,
+          meta: debtStr,
+          severity: stmtDays <= 1 ? "warning" : "info",
+        });
+      }
+    }
+
+    // 2. Son Ödeme Tarihi ve Borç Uyarısı
+    if (card_.next_due_date) {
+      const dueDays = Math.round((new Date(card_.next_due_date) - today) / 86400000);
+      if (dueDays <= 7) {
+        cardHasAlert = true;
+        const when = dueDays < 0 ? `${Math.abs(dueDays)} gün gecikti` : dueDays === 0 ? "bugün son gün" : `${dueDays} gün kaldı`;
+        alerts.push({
+          tab: "wallet",
+          text: `💳 ${title} son ödeme: ${when} (Borç: ${debtStr})`,
+          meta: debtStr,
+          severity: dueDays < 0 ? "critical" : dueDays <= 2 ? "warning" : "info",
+        });
+      }
+    }
+
+    // 3. Güncel Borç Bildirimi (Eğer kartta borç varsa ve henüz ekstre/son ödeme uyarısı tetiklenmediyse)
+    if (card_.current_debt > 0 && !cardHasAlert) {
+      const stmtInfo = card_.next_statement_date ? ` · Ekstre: ${formatDateTr(card_.next_statement_date)}` : "";
       alerts.push({
-        tab: "bank",
-        text: `🏦 ${title} son ödeme`,
-        meta: when,
-        severity: daysUntil < 0 ? "critical" : daysUntil <= 2 ? "warning" : "info",
+        tab: "wallet",
+        text: `💳 ${title} güncel borcu: ${debtStr}${stmtInfo}`,
+        meta: debtStr,
+        severity: "info",
       });
     }
   }
@@ -5770,18 +5803,38 @@ function renderUpcomingPayments() {
   }
 
   for (const card of cachedCreditCards) {
-    if (!card.next_due_date) continue;
-    const daysUntil = Math.round((new Date(card.next_due_date) - today) / 86400000);
-    if (daysUntil <= 7) {
-      items.push({
-        title: card.card_name ? `${card.bank_name} · ${card.card_name}` : card.bank_name,
-        category: "Kredi Kartı",
-        amount: card.current_debt,
-        dueDate: card.next_due_date,
-        daysUntil,
-        icon: "💳",
-        tab: "bank",
-      });
+    const cardTitle = card.card_name ? `${card.bank_name} · ${card.card_name}` : card.bank_name;
+
+    // 1. Kredi Kartı Son Ödeme Tarihi
+    if (card.next_due_date) {
+      const daysUntil = Math.round((new Date(card.next_due_date) - today) / 86400000);
+      if (daysUntil <= 7) {
+        items.push({
+          title: `${cardTitle} (Son Ödeme)`,
+          category: "Kredi Kartı Borcu",
+          amount: card.current_debt,
+          dueDate: card.next_due_date,
+          daysUntil,
+          icon: "💳",
+          tab: "wallet",
+        });
+      }
+    }
+
+    // 2. Kredi Kartı Ekstre Kesim Tarihi
+    if (card.next_statement_date) {
+      const stmtDays = Math.round((new Date(card.next_statement_date) - today) / 86400000);
+      if (stmtDays >= 0 && stmtDays <= 7) {
+        items.push({
+          title: `${cardTitle} (Ekstre Kesimi)`,
+          category: "Hesap Özeti Kesimi",
+          amount: card.current_debt,
+          dueDate: card.next_statement_date,
+          daysUntil: stmtDays,
+          icon: "📄",
+          tab: "wallet",
+        });
+      }
     }
   }
 
