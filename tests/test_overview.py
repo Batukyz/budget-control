@@ -95,3 +95,22 @@ def test_overview_scoped_to_owner(make_authed_client):
 
     assert alice.get("/overview").json()["month_income"] == 500
     assert bob.get("/overview").json()["month_income"] == 0
+
+
+def test_overview_supports_specific_month(client):
+    client.post("/transactions", json={"amount": 3000, "type": "income", "occurred_on": "2026-05-10"})
+    client.post("/transactions", json={"amount": 800, "type": "expense", "occurred_on": "2026-05-20"})
+    client.post("/transactions", json={"amount": 500, "type": "expense", "occurred_on": "2026-06-01"})
+
+    res = client.get("/overview", params={"month": "2026-05"})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["month_income"] == 3000.0
+    assert data["month_expense"] == 800.0
+    assert data["net_balance"] == 2200.0
+
+
+def test_overview_rejects_invalid_month_format(client):
+    res = client.get("/overview", params={"month": "2026/05"})
+    assert res.status_code == 400
+    assert "YYYY-MM" in res.json()["detail"]

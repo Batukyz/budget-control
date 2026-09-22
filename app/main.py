@@ -705,10 +705,19 @@ def _month_category_expense(db: Session, owner_id: int, start: date, end: date) 
 def get_overview(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
+    month: Optional[str] = Query(None, description="Format: YYYY-MM"),
 ):
     today = date.today()
-    month_start = today.replace(day=1)
-    month_end = date(today.year, today.month, calendar.monthrange(today.year, today.month)[1])
+    if month is not None:
+        try:
+            year, month_num = (int(part) for part in month.split("-"))
+            month_start = date(year, month_num, 1)
+            month_end = date(year, month_num, calendar.monthrange(year, month_num)[1])
+        except (ValueError, IndexError):
+            raise HTTPException(status_code=400, detail="month formatı 'YYYY-MM' olmalı")
+    else:
+        month_start = today.replace(day=1)
+        month_end = date(today.year, today.month, calendar.monthrange(today.year, today.month)[1])
 
     category_expense = _month_category_expense(db, current_user.id, month_start, month_end)
     month_expense = sum(category_expense.values())

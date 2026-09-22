@@ -3788,7 +3788,12 @@
             <div class="hero-header">
               <div class="hero-header-left">
                 <span class="hero-tag">Aylık Finansal Durum</span>
-                <h2 class="hero-month-title" id="overview-month-title">Bu Ay</h2>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:2px;">
+                  <button type="button" class="btn-icon-subtle" id="overview-prev-month" title="Önceki Ay" style="background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-xs);padding:4px 8px;cursor:pointer;color:var(--text);font-weight:700;">←</button>
+                  <h2 class="hero-month-title" id="overview-month-title" style="margin:0;">Bu Ay</h2>
+                  <button type="button" class="btn-icon-subtle" id="overview-next-month" title="Sonraki Ay" style="background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-xs);padding:4px 8px;cursor:pointer;color:var(--text);font-weight:700;">→</button>
+                  <button type="button" class="btn-link-action" id="overview-today-btn" style="font-size:11.5px;display:none;margin-left:4px;">Bu Ay</button>
+                </div>
               </div>
               <div class="hero-header-right">
                 <span class="hero-badge" id="overview-savings-rate" style="display:none;"></span>
@@ -5889,15 +5894,25 @@ if (recentViewAllBtn) {
   recentViewAllBtn.addEventListener("click", () => setActiveTab("activity"));
 }
 
+let selectedOverviewDate = new Date();
+
 async function loadOverview() {
-  const data = await apiRead("/overview");
+  const now = new Date();
+  const isCurrentMonth = selectedOverviewDate.getFullYear() === now.getFullYear() && selectedOverviewDate.getMonth() === now.getMonth();
+  const year = selectedOverviewDate.getFullYear();
+  const monthStr = String(selectedOverviewDate.getMonth() + 1).padStart(2, "0");
+  const monthParam = `${year}-${monthStr}`;
+
+  const data = await apiRead(`/overview?month=${monthParam}`);
   if (!data) return;
 
-  const now = new Date();
   const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
-  const currentMonthName = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+  const currentMonthName = `${monthNames[selectedOverviewDate.getMonth()]} ${selectedOverviewDate.getFullYear()}`;
   const monthTitleEl = document.getElementById("overview-month-title");
   if (monthTitleEl) monthTitleEl.textContent = currentMonthName;
+
+  const todayBtn = document.getElementById("overview-today-btn");
+  if (todayBtn) todayBtn.style.display = isCurrentMonth ? "none" : "inline-block";
 
   document.getElementById("overview-income").textContent = formatMoney(data.month_income);
   document.getElementById("overview-expense").textContent = formatMoney(data.month_expense);
@@ -5926,6 +5941,28 @@ async function loadOverview() {
   if (subsEl) subsEl.textContent = formatMoney(data.monthly_subscription_cost);
 
   updateBudgetMetric();
+}
+
+const prevMonthBtn = document.getElementById("overview-prev-month");
+if (prevMonthBtn) {
+  prevMonthBtn.addEventListener("click", () => {
+    selectedOverviewDate.setMonth(selectedOverviewDate.getMonth() - 1);
+    loadOverview();
+  });
+}
+const nextMonthBtn = document.getElementById("overview-next-month");
+if (nextMonthBtn) {
+  nextMonthBtn.addEventListener("click", () => {
+    selectedOverviewDate.setMonth(selectedOverviewDate.getMonth() + 1);
+    loadOverview();
+  });
+}
+const todayMonthBtn = document.getElementById("overview-today-btn");
+if (todayMonthBtn) {
+  todayMonthBtn.addEventListener("click", () => {
+    selectedOverviewDate = new Date();
+    loadOverview();
+  });
 }
 
 function updateCreditCardFieldVisibility() {
