@@ -3996,6 +3996,22 @@
             </select>
           </div>
 
+          <div class="filter-field-group">
+            <label for="tx-filter-card" class="filter-label">Kart</label>
+            <select id="tx-filter-card">
+              <option value="">Tüm kartlar & nakit</option>
+            </select>
+          </div>
+
+          <div class="filter-field-group date-group">
+            <label class="filter-label">Tutar Aralığı</label>
+            <div class="date-range-row">
+              <input type="number" id="tx-filter-min" placeholder="Min ₺" step="any" min="0" style="max-width: 90px;">
+              <span class="date-range-sep">–</span>
+              <input type="number" id="tx-filter-max" placeholder="Maks ₺" step="any" min="0" style="max-width: 90px;">
+            </div>
+          </div>
+
           <div class="filter-field-group date-group">
             <label class="filter-label">Tarih Aralığı</label>
             <div class="date-range-row">
@@ -6052,16 +6068,32 @@ function updateInstallmentFieldVisibility() {
 
 function populateCreditCardSelect(cards) {
   const select = document.getElementById("tx-credit-card");
-  const current = select.value;
-  select.innerHTML =
-    '<option value="">Krediye bağlama</option>' +
-    cards
-      .map((c) => {
-        const title = c.card_name ? `${c.bank_name} · ${c.card_name}` : c.bank_name;
-        return `<option value="${c.id}">${escapeHtml(title)}</option>`;
-      })
-      .join("");
-  select.value = cards.some((c) => String(c.id) === current) ? current : "";
+  if (select) {
+    const current = select.value;
+    select.innerHTML =
+      '<option value="">Krediye bağlama</option>' +
+      cards
+        .map((c) => {
+          const title = c.card_name ? `${c.bank_name} · ${c.card_name}` : c.bank_name;
+          return `<option value="${c.id}">${escapeHtml(title)}</option>`;
+        })
+        .join("");
+    select.value = cards.some((c) => String(c.id) === current) ? current : "";
+  }
+
+  const filterSelect = document.getElementById("tx-filter-card");
+  if (filterSelect) {
+    const filterCurrent = filterSelect.value;
+    filterSelect.innerHTML =
+      '<option value="">Tüm kartlar & nakit</option>' +
+      cards
+        .map((c) => {
+          const title = c.card_name ? `${c.bank_name} · ${c.card_name}` : c.bank_name;
+          return `<option value="${c.id}">${escapeHtml(title)}</option>`;
+        })
+        .join("");
+    filterSelect.value = cards.some((c) => String(c.id) === filterCurrent) ? filterCurrent : "";
+  }
 }
 
 let currentTxType = "expense";
@@ -6394,6 +6426,9 @@ function renderTransactionsList(transactions) {
     (document.getElementById("tx-search") && document.getElementById("tx-search").value.trim()) ||
     (document.getElementById("tx-filter-category") && document.getElementById("tx-filter-category").value) ||
     (document.getElementById("tx-filter-type") && document.getElementById("tx-filter-type").value) ||
+    (document.getElementById("tx-filter-card") && document.getElementById("tx-filter-card").value) ||
+    (document.getElementById("tx-filter-min") && document.getElementById("tx-filter-min").value) ||
+    (document.getElementById("tx-filter-max") && document.getElementById("tx-filter-max").value) ||
     (document.getElementById("tx-filter-from") && document.getElementById("tx-filter-from").value) ||
     (document.getElementById("tx-filter-to") && document.getElementById("tx-filter-to").value)
   );
@@ -6772,6 +6807,36 @@ function updateActiveFilterBadges() {
     });
   }
 
+  const cardSelect = document.getElementById("tx-filter-card");
+  const cardVal = cardSelect ? cardSelect.value : "";
+  if (cardVal) {
+    activeCount++;
+    const cardObj = cachedCreditCards.find((c) => String(c.id) === cardVal);
+    const cardTitle = cardObj ? (cardObj.card_name ? `${cardObj.bank_name} · ${cardObj.card_name}` : cardObj.bank_name) : "Kart";
+    chips.push({
+      label: `Kart: ${cardTitle}`,
+      clear: () => {
+        if (cardSelect) cardSelect.value = "";
+        loadTransactions(true);
+      }
+    });
+  }
+
+  const minAmount = document.getElementById("tx-filter-min") ? document.getElementById("tx-filter-min").value : "";
+  const maxAmount = document.getElementById("tx-filter-max") ? document.getElementById("tx-filter-max").value : "";
+  if (minAmount || maxAmount) {
+    activeCount++;
+    const amtText = (minAmount && maxAmount) ? `${minAmount} ₺ - ${maxAmount} ₺` : (minAmount ? `Min: ${minAmount} ₺` : `Maks: ${maxAmount} ₺`);
+    chips.push({
+      label: `Tutar: ${amtText}`,
+      clear: () => {
+        if (document.getElementById("tx-filter-min")) document.getElementById("tx-filter-min").value = "";
+        if (document.getElementById("tx-filter-max")) document.getElementById("tx-filter-max").value = "";
+        loadTransactions(true);
+      }
+    });
+  }
+
   if (badge) {
     badge.textContent = String(activeCount);
     badge.style.display = activeCount > 0 ? "inline-flex" : "none";
@@ -6804,6 +6869,9 @@ function clearAllFilters() {
   if (document.getElementById("tx-search")) document.getElementById("tx-search").value = "";
   if (document.getElementById("tx-filter-category")) document.getElementById("tx-filter-category").value = "";
   if (document.getElementById("tx-filter-type")) document.getElementById("tx-filter-type").value = "";
+  if (document.getElementById("tx-filter-card")) document.getElementById("tx-filter-card").value = "";
+  if (document.getElementById("tx-filter-min")) document.getElementById("tx-filter-min").value = "";
+  if (document.getElementById("tx-filter-max")) document.getElementById("tx-filter-max").value = "";
   if (document.getElementById("tx-filter-from")) document.getElementById("tx-filter-from").value = "";
   if (document.getElementById("tx-filter-to")) document.getElementById("tx-filter-to").value = "";
   loadTransactions(true);
@@ -6815,6 +6883,26 @@ if (txCatFilter) txCatFilter.addEventListener("change", () => loadTransactions(t
 
 const txTypeFilter = document.getElementById("tx-filter-type");
 if (txTypeFilter) txTypeFilter.addEventListener("change", () => loadTransactions(true));
+
+const txCardFilter = document.getElementById("tx-filter-card");
+if (txCardFilter) txCardFilter.addEventListener("change", () => loadTransactions(true));
+
+let txAmountDebounce = null;
+const txFilterMin = document.getElementById("tx-filter-min");
+if (txFilterMin) {
+  txFilterMin.addEventListener("input", () => {
+    clearTimeout(txAmountDebounce);
+    txAmountDebounce = setTimeout(() => loadTransactions(true), 350);
+  });
+}
+
+const txFilterMax = document.getElementById("tx-filter-max");
+if (txFilterMax) {
+  txFilterMax.addEventListener("input", () => {
+    clearTimeout(txAmountDebounce);
+    txAmountDebounce = setTimeout(() => loadTransactions(true), 350);
+  });
+}
 
 const txFilterFrom = document.getElementById("tx-filter-from");
 if (txFilterFrom) txFilterFrom.addEventListener("change", () => loadTransactions(true));
@@ -6911,6 +6999,9 @@ async function loadTransactions(reset = true) {
   const search = document.getElementById("tx-search") ? document.getElementById("tx-search").value.trim() : "";
   const fromDate = document.getElementById("tx-filter-from") ? document.getElementById("tx-filter-from").value : "";
   const toDate = document.getElementById("tx-filter-to") ? document.getElementById("tx-filter-to").value : "";
+  const cardId = document.getElementById("tx-filter-card") ? document.getElementById("tx-filter-card").value : "";
+  const minAmount = document.getElementById("tx-filter-min") ? document.getElementById("tx-filter-min").value : "";
+  const maxAmount = document.getElementById("tx-filter-max") ? document.getElementById("tx-filter-max").value : "";
 
   const params = new URLSearchParams();
   if (category) params.set("category", category);
@@ -6918,6 +7009,9 @@ async function loadTransactions(reset = true) {
   if (search) params.set("search", search);
   if (fromDate) params.set("from_date", fromDate);
   if (toDate) params.set("to_date", toDate);
+  if (cardId) params.set("credit_card_id", cardId);
+  if (minAmount) params.set("min_amount", minAmount);
+  if (maxAmount) params.set("max_amount", maxAmount);
   params.set("skip", String(reset ? 0 : allTransactions.length));
   params.set("limit", String(TX_PAGE_SIZE));
 
@@ -7945,7 +8039,26 @@ async function loadCards() {
 // ==========================================================================
 async function handleExportCsv() {
   try {
-    const response = await apiFetch("/transactions/export");
+    const params = new URLSearchParams();
+    const cat = document.getElementById("tx-filter-category")?.value;
+    const typ = document.getElementById("tx-filter-type")?.value;
+    const search = document.getElementById("tx-search")?.value.trim();
+    const from = document.getElementById("tx-filter-from")?.value;
+    const to = document.getElementById("tx-filter-to")?.value;
+    const card = document.getElementById("tx-filter-card")?.value;
+    const minA = document.getElementById("tx-filter-min")?.value;
+    const maxA = document.getElementById("tx-filter-max")?.value;
+    if (cat) params.set("category", cat);
+    if (typ) params.set("type", typ);
+    if (search) params.set("search", search);
+    if (from) params.set("from_date", from);
+    if (to) params.set("to_date", to);
+    if (card) params.set("credit_card_id", card);
+    if (minA) params.set("min_amount", minA);
+    if (maxA) params.set("max_amount", maxA);
+
+    const query = params.toString() ? `?${params.toString()}` : "";
+    const response = await apiFetch(`/transactions/export${query}`);
     if (!response.ok) {
       showToast(await extractErrorMessage(response));
       return;
@@ -7959,6 +8072,7 @@ async function handleExportCsv() {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+    showToast("CSV başarıyla indirildi.", "success");
   } catch (err) {
     showToast(err.message || "Bağlantı hatası.");
   }
