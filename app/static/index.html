@@ -7095,6 +7095,10 @@ function closeCardModal() {
 let payingDebtCard = null;
 function openPayDebtModal(card) {
   if (!card) return;
+  if (!card.current_debt || card.current_debt <= 0) {
+    showToast("Bu kartın ödenecek güncel bir borcu bulunmamaktadır.", "info");
+    return;
+  }
   payingDebtCard = card;
   const cardNameEl = document.getElementById("pay-debt-card-name");
   const debtEl = document.getElementById("pay-debt-current-debt");
@@ -7253,6 +7257,9 @@ if (payDebtForm) {
       return;
     }
 
+    const submitBtn = document.getElementById("pay-debt-submit-btn");
+    if (submitBtn) submitBtn.disabled = true;
+
     try {
       const res = await apiFetch(`/credit-cards/${cardId}/pay-debt`, {
         method: "POST",
@@ -7266,9 +7273,17 @@ if (payDebtForm) {
       }
       closePayDebtModal();
       showToast("Kart borcu başarıyla ödendi ve gidere işlendi", "success");
-      await Promise.all([loadCreditCards(), loadOverview(), loadTransactions(true)]);
+      await Promise.all([
+        loadCards(),
+        loadOverview(),
+        loadTransactions(true),
+        loadCategoryChart(),
+        loadTrendChart(),
+      ]);
     } catch (err) {
       showToast(err.message, "error");
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
     }
   });
 }
@@ -7951,7 +7966,7 @@ async function loadCards() {
       <div class="cc-footer-actions">
         <span class="cc-due-badge ${dueBadgeClass}">${dueBadgeText}</span>
         <div class="cc-btns">
-          ${card.current_debt > 0 ? `<button type="button" class="btn-card-action card-pay-debt-btn" style="background:rgba(255,255,255,0.25);font-weight:700;">Borç Öde</button>` : ""}
+          <button type="button" class="btn-card-action card-pay-debt-btn" style="background:rgba(255,255,255,0.25);font-weight:700;">Borç Öde</button>
           <button type="button" class="btn-card-action card-edit-btn">Düzenle</button>
           <button type="button" class="btn-card-action danger card-delete-btn">Sil</button>
         </div>
