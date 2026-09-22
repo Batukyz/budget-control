@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Optional
 
 from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, Response, UploadFile
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
@@ -38,6 +38,11 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(RequestLoggingMiddleware)
 app.mount("/app", StaticFiles(directory=Path(__file__).parent / "static", html=True), name="frontend")
+
+
+@app.get("/", include_in_schema=False)
+def root_redirect():
+    return RedirectResponse(url="/app/")
 
 
 @app.exception_handler(Exception)

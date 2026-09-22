@@ -129,3 +129,10 @@ def test_delete_account_success(make_authed_client):
     assert response.status_code == 204
     assert user_client.get("/me").status_code == 401
 
+
+def test_root_redirects_to_app(anon_client):
+    response = anon_client.get("/", follow_redirects=False)
+    assert response.status_code == 307
+    assert response.headers["location"] == "/app/"
+
+
