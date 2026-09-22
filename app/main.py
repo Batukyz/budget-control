@@ -344,6 +344,26 @@ def list_transactions(
 CSV_COLUMNS = ["occurred_on", "type", "category", "note", "amount"]
 
 
+def _sanitize_csv_field(val: Optional[str]) -> str:
+    if not val:
+        return ""
+    text = str(val)
+    if text and text[0] in ("=", "+", "-", "@", "\t", "\r"):
+        return f"'{text}"
+    return text
+
+
+def _desanitize_csv_field(val: Optional[str]) -> Optional[str]:
+    if not val:
+        return None
+    s = val.strip()
+    if not s:
+        return None
+    if s.startswith("'") and len(s) > 1 and s[1] in ("=", "+", "-", "@", "\t", "\r"):
+        return s[1:]
+    return s
+
+
 @app.get("/transactions/export")
 def export_transactions(
     db: Session = Depends(get_db),
@@ -375,7 +395,13 @@ def export_transactions(
     writer = csv.writer(buffer)
     writer.writerow(CSV_COLUMNS)
     for t in transactions:
-        writer.writerow([t.occurred_on.isoformat(), t.type, t.category or "", t.note or "", t.amount])
+        writer.writerow([
+            t.occurred_on.isoformat(),
+            t.type,
+            _sanitize_csv_field(t.category),
+            _sanitize_csv_field(t.note),
+            t.amount,
+        ])
     buffer.seek(0)
     filename = f"islemler_{date.today().isoformat()}.csv"
     return StreamingResponse(
@@ -433,8 +459,8 @@ def import_transactions(
                 owner_id=current_user.id,
                 amount=amount,
                 type=tx_type,
-                category=(row.get("category") or "").strip() or None,
-                note=(row.get("note") or "").strip() or None,
+                category=_desanitize_csv_field(row.get("category")),
+                note=_desanitize_csv_field(row.get("note")),
                 occurred_on=occurred_on,
             )
         )

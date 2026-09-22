@@ -117,3 +117,29 @@ def test_import_rejects_oversized_file(client):
         "/transactions/import", files={"file": ("large.csv", io.BytesIO(oversized), "text/csv")}
     )
     assert response.status_code == 413
+
+
+def test_export_sanitizes_csv_formula_injection(client):
+    client.post("/transactions", json={"amount": 100, "type": "expense", "category": "=cmd|'calc'!A0", "note": "@formula"})
+    response = client.get("/transactions/export")
+    assert response.status_code == 200
+    text = response.text
+    # Ensure raw formula trigger characters at start of field are escaped with '
+    assert "'=cmd|'calc'!A0" in text
+    assert "'@formula" in text
+
+
+def test_import_desanitizes_escaped_csv_formulas(client):
+    csv_content = (
+        "occurred_on,type,category,note,amount\n"
+        f"{TODAY},expense,'=FormulaCat,'@FormulaNote,50\n"
+    )
+    response = client.post(
+        "/transactions/import", files={"file": ("tx.csv", io.BytesIO(csv_content.encode()), "text/csv")}
+    )
+    assert response.status_code == 200
+    txs = client.get("/transactions").json()
+    matched = next(t for t in txs if t["amount"] == 50.0)
+    assert matched["category"] == "=FormulaCat"
+    assert matched["note"] == "@FormulaNote"
+
