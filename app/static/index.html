@@ -8210,10 +8210,11 @@ if (addBudgetForm) {
   });
 }
 
-async function loadBudgets() {
-  const budgets = await apiRead("/budgets");
+async function loadBudgets(month = null) {
+  const url = month ? `/budgets?month=${encodeURIComponent(month)}` : "/budgets";
+  const budgets = await apiRead(url);
   if (!budgets) {
-    showLoadError("budgets-empty", loadBudgets);
+    showLoadError("budgets-empty", () => loadBudgets(month));
     return;
   }
   cachedBudgets = budgets;
@@ -8265,9 +8266,9 @@ async function loadBudgets() {
     const card = document.createElement("div");
     card.className = `budget-card${budget.is_over_limit ? " over-budget" : ""}`;
 
-    const rawPct = budget.monthly_limit > 0 ? (budget.spent_this_month / budget.monthly_limit) * 100 : 0;
+    const rawPct = typeof budget.spent_percentage === "number" ? budget.spent_percentage : (budget.monthly_limit > 0 ? (budget.spent_this_month / budget.monthly_limit) * 100 : 0);
     const usagePct = Math.min(100, Math.max(2, rawPct));
-    const isWarning = rawPct >= 80 && !budget.is_over_limit;
+    const isWarning = typeof budget.is_near_limit === "boolean" ? budget.is_near_limit : (rawPct >= 80 && !budget.is_over_limit);
 
     let statusClass = "normal";
     let statusLabel = "Normal";
