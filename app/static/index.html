@@ -3462,81 +3462,277 @@
     gap: 16px;
     margin-top: 14px;
   }
-  .installment-plan-card {
+  /* Bubble / Baloncuk Card Styling for Installments */
+  .installment-plan-card,
+  .wallet-installment-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg, 16px);
+    border-radius: 20px;
     padding: 18px 20px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.03);
   }
-  .installment-plan-card:hover {
+  .installment-plan-card:hover,
+  .wallet-installment-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 26px rgba(0,0,0,0.08);
     border-color: var(--accent);
   }
-  .installment-plan-header {
+  .inst-bubble-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 10px;
+    gap: 12px;
   }
-  .installment-plan-title {
-    font-size: 15px;
+  .inst-bubble-title {
+    font-size: 15.5px;
     font-weight: 800;
     color: var(--text);
     line-height: 1.3;
   }
-  .installment-plan-card-tag {
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-  .installment-plan-amounts {
+  .inst-bubble-pills {
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-top: 4px;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
   }
-  .installment-plan-total {
-    font-size: 16px;
+  .inst-bubble-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3.5px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+  .inst-bubble-pill.card-pill {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+    border: 1px solid rgba(59, 130, 246, 0.22);
+  }
+  .inst-bubble-pill.cat-pill {
+    background: rgba(147, 51, 234, 0.1);
+    color: #9333ea;
+    border: 1px solid rgba(147, 51, 234, 0.22);
+  }
+  .inst-bubble-pill.status-pill.active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.22);
+  }
+  .inst-bubble-pill.status-pill.completed {
+    background: rgba(107, 114, 128, 0.1);
+    color: #4b5563;
+    border: 1px solid rgba(107, 114, 128, 0.22);
+  }
+  .inst-bubble-total {
+    font-size: 17px;
     font-weight: 800;
     color: var(--text);
+    text-align: right;
+    white-space: nowrap;
   }
-  .installment-plan-remaining {
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--danger);
-  }
-  .installment-progress-bar {
-    height: 6px;
-    border-radius: 99px;
+  .inst-bubble-metrics-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
     background: var(--input-bg);
-    overflow: hidden;
+    padding: 10px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
   }
-  .installment-progress-fill {
-    height: 100%;
-    border-radius: 99px;
-    background: var(--accent);
-    transition: width 0.3s ease;
+  .inst-metric-item {
+    display: flex;
+    flex-direction: column;
   }
-  .installment-progress-fill.completed {
-    background: var(--success);
+  .inst-metric-item .lbl {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
   }
-  .installment-plan-footer {
+  .inst-metric-item .val {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--text);
+    margin-top: 1px;
+  }
+  .inst-next-due-bubble {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.22);
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #d97706;
+  }
+  .inst-progress-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .inst-progress-bar-wrap {
+    height: 7px;
+    background: var(--input-bg);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .inst-progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #6366f1);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+  .inst-progress-bar-fill.completed {
+    background: var(--success);
+  }
+  .inst-progress-labels-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .inst-bubble-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .inst-bubble-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    border: 1px solid var(--border);
+    background: var(--input-bg);
+    color: var(--text);
+    transition: all 0.15s ease;
+  }
+  .inst-bubble-btn:hover {
+    background: var(--border);
+  }
+  .inst-bubble-btn.primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .inst-empty-bubble-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: var(--card-bg);
+    border: 1px dashed var(--border);
+    border-radius: 20px;
+    padding: 22px 24px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .inst-empty-bubble-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 240px;
+    flex: 1;
+  }
+  .inst-empty-bubble-icon {
+    font-size: 32px;
+    background: var(--input-bg);
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+  }
+  .inst-empty-bubble-title {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .inst-empty-bubble-desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Card Transactions Modal Items */
+  .card-tx-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    transition: background 0.15s ease;
+  }
+  .card-tx-item:hover {
+    background: var(--card-bg);
+  }
+  .card-tx-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .card-tx-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .card-tx-meta {
     font-size: 11.5px;
     color: var(--muted);
-    padding-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
+  .card-tx-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-tx-amount {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: var(--danger);
+  }
+  .card-tx-btns {
+    display: flex;
+    gap: 4px;
+  }
+  .btn-tx-action {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.15s ease;
+  }
+  .btn-tx-action:hover {
+    background: var(--border);
+  }
+  .btn-tx-action.danger:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--danger);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
   .installment-badge {
     display: inline-block;
     padding: 2.5px 8px;
@@ -5144,12 +5340,79 @@
           </div>
         </div>
 
+        <!-- Plan Edit Form (toggleable) -->
+        <div id="installment-detail-edit-form" style="display:none; background:var(--input-bg); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:14px;">
+          <div style="font-size:13px; font-weight:700; margin-bottom:10px; color:var(--text);">Taksit Planını & Tarihlerini Düzenle</div>
+          <div class="form-group" style="margin-bottom:10px;">
+            <label for="inst-edit-desc" style="font-size:12px;">Plan Açıklaması</label>
+            <input type="text" id="inst-edit-desc" class="form-input" style="width:100%;">
+          </div>
+          <div class="form-group-row" style="margin-bottom:10px;">
+            <div class="form-group" style="flex:1;">
+              <label for="inst-edit-cat" style="font-size:12px;">Kategori</label>
+              <input type="text" id="inst-edit-cat" list="category-datalist" class="form-input" style="width:100%;">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label for="inst-edit-date" style="font-size:12px;">İlk Taksit / Vade Tarihi</label>
+              <input type="date" id="inst-edit-date" class="form-input" style="width:100%;">
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button type="button" class="btn-ghost btn-small" id="inst-edit-cancel-btn">İptal</button>
+            <button type="button" class="btn-primary btn-small" id="inst-edit-save-btn">Değişiklikleri Kaydet</button>
+          </div>
+        </div>
+
         <div style="font-size: 13px; font-weight: 700; margin: 12px 0 6px; color: var(--text);">Ödeme Takvimi</div>
         <div class="installment-schedule-list" id="installment-detail-schedule"></div>
 
         <div class="modal-actions-row" style="margin-top: 20px;">
           <button type="button" class="btn-ghost btn-danger-action" id="installment-detail-delete-btn" style="color: var(--danger);">Planı Sil</button>
-          <button type="button" class="btn-primary" id="installment-detail-close-btn">Kapat</button>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn-ghost" id="installment-detail-edit-toggle-btn">✏️ Planı Düzenle</button>
+            <button type="button" class="btn-primary" id="installment-detail-close-btn">Kapat</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Transactions Modal / Bottom Sheet -->
+  <div class="tx-modal-overlay" id="card-txs-modal-overlay" style="display:none;" aria-hidden="true">
+    <div class="tx-modal-backdrop" id="card-txs-modal-backdrop"></div>
+    <div class="tx-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="card-txs-title" style="max-width: 580px;">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="tx-modal-header">
+        <div class="tx-modal-title-group">
+          <h3 class="tx-modal-title" id="card-txs-title">Kart Harcamaları</h3>
+          <p class="tx-modal-subtitle" id="card-txs-subtitle">Bu karta ait işlemler ve harcama detayları</p>
+        </div>
+        <button type="button" class="tx-modal-close" id="card-txs-modal-close-btn" aria-label="Pencereyi kapat">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="tx-modal-body">
+        <div class="card-txs-summary-bar" id="card-txs-summary-bar" style="background:var(--input-bg); border-radius:14px; padding:12px 16px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; color:var(--muted); font-weight:600;">Kart Güncel Borcu</div>
+            <div style="font-size:18px; font-weight:800; color:var(--danger);" id="card-txs-debt-val">₺0,00</div>
+          </div>
+          <div>
+            <div style="font-size:11px; color:var(--muted); font-weight:600;">Kullanılabilir Limit</div>
+            <div style="font-size:18px; font-weight:800; color:var(--accent);" id="card-txs-avail-val">₺0,00</div>
+          </div>
+          <button type="button" class="btn-primary btn-small" id="card-txs-quick-add-btn">+ Harcama Ekle</button>
+        </div>
+
+        <div style="font-size: 13px; font-weight: 700; margin: 12px 0 8px; color: var(--text);">Karta Bağlı Harcamalar</div>
+        <div class="card-txs-list" id="card-txs-list" style="display:flex; flex-direction:column; gap:8px; max-height:360px; overflow-y:auto;"></div>
+
+        <div class="modal-actions-row" style="margin-top: 20px;">
+          <button type="button" class="btn-primary" id="card-txs-close-btn">Kapat</button>
         </div>
       </div>
     </div>
@@ -6416,12 +6679,18 @@ if (txForm) {
     submitBtn.disabled = false;
     if (!ok) return;
     closeTxModal();
-    loadTransactions();
-    loadOverview();
-    loadCategoryChart();
-    loadTrendChart();
-    loadBudgets();
-    loadInstallments();
+    await Promise.all([
+      loadTransactions(),
+      loadOverview(),
+      loadCategoryChart(),
+      loadTrendChart(),
+      loadBudgets(),
+      loadInstallments(),
+    ]);
+    if (viewingCardTxs) {
+      const refreshedCard = (cachedCreditCards || []).find((c) => c.id === viewingCardTxs.id);
+      if (refreshedCard) openCardTxsModal(refreshedCard);
+    }
   });
 }
 
@@ -7341,6 +7610,143 @@ if (payDebtForm) {
   });
 }
 
+let viewingCardTxs = null;
+
+async function openCardTxsModal(card) {
+  if (!card) return;
+  viewingCardTxs = card;
+  const overlay = document.getElementById("card-txs-modal-overlay");
+  const titleEl = document.getElementById("card-txs-title");
+  const subtitleEl = document.getElementById("card-txs-subtitle");
+  const debtEl = document.getElementById("card-txs-debt-val");
+  const availEl = document.getElementById("card-txs-avail-val");
+  const listEl = document.getElementById("card-txs-list");
+  const quickAddBtn = document.getElementById("card-txs-quick-add-btn");
+
+  if (!overlay) return;
+
+  const cardTitle = card.card_name ? `${card.bank_name} · ${card.card_name}` : card.bank_name;
+  if (titleEl) titleEl.textContent = `${cardTitle} Harcamaları`;
+  if (subtitleEl) subtitleEl.textContent = `Toplam Limit: ${formatMoney(card.limit_amount)} · Ekstre Günü: Her ayın ${card.statement_day}. günü`;
+  if (debtEl) debtEl.textContent = formatMoney(card.current_debt);
+  if (availEl) availEl.textContent = formatMoney(card.available_limit);
+
+  if (quickAddBtn) {
+    quickAddBtn.onclick = () => {
+      closeCardTxsModal();
+      openTxModal(null);
+      setTxType("expense");
+      const advFields = document.getElementById("tx-advanced-fields");
+      if (advFields) advFields.style.display = "block";
+      const advToggle = document.getElementById("tx-advanced-toggle");
+      if (advToggle) advToggle.classList.add("open");
+      const ccSelect = document.getElementById("tx-credit-card");
+      if (ccSelect) ccSelect.value = String(card.id);
+      updateInstallmentFieldVisibility();
+    };
+  }
+
+  if (listEl) {
+    listEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted); font-size:13px;">Harcamalar yükleniyor…</div>';
+  }
+
+  overlay.style.display = "flex";
+  overlay.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+
+  const txs = await apiRead(`/transactions?credit_card_id=${card.id}&limit=100`);
+  if (!listEl) return;
+  listEl.innerHTML = "";
+
+  if (!txs || txs.length === 0) {
+    listEl.innerHTML = `
+      <div style="text-align:center; padding:28px 16px; background:var(--input-bg); border-radius:14px; border:1px dashed var(--border);">
+        <div style="font-size:28px; margin-bottom:6px;">💳</div>
+        <div style="font-weight:700; font-size:14px; color:var(--text);">Bu Karta Ait Harcama Bulunmuyor</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">Yeni bir harcama eklerken "Daha fazla seçenek" altından bu kartı seçebilirsiniz.</div>
+      </div>
+    `;
+    return;
+  }
+
+  txs.forEach((tx) => {
+    const item = document.createElement("div");
+    item.className = "card-tx-item";
+    const title = tx.note || tx.category || "Harcama";
+    const isInst = Boolean(tx.installment_plan_id);
+
+    item.innerHTML = `
+      <div class="card-tx-left">
+        <div class="card-tx-title">${escapeHtml(title)}</div>
+        <div class="card-tx-meta">
+          <span>📅 ${formatDateTr(tx.occurred_on)}</span>
+          ${tx.category ? `<span>· 🏷️ ${escapeHtml(tx.category)}</span>` : ""}
+          ${isInst ? `<span class="tx-tag installment" style="font-size:10.5px; padding:2px 6px;">💳 Taksit</span>` : ""}
+        </div>
+      </div>
+      <div class="card-tx-right">
+        <span class="card-tx-amount">-${formatMoney(tx.amount)}</span>
+        <div class="card-tx-btns">
+          <button type="button" class="btn-tx-action edit-tx-btn" title="İşlemi ve Tarihi Düzenle">Düzenle</button>
+          <button type="button" class="btn-tx-action danger delete-tx-btn" title="İşlemi Sil">Sil</button>
+        </div>
+      </div>
+    `;
+
+    const editBtn = item.querySelector(".edit-tx-btn");
+    if (editBtn) {
+      editBtn.addEventListener("click", () => {
+        closeCardTxsModal();
+        openTxModal(tx);
+      });
+    }
+
+    const delBtn = item.querySelector(".delete-tx-btn");
+    if (delBtn) {
+      delBtn.addEventListener("click", async () => {
+        const confirmed = await showConfirmDialog({
+          title: "İşlemi Sil",
+          message: `"${title}" (${formatMoney(tx.amount)}) işlemini silmek istediğinizden emin misiniz? Kart borcu güncellenecektir.`,
+          confirmText: "Sil",
+          danger: true,
+        });
+        if (!confirmed) return;
+        const ok = await apiWrite(`/transactions/${tx.id}`, { method: "DELETE" }, "İşlem silindi.");
+        if (ok) {
+          await loadCards();
+          await loadTransactions(true);
+          await loadOverview();
+          await loadCategoryChart();
+          await loadTrendChart();
+          await loadBudgets();
+          const refreshedCard = (cachedCreditCards || []).find((c) => c.id === card.id);
+          if (refreshedCard) openCardTxsModal(refreshedCard);
+          else closeCardTxsModal();
+        }
+      });
+    }
+
+    listEl.appendChild(item);
+  });
+}
+
+function closeCardTxsModal() {
+  const overlay = document.getElementById("card-txs-modal-overlay");
+  if (overlay) {
+    overlay.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+  viewingCardTxs = null;
+}
+
+const cardTxsCloseBtn = document.getElementById("card-txs-modal-close-btn");
+if (cardTxsCloseBtn) cardTxsCloseBtn.addEventListener("click", closeCardTxsModal);
+const cardTxsActionCloseBtn = document.getElementById("card-txs-close-btn");
+if (cardTxsActionCloseBtn) cardTxsActionCloseBtn.addEventListener("click", closeCardTxsModal);
+const cardTxsBackdrop = document.getElementById("card-txs-modal-backdrop");
+if (cardTxsBackdrop) cardTxsBackdrop.addEventListener("click", closeCardTxsModal);
+
 const catCloseBtn = document.getElementById("category-modal-close-btn");
 if (catCloseBtn) catCloseBtn.addEventListener("click", closeCategoryModal);
 const catBackdrop = document.getElementById("category-modal-backdrop");
@@ -8009,9 +8415,9 @@ async function loadCards() {
       </div>
 
       ${card.total_installment_debt > 0 ? `
-      <div class="cc-installment-indicator" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.1); padding:6px 12px; border-radius:8px; margin: 8px 0; font-size:12px;">
+      <div class="cc-installment-indicator" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.15); padding:7px 12px; border-radius:10px; margin: 8px 0; font-size:12px; cursor:pointer;" title="Taksit planlarını gör">
         <span style="opacity:0.9;">💳 Kalan Taksit Borcu</span>
-        <span style="font-weight:700;">${formatMoney(card.total_installment_debt)} (${card.active_installment_count} Plan)</span>
+        <span style="font-weight:700;">${formatMoney(card.total_installment_debt)} (${card.active_installment_count} Plan) →</span>
       </div>` : ""}
 
       ${card.note ? `<div class="cc-note">📝 ${escapeHtml(card.note)}</div>` : ""}
@@ -8019,12 +8425,24 @@ async function loadCards() {
       <div class="cc-footer-actions">
         <span class="cc-due-badge ${dueBadgeClass}">${dueBadgeText}</span>
         <div class="cc-btns">
+          <button type="button" class="btn-card-action card-txs-btn" style="background:rgba(255,255,255,0.2);font-weight:700;">Harcamalar</button>
           <button type="button" class="btn-card-action card-pay-debt-btn" style="background:rgba(255,255,255,0.25);font-weight:700;">Borç Öde</button>
           <button type="button" class="btn-card-action card-edit-btn">Düzenle</button>
           <button type="button" class="btn-card-action danger card-delete-btn">Sil</button>
         </div>
       </div>
     `;
+
+    const txsBtn = cardEl.querySelector(".card-txs-btn");
+    if (txsBtn) txsBtn.addEventListener("click", () => openCardTxsModal(card));
+
+    const instIndicator = cardEl.querySelector(".cc-installment-indicator");
+    if (instIndicator) {
+      instIndicator.addEventListener("click", () => {
+        const target = document.getElementById("wallet-installments-section");
+        if (target) target.scrollIntoView({ behavior: "smooth" });
+      });
+    }
 
     const payDebtBtn = cardEl.querySelector(".card-pay-debt-btn");
     if (payDebtBtn) payDebtBtn.addEventListener("click", () => openPayDebtModal(card));
@@ -8750,46 +9168,51 @@ function renderPlanInstallments() {
 
     const nextPay = (plan.payments || []).find((p) => p.status === "pending");
     const nextPayText = nextPay
-      ? `Sıradaki: ${formatDateTr(nextPay.due_date)} (${formatMoney(nextPay.amount)})`
-      : "Tüm taksitler tamamlandı";
+      ? `⏰ Sıradaki Vade: ${formatDateTr(nextPay.due_date)} (${formatMoney(nextPay.amount)})`
+      : "✓ Tüm taksitler ödendi";
 
     const planEl = document.createElement("div");
     planEl.className = "installment-plan-card";
     planEl.innerHTML = `
-      <div class="installment-plan-header">
+      <div class="inst-bubble-header">
         <div>
-          <h4 class="installment-plan-title">${escapeHtml(plan.description)}</h4>
-          <span class="installment-plan-card-name">💳 ${escapeHtml(cardTitle)}${plan.category ? ` · ${escapeHtml(plan.category)}` : ""}</span>
+          <div class="inst-bubble-title">${escapeHtml(plan.description)}</div>
+          <div class="inst-bubble-pills">
+            <span class="inst-bubble-pill card-pill">💳 ${escapeHtml(cardTitle)}</span>
+            ${plan.category ? `<span class="inst-bubble-pill cat-pill">🏷️ ${escapeHtml(plan.category)}</span>` : ""}
+            <span class="inst-bubble-pill status-pill ${isCompleted ? "completed" : "active"}">
+              ${isCompleted ? "✓ Tamamlandı" : "⚡ Aktif Plan"}
+            </span>
+          </div>
         </div>
-        <span class="installment-badge ${isCompleted ? "completed" : "active"}">
-          ${isCompleted ? "Tamamlandı" : "Aktif"}
-        </span>
+        <div class="inst-bubble-total">${formatMoney(plan.total_amount)}</div>
       </div>
 
-      <div class="installment-plan-metrics">
-        <div>
-          <div class="installment-metric-label">Toplam Tutar</div>
-          <div class="installment-metric-val">${formatMoney(plan.total_amount)}</div>
+      <div class="inst-bubble-metrics-row">
+        <div class="inst-metric-item">
+          <span class="lbl">Kalan Taksit Borcu</span>
+          <span class="val expense-text">${formatMoney(plan.remaining_amount)}</span>
         </div>
-        <div>
-          <div class="installment-metric-label">Kalan Borç</div>
-          <div class="installment-metric-val expense-text">${formatMoney(plan.remaining_amount)}</div>
+        <div class="inst-metric-item">
+          <span class="lbl">Taksit Durumu</span>
+          <span class="val">${plan.completed_installments} / ${plan.installment_count} Ödendi</span>
         </div>
       </div>
 
-      <div class="installment-progress-wrap">
-        <div class="installment-progress-bar">
-          <div class="installment-progress-fill" style="width: ${pct}%"></div>
+      ${nextPay ? `<div class="inst-next-due-bubble">${nextPayText}</div>` : ""}
+
+      <div class="inst-progress-container">
+        <div class="inst-progress-bar-wrap">
+          <div class="inst-progress-bar-fill${isCompleted ? " completed" : ""}" style="width: ${pct}%"></div>
         </div>
-        <div class="installment-progress-labels">
-          <span>${plan.completed_installments} / ${plan.installment_count} Taksit Ödendi</span>
+        <div class="inst-progress-labels-row">
+          <span>İlerleme</span>
           <span>%${pct}</span>
         </div>
       </div>
 
-      <div class="installment-next-due">
-        <span>⏰ ${nextPayText}</span>
-        <span style="color: var(--accent); font-weight:700;">Detay →</span>
+      <div class="inst-bubble-actions">
+        <button type="button" class="inst-bubble-btn">🔍 Detay & Tarihleri Düzenle →</button>
       </div>
     `;
 
@@ -8805,12 +9228,36 @@ function renderWalletInstallments() {
   if (!section || !list) return;
 
   const activePlans = (cachedInstallments || []).filter((p) => p.status === "active");
+  section.style.display = "block";
+
   if (activePlans.length === 0) {
-    section.style.display = "none";
+    if (badge) badge.textContent = "0 Plan";
+    list.innerHTML = `
+      <div class="inst-empty-bubble-card">
+        <div class="inst-empty-bubble-left">
+          <div class="inst-empty-bubble-icon">💳</div>
+          <div>
+            <div class="inst-empty-bubble-title">Aktif Taksitli Harcama Bulunmuyor</div>
+            <div class="inst-empty-bubble-desc">Kredi kartlarınızla yaptığınız taksitli alışverişler ve aylık ödeme planlarınız burada baloncuklar halinde listelenir.</div>
+          </div>
+        </div>
+        <button type="button" class="btn-primary btn-small inst-add-plan-action-btn">+ Taksitli Harcama Ekle</button>
+      </div>
+    `;
+    const addBtn = list.querySelector(".inst-add-plan-action-btn");
+    if (addBtn) {
+      addBtn.addEventListener("click", () => {
+        openTxModal(null);
+        setTxType("expense");
+        const advFields = document.getElementById("tx-advanced-fields");
+        if (advFields) advFields.style.display = "block";
+        const instContainer = document.getElementById("tx-installment-container");
+        if (instContainer) instContainer.style.display = "block";
+      });
+    }
     return;
   }
 
-  section.style.display = "block";
   if (badge) badge.textContent = `${activePlans.length} Plan`;
   list.innerHTML = "";
 
@@ -8818,23 +9265,76 @@ function renderWalletInstallments() {
     const cardObj = cachedCreditCards.find((c) => c.id === plan.credit_card_id);
     const cardTitle = cardObj ? (cardObj.card_name ? `${cardObj.bank_name} · ${cardObj.card_name}` : cardObj.bank_name) : "Kredi Kartı";
     const nextPay = (plan.payments || []).find((p) => p.status === "pending");
+    const pct = plan.installment_count > 0 ? Math.round((plan.completed_installments / plan.installment_count) * 100) : 0;
 
     const itemEl = document.createElement("div");
     itemEl.className = "wallet-installment-card";
     itemEl.innerHTML = `
-      <div class="wallet-installment-header">
+      <div class="inst-bubble-header">
         <div>
-          <div class="wallet-installment-title">${escapeHtml(plan.description)}</div>
-          <div class="wallet-installment-card-name">💳 ${escapeHtml(cardTitle)}</div>
+          <div class="inst-bubble-title">${escapeHtml(plan.description)}</div>
+          <div class="inst-bubble-pills">
+            <span class="inst-bubble-pill card-pill">💳 ${escapeHtml(cardTitle)}</span>
+            ${plan.category ? `<span class="inst-bubble-pill cat-pill">🏷️ ${escapeHtml(plan.category)}</span>` : ""}
+            <span class="inst-bubble-pill status-pill active">⚡ Aktif Plan</span>
+          </div>
         </div>
-        <div class="wallet-installment-amount">${formatMoney(plan.total_amount)}</div>
+        <div class="inst-bubble-total">${formatMoney(plan.total_amount)}</div>
       </div>
-      <div class="wallet-installment-progress-text">
-        <span>${plan.completed_installments}/${plan.installment_count} Taksit</span>
-        <span class="expense-text">Kalan: ${formatMoney(plan.remaining_amount)}</span>
+
+      <div class="inst-bubble-metrics-row">
+        <div class="inst-metric-item">
+          <span class="lbl">Kalan Borç</span>
+          <span class="val expense-text">${formatMoney(plan.remaining_amount)}</span>
+        </div>
+        <div class="inst-metric-item">
+          <span class="lbl">Taksit Durumu</span>
+          <span class="val">${plan.completed_installments} / ${plan.installment_count} Ödendi</span>
+        </div>
       </div>
-      ${nextPay ? `<div class="wallet-installment-next">Sıradaki: ${formatDateTr(nextPay.due_date)} · ${formatMoney(nextPay.amount)}</div>` : ""}
+
+      ${nextPay ? `<div class="inst-next-due-bubble">⏰ Sıradaki Vade: ${formatDateTr(nextPay.due_date)} (${formatMoney(nextPay.amount)})</div>` : ""}
+
+      <div class="inst-progress-container">
+        <div class="inst-progress-bar-wrap">
+          <div class="inst-progress-bar-fill" style="width: ${pct}%"></div>
+        </div>
+        <div class="inst-progress-labels-row">
+          <span>İlerleme</span>
+          <span>%${pct}</span>
+        </div>
+      </div>
+
+      <div class="inst-bubble-actions">
+        <button type="button" class="inst-bubble-btn">🔍 Detay / Tarih Düzenle</button>
+        ${nextPay ? `<button type="button" class="inst-bubble-btn primary wallet-quick-pay-btn" data-pay-id="${nextPay.id}">Öde (${formatMoney(nextPay.amount)})</button>` : ""}
+      </div>
     `;
+
+    const quickPayBtn = itemEl.querySelector(".wallet-quick-pay-btn");
+    if (quickPayBtn) {
+      quickPayBtn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        quickPayBtn.disabled = true;
+        quickPayBtn.textContent = "Ödeniyor…";
+        const ok = await apiWrite(
+          `/installments/${plan.id}/payments/${nextPay.id}/pay`,
+          { method: "POST" },
+          `${nextPay.installment_number}. taksit ödendi olarak kaydedildi.`
+        );
+        if (ok) {
+          await loadInstallments();
+          await loadCards();
+          await loadTransactions();
+          await loadOverview();
+          await loadBudgets();
+        } else {
+          quickPayBtn.disabled = false;
+          quickPayBtn.textContent = "Öde";
+        }
+      });
+    }
+
     itemEl.addEventListener("click", () => openInstallmentDetailModal(plan));
     list.appendChild(itemEl);
   }
@@ -8865,7 +9365,73 @@ function openInstallmentDetailModal(plan) {
   const scheduleList = document.getElementById("installment-detail-schedule");
   const deleteBtn = document.getElementById("installment-detail-delete-btn");
 
+  const editForm = document.getElementById("installment-detail-edit-form");
+  const editToggleBtn = document.getElementById("installment-detail-edit-toggle-btn");
+  const editDesc = document.getElementById("inst-edit-desc");
+  const editCat = document.getElementById("inst-edit-cat");
+  const editDate = document.getElementById("inst-edit-date");
+  const saveEditBtn = document.getElementById("inst-edit-save-btn");
+  const cancelEditBtn = document.getElementById("inst-edit-cancel-btn");
+
   if (!overlay) return;
+
+  if (editForm) editForm.style.display = "none";
+  if (editToggleBtn) editToggleBtn.textContent = "✏️ Planı Düzenle";
+  if (editDesc) editDesc.value = plan.description;
+  if (editCat) editCat.value = plan.category || "";
+  if (editDate) editDate.value = plan.first_due_date || "";
+
+  if (editToggleBtn) {
+    editToggleBtn.onclick = () => {
+      if (editForm) {
+        const isOpen = editForm.style.display === "block";
+        editForm.style.display = isOpen ? "none" : "block";
+        editToggleBtn.textContent = isOpen ? "✏️ Planı Düzenle" : "Kapat";
+      }
+    };
+  }
+
+  if (cancelEditBtn) {
+    cancelEditBtn.onclick = () => {
+      if (editForm) editForm.style.display = "none";
+      if (editToggleBtn) editToggleBtn.textContent = "✏️ Planı Düzenle";
+    };
+  }
+
+  if (saveEditBtn) {
+    saveEditBtn.onclick = async () => {
+      const description = editDesc ? editDesc.value.trim() : plan.description;
+      const category = editCat ? editCat.value.trim() : plan.category;
+      const first_due_date = editDate && editDate.value ? editDate.value : null;
+
+      if (!description) {
+        showToast("Plan açıklaması boş olamaz", "error");
+        return;
+      }
+      saveEditBtn.disabled = true;
+      saveEditBtn.textContent = "Kaydediliyor…";
+
+      const ok = await apiWrite(
+        `/installments/${plan.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ description, category, first_due_date }),
+        },
+        "Taksit planı ve tarihleri güncellendi."
+      );
+      saveEditBtn.disabled = false;
+      saveEditBtn.textContent = "Değişiklikleri Kaydet";
+
+      if (ok) {
+        await loadInstallments();
+        await loadCards();
+        await loadUpcomingPayments();
+        const updatedPlan = (cachedInstallments || []).find((p) => p.id === plan.id);
+        if (updatedPlan) openInstallmentDetailModal(updatedPlan);
+      }
+    };
+  }
 
   const cardObj = cachedCreditCards.find((c) => c.id === plan.credit_card_id);
   const cardTitle = cardObj ? (cardObj.card_name ? `${cardObj.bank_name} · ${cardObj.card_name}` : cardObj.bank_name) : "Kredi Kartı";
@@ -8898,12 +9464,45 @@ function openInstallmentDetailModal(plan) {
           <span class="installment-schedule-amount">${formatMoney(payment.amount)}</span>
           ${isPaid
             ? `<span class="installment-badge completed" style="font-size: 11px;">Ödendi</span>`
-            : `<button type="button" class="installment-pay-action-btn" data-payment-id="${payment.id}">Öde</button>`
+            : `
+              <div style="display:flex; gap:6px; align-items:center;">
+                <button type="button" class="btn-tx-action edit-pay-date-btn" data-payment-id="${payment.id}" title="Vade Tarihini Değiştir">✏️ Tarih</button>
+                <button type="button" class="installment-pay-action-btn" data-payment-id="${payment.id}">Öde</button>
+              </div>
+            `
           }
         </div>
       `;
 
       if (!isPaid) {
+        const editDateBtn = item.querySelector(".edit-pay-date-btn");
+        if (editDateBtn) {
+          editDateBtn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            const newDate = prompt(`${payment.installment_number}. taksit vadesini girin (YYYY-AA-GG):`, payment.due_date);
+            if (!newDate || newDate === payment.due_date) return;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+              showToast("Geçerli bir tarih formatı girin (YYYY-AA-GG)", "error");
+              return;
+            }
+            const ok = await apiWrite(
+              `/installments/${plan.id}/payments/${payment.id}`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ due_date: newDate }),
+              },
+              `${payment.installment_number}. taksit vadesi güncellendi.`
+            );
+            if (ok) {
+              await loadInstallments();
+              await loadUpcomingPayments();
+              const updatedPlan = (cachedInstallments || []).find((p) => p.id === plan.id);
+              if (updatedPlan) openInstallmentDetailModal(updatedPlan);
+            }
+          });
+        }
+
         const payBtn = item.querySelector(".installment-pay-action-btn");
         if (payBtn) {
           payBtn.addEventListener("click", async (e) => {

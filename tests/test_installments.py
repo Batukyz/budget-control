@@ -382,6 +382,8 @@ def test_frontend_elements_present():
     assert "id=\"tab-installments\"" in html
     assert "id=\"wallet-installments-section\"" in html
     assert "id=\"installment-modal-overlay\"" in html
+    assert "id=\"installment-detail-edit-form\"" in html
+    assert "id=\"card-txs-modal-overlay\"" in html
     assert "id=\"tx-installments\"" in html
     assert "id=\"confirm-modal-input\"" in html
     assert "SIFIRLA" in html
