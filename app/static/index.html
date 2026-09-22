@@ -4467,6 +4467,28 @@
               </button>
             </div>
           </div>
+
+          <!-- Tehlikeli Bölge: Hesap Silme -->
+          <div class="card settings-card" style="border: 1px solid rgba(232, 17, 74, 0.35);">
+            <div class="settings-card-header">
+              <div class="settings-card-icon danger">⚠️</div>
+              <div>
+                <h3 class="settings-card-title" style="color: var(--danger);">Hesabı Kalıcı Olarak Sil</h3>
+                <p class="settings-card-subtitle">Tüm işlemleriniz, kartlarınız, taksitleriniz ve bütçeleriniz kalıcı olarak silinecektir.</p>
+              </div>
+            </div>
+            <form id="delete-account-form" class="settings-form">
+              <div class="form-group">
+                <label for="delete-account-password-input">Onaylamak İçin Şifrenizi Girin</label>
+                <input type="password" id="delete-account-password-input" required placeholder="Mevcut şifreniz" autocomplete="current-password">
+                <div class="form-hint" style="color: var(--danger); font-weight: 500;">Bu işlem geri alınamaz!</div>
+              </div>
+              <div class="error" id="delete-account-error"></div>
+              <div class="form-actions-row">
+                <button type="submit" class="btn-primary danger-btn" id="delete-account-submit-btn" style="background: var(--danger); color: #fff !important; border-color: var(--danger);">Hesabımı Kalıcı Olarak Sil</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 
@@ -8807,6 +8829,36 @@ document.getElementById("account-form").addEventListener("submit", async (e) => 
     }
     showToast("Hesap güncellendi.", "success");
     loadAccount();
+  } catch (err) {
+    errorEl.textContent = err.message || "Bağlantı hatası.";
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+
+document.getElementById("delete-account-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const password = document.getElementById("delete-account-password-input").value;
+  const errorEl = document.getElementById("delete-account-error");
+  errorEl.textContent = "";
+  if (!confirm("Hesabınızı ve TÜM verilerinizi kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!")) {
+    return;
+  }
+  const submitBtn = document.getElementById("delete-account-submit-btn");
+  submitBtn.disabled = true;
+  try {
+    const response = await apiFetch("/me", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    });
+    if (!response.ok) {
+      errorEl.textContent = await extractErrorMessage(response);
+      return;
+    }
+    showToast("Hesabınız ve tüm verileriniz başarıyla silindi.", "info");
+    document.getElementById("delete-account-form").reset();
+    showLogin();
   } catch (err) {
     errorEl.textContent = err.message || "Bağlantı hatası.";
   } finally {
