@@ -1336,7 +1336,7 @@ def _installment_plan_to_out(plan: models.InstallmentPlan) -> schemas.Installmen
             status=p.status,
             transaction_id=p.transaction_id,
         )
-        for p in plan.payments
+        for p in sorted(plan.payments, key=lambda x: x.installment_number)
     ]
     paid_payments = [p for p in plan.payments if p.status == "paid"]
     paid_count = len(paid_payments)
@@ -1443,7 +1443,7 @@ def update_installment_plan(
         plan.description = update.description.strip()
     if update.category is not None:
         plan.category = update.category
-    if update.first_due_date is not None:
+    if update.first_due_date is not None and update.first_due_date != plan.first_due_date:
         plan.first_due_date = update.first_due_date
         base_date = update.first_due_date
         for p in plan.payments:
@@ -1474,6 +1474,8 @@ def update_installment_payment(
         raise HTTPException(status_code=400, detail="Ödenmiş bir taksitin vadesi değiştirilemez")
     if update.due_date is not None:
         payment.due_date = update.due_date
+        if payment.installment_number == 1:
+            plan.first_due_date = update.due_date
     if update.amount is not None:
         payment.amount = round(update.amount, 2)
     db.commit()

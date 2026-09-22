@@ -1,8 +1,8 @@
 import re
 from datetime import date, datetime
-from typing import Optional, Literal
+from typing import Optional, Literal, Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -317,6 +317,15 @@ class InstallmentPlanCreate(BaseModel):
     total_amount: float = Field(gt=0)
     installment_count: int = Field(ge=1, le=60)
     first_due_date: Optional[date] = None
+    first_payment_date: Optional[date] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def resolve_dates(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if not data.get("first_due_date") and data.get("first_payment_date"):
+                data["first_due_date"] = data["first_payment_date"]
+        return data
 
 
 class InstallmentPlanUpdate(BaseModel):

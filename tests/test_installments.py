@@ -374,6 +374,94 @@ def test_update_installment_plan_dates_and_payment_dates(client):
     assert paid_up.status_code == 400
 
 
+def test_installment_due_date_independent_updates_and_plan_edit_preservation(client):
+    card = _make_card(client)
+    res = client.post(
+        "/installments",
+        json={
+            "credit_card_id": card["id"],
+            "description": "Buzdolabı",
+            "total_amount": 15000.0,
+            "installment_count": 3,
+            "first_due_date": "2026-09-15",
+        },
+    )
+    assert res.status_code == 201
+    plan = res.json()
+    p1 = plan["payments"][0]
+    p2 = plan["payments"][1]
+    p3 = plan["payments"][2]
+
+    assert p1["due_date"] == "2026-09-15"
+    assert p2["due_date"] == "2026-10-15"
+    assert p3["due_date"] == "2026-11-15"
+
+    # Update payment 2 due date independently
+    p2_up = client.put(
+        f"/installments/{plan['id']}/payments/{p2['id']}",
+        json={"due_date": "2026-11-20"},
+    )
+    assert p2_up.status_code == 200
+    assert p2_up.json()["due_date"] == "2026-11-20"
+
+    # Update payment 3 due date independently
+    p3_up = client.put(
+        f"/installments/{plan['id']}/payments/{p3['id']}",
+        json={"due_date": "2026-12-25"},
+    )
+    assert p3_up.status_code == 200
+    assert p3_up.json()["due_date"] == "2026-12-25"
+
+    # Verify payments from GET endpoint: p1 unchanged, p2 and p3 independently changed
+    fetched_plan = client.get(f"/installments/{plan['id']}").json()
+    assert fetched_plan["payments"][0]["due_date"] == "2026-09-15"
+    assert fetched_plan["payments"][1]["due_date"] == "2026-11-20"
+    assert fetched_plan["payments"][2]["due_date"] == "2026-12-25"
+
+    # Updating plan description must NOT reset individual payment dates
+    plan_up = client.put(
+        f"/installments/{plan['id']}",
+        json={"description": "Akıllı Buzdolabı", "first_due_date": "2026-09-15"},
+    )
+    assert plan_up.status_code == 200
+    plan_up_data = plan_up.json()
+    assert plan_up_data["description"] == "Akıllı Buzdolabı"
+    assert plan_up_data["payments"][0]["due_date"] == "2026-09-15"
+    assert plan_up_data["payments"][1]["due_date"] == "2026-11-20"
+    assert plan_up_data["payments"][2]["due_date"] == "2026-12-25"
+
+    # Updating payment 1 syncs plan.first_due_date without resetting p2 or p3
+    p1_up = client.put(
+        f"/installments/{plan['id']}/payments/{p1['id']}",
+        json={"due_date": "2026-09-22"},
+    )
+    assert p1_up.status_code == 200
+    final_plan = client.get(f"/installments/{plan['id']}").json()
+    assert final_plan["first_due_date"] == "2026-09-22"
+    assert final_plan["payments"][0]["due_date"] == "2026-09-22"
+    assert final_plan["payments"][1]["due_date"] == "2026-11-20"
+    assert final_plan["payments"][2]["due_date"] == "2026-12-25"
+
+
+def test_installment_create_with_first_payment_date_alias(client):
+    card = _make_card(client)
+    res = client.post(
+        "/installments",
+        json={
+            "credit_card_id": card["id"],
+            "description": "Fırın",
+            "total_amount": 6000.0,
+            "installment_count": 2,
+            "first_payment_date": "2026-12-05",
+        },
+    )
+    assert res.status_code == 201
+    plan = res.json()
+    assert plan["first_due_date"] == "2026-12-05"
+    assert plan["payments"][0]["due_date"] == "2026-12-05"
+    assert plan["payments"][1]["due_date"] == "2027-01-05"
+
+
 def test_frontend_elements_present():
     with open("app/static/index.html", "r", encoding="utf-8") as f:
         html = f.read()
@@ -387,4 +475,14 @@ def test_frontend_elements_present():
     assert "id=\"tx-installments\"" in html
     assert "id=\"confirm-modal-input\"" in html
     assert "SIFIRLA" in html
+
+    # Stacking context and modal hierarchy assertions
+    inst_modal_idx = html.index("id=\"installment-modal-overlay\"")
+    confirm_modal_idx = html.index("id=\"confirm-modal-overlay\"")
+    assert confirm_modal_idx > inst_modal_idx, "confirm-modal-overlay must appear after installment-modal-overlay in DOM"
+
+    assert "z-index: 600" in html
+    assert "z-index: 500" in html
+    assert "inst-due-input" in html
+    assert "edit-pay-date-btn" in html
 
