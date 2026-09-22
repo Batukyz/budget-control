@@ -1,12 +1,23 @@
+import re
 from datetime import date, datetime
 from typing import Optional, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 class UserCreate(BaseModel):
     email: str
     password: str = Field(min_length=8)
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        v = v.strip().lower()
+        if not EMAIL_REGEX.match(v):
+            raise ValueError("Geçerli bir e-posta adresi giriniz")
+        return v
 
 
 class UserOut(BaseModel):
@@ -20,6 +31,15 @@ class UserOut(BaseModel):
 class UserUpdate(BaseModel):
     email: Optional[str] = None
     password: Optional[str] = Field(default=None, min_length=8)
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            v = v.strip().lower()
+            if not EMAIL_REGEX.match(v):
+                raise ValueError("Geçerli bir e-posta adresi giriniz")
+        return v
 
 
 class Token(BaseModel):

@@ -6,6 +6,13 @@ def test_register(anon_client):
     assert response.json()["email"] == "new@example.com"
 
 
+def test_register_rejects_invalid_email(anon_client):
+    response = anon_client.post(
+        "/auth/register", json={"email": "not-an-email", "password": "testpassword123"}
+    )
+    assert response.status_code == 422
+
+
 def test_register_duplicate_email(anon_client):
     anon_client.post(
         "/auth/register", json={"email": "dup@example.com", "password": "testpassword123"}
