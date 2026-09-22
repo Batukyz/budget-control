@@ -42,6 +42,10 @@ class UserUpdate(BaseModel):
         return v
 
 
+class AccountDeleteRequest(BaseModel):
+    password: str
+
+
 class Token(BaseModel):
     access_token: str
     refresh_token: str

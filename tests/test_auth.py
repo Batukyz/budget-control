@@ -113,3 +113,19 @@ def test_logout_revokes_refresh_token(anon_client):
 
     response = anon_client.post("/auth/refresh", json={"refresh_token": refresh_token})
     assert response.status_code == 401
+
+
+def test_delete_account_wrong_password(client):
+    response = client.request("DELETE", "/me", json={"password": "wrongpassword"})
+    assert response.status_code == 400
+    assert "Hatalı şifre" in response.json()["detail"]
+    assert client.get("/me").status_code == 200
+
+
+def test_delete_account_success(make_authed_client):
+    user_client = make_authed_client(email="delete_me@example.com", password="mypassword123")
+    user_client.post("/transactions", json={"amount": 100.0, "type": "expense", "category": "Food"})
+    response = user_client.request("DELETE", "/me", json={"password": "mypassword123"})
+    assert response.status_code == 204
+    assert user_client.get("/me").status_code == 401
+

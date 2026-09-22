@@ -161,6 +161,24 @@ def update_me(
     return current_user
 
 
+@app.delete("/me", status_code=204)
+def delete_me(
+    payload: schemas.AccountDeleteRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    if not verify_password(payload.password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Hatalı şifre; hesap silinemedi")
+    _clear_auth_cookies(response)
+    db.query(models.RefreshToken).filter(models.RefreshToken.user_id == current_user.id).delete(synchronize_session=False)
+    db.query(models.BackupImport).filter(models.BackupImport.owner_id == current_user.id).delete(synchronize_session=False)
+    db.delete(current_user)
+    db.commit()
+    return Response(status_code=204)
+
+
+
 def _get_owned_transaction(transaction_id: int, owner_id: int, db: Session) -> models.Transaction:
     transaction = (
         db.query(models.Transaction)
