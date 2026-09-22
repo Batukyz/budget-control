@@ -1069,77 +1069,264 @@
   .toast-close:hover { color: var(--text); }
   .toast.hide { opacity: 0; transform: translateY(8px) scale(0.96); }
 
+  /* ==========================================================================
+     Bildirimler & Uyarılar (Notification & Alert Cards) - Compact & Polished
+     ========================================================================== */
+  .alerts-positive-state {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm, 10px);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  .alerts-positive-state .status-dot-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+    flex-shrink: 0;
+    animation: alert-pulse-green 2.2s infinite ease-out;
+  }
+  @keyframes alert-pulse-green {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 6px rgba(52, 211, 153, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+    }
+  }
+  .alerts-positive-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+  .alerts-positive-text strong {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .alerts-positive-text span {
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.3;
+  }
+
   .alert-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 10px;
-    padding: 11px 13px;
-    margin-bottom: 8px;
-    border-radius: 11px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    border-radius: var(--radius-sm, 10px);
     border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
     background: var(--card);
     cursor: pointer;
     text-align: left;
     width: 100%;
     font-family: inherit;
-    transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease;
+    position: relative;
+    box-sizing: border-box;
+    transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.15s ease,
+                border-color 0.15s ease,
+                box-shadow 0.15s ease;
   }
-  .alert-row:last-child { margin-bottom: 0; }
+  .alert-row:last-child {
+    margin-bottom: 0;
+  }
   .alert-row:hover {
     background: var(--input-bg);
-    transform: translateY(-1px);
+    border-color: var(--border-hover);
+    transform: translateY(-0.5px);
+    box-shadow: var(--shadow-xs);
   }
+  .alert-row:active {
+    transform: translateY(0) scale(0.996);
+  }
+  .alert-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
   .alert-row.alert-critical {
-    border-left: 4px solid var(--danger);
-    background: var(--danger-bg);
+    border-left-color: var(--danger);
   }
   .alert-row.alert-warning {
-    border-left: 4px solid var(--warning);
-    background: var(--warning-bg);
+    border-left-color: var(--warning);
   }
   .alert-row.alert-info {
-    border-left: 4px solid var(--accent);
-    background: var(--input-bg);
+    border-left-color: var(--info);
   }
-  .alert-content-left {
+
+  .alert-icon-box {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-xs, 7px);
     display: flex;
     align-items: center;
-    gap: 8px;
-    min-width: 0;
-  }
-  .alert-badge-icon {
-    font-size: 14px;
-    line-height: 1;
+    justify-content: center;
     flex-shrink: 0;
+    transition: transform 0.12s ease;
   }
-  .alert-text {
+  .alert-row:hover .alert-icon-box {
+    transform: scale(1.04);
+  }
+  .alert-icon-box.critical {
+    background: var(--danger-bg);
+    color: var(--danger);
+  }
+  .alert-icon-box.warning {
+    background: var(--warning-bg);
+    color: var(--warning);
+  }
+  .alert-icon-box.info {
+    background: var(--info-bg);
+    color: var(--info);
+  }
+
+  .alert-content-middle {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .alert-title {
     font-size: 13px;
     font-weight: 600;
     color: var(--text);
+    line-height: 1.25;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  .alert-desc {
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .alert-content-right {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2px;
     flex-shrink: 0;
+    text-align: right;
   }
-  .alert-meta {
-    font-size: 11.5px;
+  .alert-amount {
+    font-size: 13px;
     font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
   }
-  .alert-meta.critical { color: var(--danger); }
-  .alert-meta.warning { color: var(--warning); }
-  .alert-meta.info { color: var(--muted); }
+  .alert-amount.danger {
+    color: var(--danger);
+  }
+  .alert-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .alert-badge-tag {
+    font-size: 10.5px;
+    font-weight: 500;
+    padding: 1.5px 6px;
+    border-radius: var(--radius-pill, 9999px);
+    line-height: 1.2;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+  }
+  .alert-badge-tag.critical {
+    background: var(--danger-bg);
+    color: var(--danger);
+  }
+  .alert-badge-tag.warning {
+    background: var(--warning-bg);
+    color: var(--warning);
+  }
+  .alert-badge-tag.info {
+    background: var(--input-bg);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
   .alert-arrow {
     color: var(--muted);
-    transition: transform 0.15s ease;
+    flex-shrink: 0;
+    opacity: 0.6;
+    transition: transform 0.15s ease, opacity 0.15s ease, color 0.15s ease;
   }
   .alert-row:hover .alert-arrow {
     transform: translateX(2px);
+    opacity: 1;
+    color: var(--text);
+  }
+
+  @media (max-width: 600px) {
+    .alert-row {
+      padding: 8px 10px;
+      gap: 9px;
+      margin-bottom: 5px;
+    }
+    .alert-icon-box {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+    }
+    .alert-icon-box svg {
+      width: 14px;
+      height: 14px;
+    }
+    .alert-title {
+      font-size: 12.5px;
+    }
+    .alert-desc {
+      font-size: 11px;
+    }
+    .alert-amount {
+      font-size: 12.5px;
+    }
+    .alert-badge-tag {
+      font-size: 10px;
+      padding: 1px 5px;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .alert-row {
+      padding: 7px 9px;
+      gap: 7px;
+    }
+    .alert-icon-box {
+      width: 26px;
+      height: 26px;
+    }
+    .alert-icon-box svg {
+      width: 13px;
+      height: 13px;
+    }
+    .alert-amount {
+      font-size: 12px;
+    }
   }
   .card-entry { padding: 14px 0; border-bottom: 1px solid var(--border); }
   .card-entry:last-child { border-bottom: none; }
@@ -4082,6 +4269,7 @@
                     <span class="section-icon">🔔</span>
                     <h3 class="section-title">Bildirimler & Uyarılar</h3>
                   </div>
+                  <span class="counter-badge" id="alerts-count-badge" style="display:none;"></span>
                 </div>
                 <div id="alerts-list"></div>
               </div>
@@ -5937,96 +6125,253 @@ let cachedRecurring = [];
 let latestTransactions = [];
 let cachedInstallments = [];
 
+function formatAlertCardTitle(bankName, cardName) {
+  const bank = (bankName || "").trim();
+  const card = (cardName || "").trim();
+  if (!bank && !card) return "Kredi Kartı";
+  if (!bank) return card;
+  if (!card) return bank;
+
+  const normalize = (s) => s.toLowerCase().replace(/[\s\-_.:/·]+/g, " ").trim();
+  const nBank = normalize(bank);
+  const nCard = normalize(card);
+
+  if (nBank === nCard) return card;
+
+  const cleanBank = nBank.replace(/^türkiye\s+/, "");
+  if (nCard.includes(nBank) || (cleanBank.length > 3 && nCard.includes(cleanBank))) {
+    if (nCard.startsWith(nBank)) {
+      const remainder = card.slice(bank.length).replace(/^[\s·\-_:/]+/, "").trim();
+      return remainder ? `${bank} · ${remainder}` : bank;
+    }
+    return card;
+  }
+  return `${bank} · ${card}`;
+}
+
 function renderAlerts() {
   const card = document.getElementById("alerts-card");
   const list = document.getElementById("alerts-list");
+  const countBadge = document.getElementById("alerts-count-badge");
   if (!card || !list) return;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const alerts = [];
 
-  for (const sub of cachedSubscriptions) {
-    if (!sub.is_active || sub.is_paid_this_cycle) continue;
-    const daysUntil = Math.round((new Date(sub.next_due_date) - today) / 86400000);
+  // 1. Subscriptions
+  for (const sub of (cachedSubscriptions || [])) {
+    if (!sub.is_active || sub.is_paid_this_cycle || !sub.next_due_date) continue;
+    const targetDate = parseDateOnly(sub.next_due_date);
+    if (!targetDate) continue;
+    const daysUntil = Math.round((targetDate.getTime() - today.getTime()) / 86400000);
     if (daysUntil <= 7) {
-      const when = daysUntil < 0 ? "gecikti" : daysUntil === 0 ? "bugün" : `${daysUntil} gün sonra`;
+      const when = daysUntil < 0
+        ? `${Math.abs(daysUntil)} gün gecikti`
+        : daysUntil === 0
+        ? "Bugün yenileniyor"
+        : daysUntil === 1
+        ? "Yarın yenileniyor"
+        : `${daysUntil} gün sonra`;
+      const sev = daysUntil < 0 ? "critical" : daysUntil <= 2 ? "warning" : "info";
+      const dateStr = formatDateTr(sub.next_due_date);
       alerts.push({
         tab: "subscriptions",
-        text: `🔁 ${sub.name} aboneliği`,
-        meta: when,
-        severity: daysUntil < 0 ? "critical" : daysUntil <= 2 ? "warning" : "info",
+        severity: sev,
+        iconType: "subscription",
+        title: `${sub.name} Aboneliği`,
+        desc: dateStr ? `Yenileme: ${dateStr}` : "Abonelik ödemesi",
+        primaryVal: sub.amount > 0 ? `${formatMoney(sub.amount)} TL` : "",
+        badge: when,
+        amountDanger: daysUntil < 0,
+        eventDate: targetDate,
       });
     }
   }
 
-  for (const card_ of cachedCreditCards) {
-    const title = card_.card_name ? `${card_.bank_name} · ${card_.card_name}` : card_.bank_name;
-    const debtStr = formatMoney(card_.current_debt);
+  // 2. Credit Cards
+  for (const card_ of (cachedCreditCards || [])) {
+    const title = formatAlertCardTitle(card_.bank_name, card_.card_name);
+    const debt = Number(card_.current_debt) || 0;
+    const debtStr = debt > 0 ? `${formatMoney(debt)} TL` : "0,00 TL";
     let cardHasAlert = false;
 
-    // 1. Ekstre Kesim Tarihi Uyarısı
+    // 2a. Ekstre Kesim Tarihi Uyarısı
     if (card_.next_statement_date) {
-      const stmtDays = Math.round((new Date(card_.next_statement_date) - today) / 86400000);
-      if (stmtDays <= 7 && stmtDays >= -2) {
-        cardHasAlert = true;
-        const when = stmtDays < 0 ? `${Math.abs(stmtDays)} gün önce kesildi` : stmtDays === 0 ? "bugün kesiliyor" : `${stmtDays} gün sonra`;
-        alerts.push({
-          tab: "wallet",
-          text: `📄 ${title} ekstre kesimi: ${when} (Borç: ${debtStr})`,
-          meta: debtStr,
-          severity: stmtDays <= 1 ? "warning" : "info",
-        });
+      const stmtDate = parseDateOnly(card_.next_statement_date);
+      if (stmtDate) {
+        const stmtDays = Math.round((stmtDate.getTime() - today.getTime()) / 86400000);
+        if (stmtDays <= 7 && stmtDays >= -2) {
+          cardHasAlert = true;
+          const when = stmtDays < 0
+            ? `${Math.abs(stmtDays)} gün önce`
+            : stmtDays === 0
+            ? "Bugün kesiliyor"
+            : stmtDays === 1
+            ? "Yarın kesiliyor"
+            : `${stmtDays} gün sonra`;
+          alerts.push({
+            tab: "wallet",
+            severity: stmtDays <= 1 ? "warning" : "info",
+            iconType: "statement",
+            title: title,
+            desc: `Ekstre kesimi: ${formatDateTr(card_.next_statement_date)}`,
+            primaryVal: debtStr,
+            badge: when,
+            amountDanger: false,
+            eventDate: stmtDate,
+          });
+        }
       }
     }
 
-    // 2. Son Ödeme Tarihi ve Borç Uyarısı
+    // 2b. Son Ödeme Tarihi ve Borç Uyarısı
     if (card_.next_due_date) {
-      const dueDays = Math.round((new Date(card_.next_due_date) - today) / 86400000);
-      if (dueDays <= 7) {
-        cardHasAlert = true;
-        const when = dueDays < 0 ? `${Math.abs(dueDays)} gün gecikti` : dueDays === 0 ? "bugün son gün" : `${dueDays} gün kaldı`;
-        alerts.push({
-          tab: "wallet",
-          text: `💳 ${title} son ödeme: ${when} (Borç: ${debtStr})`,
-          meta: debtStr,
-          severity: dueDays < 0 ? "critical" : dueDays <= 2 ? "warning" : "info",
-        });
+      const dueDate = parseDateOnly(card_.next_due_date);
+      if (dueDate) {
+        const dueDays = Math.round((dueDate.getTime() - today.getTime()) / 86400000);
+        if (dueDays <= 7) {
+          cardHasAlert = true;
+          const when = dueDays < 0
+            ? `${Math.abs(dueDays)} gün gecikti`
+            : dueDays === 0
+            ? "Bugün son gün"
+            : dueDays === 1
+            ? "Yarın son gün"
+            : `${dueDays} gün kaldı`;
+          alerts.push({
+            tab: "wallet",
+            severity: dueDays < 0 ? "critical" : dueDays <= 2 ? "warning" : "info",
+            iconType: "card",
+            title: title,
+            desc: `Son ödeme: ${formatDateTr(card_.next_due_date)}`,
+            primaryVal: debtStr,
+            badge: when,
+            amountDanger: dueDays <= 2,
+            eventDate: dueDate,
+          });
+        }
       }
     }
 
-    // 3. Güncel Borç Bildirimi (Eğer kartta borç varsa ve henüz ekstre/son ödeme uyarısı tetiklenmediyse)
-    if (card_.current_debt > 0 && !cardHasAlert) {
-      const stmtInfo = card_.next_statement_date ? ` · Ekstre: ${formatDateTr(card_.next_statement_date)}` : "";
+    // 2c. Güncel Borç Bildirimi (Eğer kartta borç varsa ve henüz ekstre/son ödeme uyarısı tetiklenmediyse)
+    if (debt > 0 && !cardHasAlert) {
+      const stmtDate = card_.next_statement_date ? parseDateOnly(card_.next_statement_date) : null;
+      const stmtInfo = card_.next_statement_date
+        ? `Ekstre: ${formatDateTr(card_.next_statement_date)}`
+        : card_.statement_day
+        ? `Ekstre her ayın ${card_.statement_day}. günü`
+        : "Güncel kart borcu";
       alerts.push({
         tab: "wallet",
-        text: `💳 ${title} güncel borcu: ${debtStr}${stmtInfo}`,
-        meta: debtStr,
         severity: "info",
+        iconType: "card",
+        title: title,
+        desc: stmtInfo,
+        primaryVal: debtStr,
+        badge: "Kart borcu",
+        amountDanger: false,
+        eventDate: stmtDate,
       });
     }
   }
 
-  for (const budget of cachedBudgets) {
+  // 3. Installments
+  for (const plan of (cachedInstallments || [])) {
+    if (plan.status !== "active" || !plan.payments) continue;
+    for (const p of plan.payments) {
+      if (p.status !== "pending" || !p.due_date) continue;
+      const instDate = parseDateOnly(p.due_date);
+      if (!instDate) continue;
+      const daysUntil = Math.round((instDate.getTime() - today.getTime()) / 86400000);
+      if (daysUntil <= 7) {
+        const when = daysUntil < 0
+          ? `${Math.abs(daysUntil)} gün gecikti`
+          : daysUntil === 0
+          ? "Bugün son gün"
+          : daysUntil === 1
+          ? "Yarın son gün"
+          : `${daysUntil} gün kaldı`;
+        const totalCount = plan.installment_count || plan.total_installments || plan.payments.length;
+        alerts.push({
+          tab: "installments",
+          severity: daysUntil < 0 ? "critical" : daysUntil <= 2 ? "warning" : "info",
+          iconType: "installment",
+          title: `${plan.description || "Taksit"} (${p.installment_number}/${totalCount}. Taksit)`,
+          desc: `Vade tarihi: ${formatDateTr(p.due_date)}`,
+          primaryVal: `${formatMoney(p.amount)} TL`,
+          badge: when,
+          amountDanger: daysUntil <= 2,
+          eventDate: instDate,
+        });
+      }
+    }
+  }
+
+  // 4. Budgets Over Limit
+  for (const budget of (cachedBudgets || [])) {
     if (budget.is_over_limit) {
-      const title = budget.category || "Genel bütçe";
+      const bTitle = budget.category ? `${budget.category} Bütçesi` : "Genel Bütçe";
+      const overAmount = Math.abs(budget.remaining);
+      const budgetDate = budget.end_date ? parseDateOnly(budget.end_date) : null;
       alerts.push({
         tab: "budgets",
-        text: `🎯 ${title} bütçesi aşıldı`,
-        meta: formatMoney(Math.abs(budget.remaining)),
         severity: "critical",
+        iconType: "budget",
+        title: bTitle,
+        desc: "Aylık limit aşıldı",
+        primaryVal: `+${formatMoney(overAmount)} TL`,
+        badge: "Limit aşıldı",
+        amountDanger: true,
+        eventDate: budgetDate,
       });
     }
   }
+
+  // Chronological Sorting:
+  // 1. Dated items come before undated items (undated items placed at the end)
+  // 2. Earliest date at top (ascending timestamp)
+  // 3. Same date or both undated: secondary sort by severity (critical > warning > info)
+  const severityRank = { critical: 0, warning: 1, info: 2 };
+  alerts.sort((a, b) => {
+    const hasDateA = a.eventDate instanceof Date && !isNaN(a.eventDate.getTime());
+    const hasDateB = b.eventDate instanceof Date && !isNaN(b.eventDate.getTime());
+
+    if (hasDateA && !hasDateB) return -1;
+    if (!hasDateA && hasDateB) return 1;
+
+    if (hasDateA && hasDateB) {
+      const diff = a.eventDate.getTime() - b.eventDate.getTime();
+      if (diff !== 0) return diff;
+    }
+
+    const rankA = severityRank[a.severity] ?? 9;
+    const rankB = severityRank[b.severity] ?? 9;
+    if (rankA !== rankB) return rankA - rankB;
+
+    return 0;
+  });
 
   card.style.display = "block";
   list.innerHTML = "";
 
+  if (countBadge) {
+    if (alerts.length > 0) {
+      countBadge.textContent = alerts.length;
+      countBadge.style.display = "inline-flex";
+    } else {
+      countBadge.style.display = "none";
+    }
+  }
+
   if (alerts.length === 0) {
     list.innerHTML = `
       <div class="alerts-positive-state">
-        <span class="status-dot-pulse"></span>
-        <span>Her şey yolunda; geciken ödeme veya bütçe aşımı bulunmuyor.</span>
+        <span class="status-dot-pulse" aria-hidden="true"></span>
+        <div class="alerts-positive-text">
+          <strong>Her şey yolunda</strong>
+          <span>Geciken ödeme veya bütçe aşımı bulunmuyor.</span>
+        </div>
       </div>
     `;
     return;
@@ -6036,14 +6381,37 @@ function renderAlerts() {
     const row = document.createElement("button");
     row.type = "button";
     row.className = `alert-row alert-${alert.severity}`;
+    row.setAttribute("aria-label", `${alert.title} - ${alert.desc} - ${alert.primaryVal} ${alert.badge}`);
+
+    let iconSvg = "";
+    if (alert.iconType === "subscription") {
+      iconSvg = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`;
+    } else if (alert.iconType === "statement") {
+      iconSvg = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;
+    } else if (alert.iconType === "installment") {
+      iconSvg = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><path d="M7 15h2M12 15h5"/></svg>`;
+    } else if (alert.iconType === "card") {
+      iconSvg = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>`;
+    } else {
+      iconSvg = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+    }
+
+    const amountClass = alert.amountDanger ? "alert-amount danger" : "alert-amount";
+
     row.innerHTML = `
-      <div class="alert-content-left">
-        <span class="alert-badge-icon">${alert.severity === "critical" ? "⚠️" : alert.severity === "warning" ? "⏰" : "ℹ️"}</span>
-        <span class="alert-text">${escapeHtml(alert.text)}</span>
+      <div class="alert-icon-box ${alert.severity}">
+        ${iconSvg}
+      </div>
+      <div class="alert-content-middle">
+        <div class="alert-title" title="${escapeHtml(alert.title)}">${escapeHtml(alert.title)}</div>
+        <div class="alert-desc" title="${escapeHtml(alert.desc)}">${escapeHtml(alert.desc)}</div>
       </div>
       <div class="alert-content-right">
-        <span class="alert-meta ${alert.severity}">${escapeHtml(alert.meta)}</span>
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="alert-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+        ${alert.primaryVal ? `<div class="${amountClass}">${escapeHtml(alert.primaryVal)}</div>` : ''}
+        <div class="alert-meta-row">
+          ${alert.badge ? `<span class="alert-badge-tag ${alert.severity}">${escapeHtml(alert.badge)}</span>` : ''}
+          <svg class="alert-arrow" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
       </div>
     `;
     row.addEventListener("click", () => setActiveTab(alert.tab));
@@ -9156,6 +9524,7 @@ async function loadInstallments() {
   renderPlanInstallments();
   renderWalletInstallments();
   renderUpcomingPayments();
+  renderAlerts();
 }
 
 function renderPlanInstallments() {
