@@ -1155,6 +1155,47 @@ def delete_credit_card(
     db.commit()
 
 
+@app.post("/credit-cards/{card_id}/pay-debt", response_model=schemas.CreditCardPayDebtOut)
+def pay_credit_card_debt(
+    card_id: int,
+    payload: schemas.CreditCardPayDebt,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    card = _get_owned_credit_card(card_id, current_user.id, db)
+    if card.current_debt <= 0:
+        raise HTTPException(status_code=400, detail="Kartın ödenecek güncel borcu bulunmamaktadır")
+
+    pay_amount = round(payload.amount, 2)
+    if pay_amount > card.current_debt:
+        raise HTTPException(status_code=400, detail="Ödeme tutarı güncel borçtan büyük olamaz")
+
+    card.current_debt = max(0.0, round(card.current_debt - pay_amount, 2))
+
+    card_label = f"{card.bank_name} {card.card_name or ''}".strip()
+    tx_note = payload.note or f"{card_label} Borç Ödemesi"
+    payment_date = payload.occurred_on or date.today()
+
+    tx = models.Transaction(
+        owner_id=current_user.id,
+        amount=pay_amount,
+        type="expense",
+        category="Kredi Kartı Ödemesi",
+        note=tx_note,
+        occurred_on=payment_date,
+        credit_card_id=None,
+    )
+    db.add(tx)
+    db.commit()
+    db.refresh(card)
+    db.refresh(tx)
+
+    return schemas.CreditCardPayDebtOut(
+        card=_credit_card_to_out(card),
+        transaction=tx,
+    )
+
+
 def _compute_installment_amounts(total_amount: float, count: int) -> list[float]:
     total_cents = round(total_amount * 100)
     base_cents = total_cents // count

@@ -292,6 +292,17 @@ class CreditCardOut(BaseModel):
     active_installment_count: int = 0
 
 
+class CreditCardPayDebt(BaseModel):
+    amount: float = Field(gt=0)
+    occurred_on: Optional[date] = None
+    note: Optional[str] = Field(default=None, max_length=1000)
+
+
+class CreditCardPayDebtOut(BaseModel):
+    card: CreditCardOut
+    transaction: TransactionOut
+
+
 class InstallmentPlanCreate(BaseModel):
     credit_card_id: int
     description: str = Field(min_length=1, max_length=200)

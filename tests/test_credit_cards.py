@@ -98,3 +98,68 @@ def test_credit_cards_scoped_to_owner(make_authed_client):
     cards = alice.get("/credit-cards").json()
     assert len(cards) == 1
     assert cards[0]["bank_name"] == "Alice Bank"
+
+
+def test_pay_credit_card_debt_success(client):
+    card = client.post(
+        "/credit-cards",
+        json={"bank_name": "Garanti BBVA", "limit_amount": 20000, "current_debt": 5000, "statement_day": 5, "due_day": 20},
+    ).json()
+
+    res = client.post(
+        f"/credit-cards/{card['id']}/pay-debt",
+        json={"amount": 2000.0, "note": "Kısmi borç ödeme"},
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["card"]["current_debt"] == 3000.0
+    assert data["card"]["available_limit"] == 17000.0
+    assert data["transaction"]["amount"] == 2000.0
+    assert data["transaction"]["type"] == "expense"
+    assert data["transaction"]["category"] == "Kredi Kartı Ödemesi"
+    assert data["transaction"]["credit_card_id"] is None
+
+    # Verify transaction is in activity list
+    txs = client.get("/transactions").json()
+    assert len(txs) == 1
+    assert txs[0]["amount"] == 2000.0
+
+
+def test_pay_credit_card_debt_rejects_overpayment(client):
+    card = client.post(
+        "/credit-cards",
+        json={"bank_name": "Garanti BBVA", "limit_amount": 20000, "current_debt": 1000, "statement_day": 5, "due_day": 20},
+    ).json()
+
+    res = client.post(
+        f"/credit-cards/{card['id']}/pay-debt",
+        json={"amount": 1500.0},
+    )
+    assert res.status_code == 400
+    assert "büyük olamaz" in res.json()["detail"]
+
+
+def test_pay_credit_card_debt_rejects_zero_debt(client):
+    card = client.post(
+        "/credit-cards",
+        json={"bank_name": "Garanti BBVA", "limit_amount": 20000, "current_debt": 0, "statement_day": 5, "due_day": 20},
+    ).json()
+
+    res = client.post(
+        f"/credit-cards/{card['id']}/pay-debt",
+        json={"amount": 100.0},
+    )
+    assert res.status_code == 400
+
+
+def test_pay_credit_card_debt_scoped_to_owner(make_authed_client):
+    alice = make_authed_client(email="alice_debt@example.com")
+    bob = make_authed_client(email="bob_debt@example.com")
+
+    card = alice.post(
+        "/credit-cards",
+        json={"bank_name": "Alice Bank", "limit_amount": 1000, "current_debt": 500, "statement_day": 1, "due_day": 10},
+    ).json()
+
+    res = bob.post(f"/credit-cards/{card['id']}/pay-debt", json={"amount": 100.0})
+    assert res.status_code == 404
