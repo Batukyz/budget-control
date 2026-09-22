@@ -328,13 +328,29 @@ def export_transactions(
     )
 
 
+MAX_CSV_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
+
+
 @app.post("/transactions/import", response_model=schemas.TransactionImportResult)
 def import_transactions(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    raw = file.file.read().decode("utf-8-sig")
+    content = file.file.read(MAX_CSV_SIZE_BYTES + 1)
+    if len(content) > MAX_CSV_SIZE_BYTES:
+        raise HTTPException(status_code=413, detail="Dosya boyutu çok büyük (Maksimum 5 MB)")
+
+    raw = None
+    for enc in ("utf-8-sig", "utf-8", "cp1254", "iso-8859-9", "latin-1"):
+        try:
+            raw = content.decode(enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    if raw is None:
+        raise HTTPException(status_code=400, detail="Dosya karakter kodlaması okunamadı")
+
     reader = csv.DictReader(io.StringIO(raw))
     missing = set(["occurred_on", "type", "amount"]) - set(reader.fieldnames or [])
     if missing:
@@ -692,10 +708,11 @@ def get_overview(
 ):
     today = date.today()
     month_start = today.replace(day=1)
+    month_end = date(today.year, today.month, calendar.monthrange(today.year, today.month)[1])
 
-    category_expense = _month_category_expense(db, current_user.id, month_start, today)
+    category_expense = _month_category_expense(db, current_user.id, month_start, month_end)
     month_expense = sum(category_expense.values())
-    month_income = _sum_amount(db, current_user.id, "income", month_start, today)
+    month_income = _sum_amount(db, current_user.id, "income", month_start, month_end)
 
     active_subscriptions = (
         db.query(models.Subscription)
@@ -853,7 +870,8 @@ def list_budgets(
     )
     today = date.today()
     month_start = today.replace(day=1)
-    category_expense = _month_category_expense(db, current_user.id, month_start, today)
+    month_end = date(today.year, today.month, calendar.monthrange(today.year, today.month)[1])
+    category_expense = _month_category_expense(db, current_user.id, month_start, month_end)
     total_expense = sum(category_expense.values())
 
     results = []
@@ -1580,19 +1598,7 @@ def import_account(
             if p.source_id is not None:
                 plan_map[p.source_id] = plan.id
 
-    for pay in payload.installment_payments:
-        new_plan_id = plan_map.get(pay.plan_source_id)
-        if new_plan_id is not None:
-            payment = models.InstallmentPayment(
-                installment_plan_id=new_plan_id,
-                installment_number=pay.installment_number,
-                amount=pay.amount,
-                due_date=pay.due_date,
-                paid_at=pay.paid_at,
-                status=pay.status,
-            )
-            db.add(payment)
-
+    tx_map: dict[int, int] = {}
     for t in payload.transactions:
         data = t.model_dump(
             exclude={"source_id", "credit_card_source_id", "recurring_transaction_source_id", "installment_plan_source_id"}
@@ -1600,7 +1606,26 @@ def import_account(
         data["credit_card_id"] = card_map.get(t.credit_card_source_id)
         data["recurring_transaction_id"] = recurring_map.get(t.recurring_transaction_source_id)
         data["installment_plan_id"] = plan_map.get(t.installment_plan_source_id)
-        db.add(models.Transaction(owner_id=owner_id, **data))
+        db_tx = models.Transaction(owner_id=owner_id, **data)
+        db.add(db_tx)
+        db.flush()
+        if t.source_id is not None:
+            tx_map[t.source_id] = db_tx.id
+
+    for pay in payload.installment_payments:
+        new_plan_id = plan_map.get(pay.plan_source_id)
+        if new_plan_id is not None:
+            new_tx_id = tx_map.get(pay.transaction_source_id) if pay.transaction_source_id is not None else None
+            payment = models.InstallmentPayment(
+                installment_plan_id=new_plan_id,
+                installment_number=pay.installment_number,
+                amount=pay.amount,
+                due_date=pay.due_date,
+                paid_at=pay.paid_at,
+                status=pay.status,
+                transaction_id=new_tx_id,
+            )
+            db.add(payment)
 
     for s in payload.subscriptions:
         db.add(models.Subscription(owner_id=owner_id, **s.model_dump()))

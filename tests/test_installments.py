@@ -258,6 +258,18 @@ def test_installment_backup_export_and_import(client, make_authed_client):
     assert restored_plans[0]["paid_count"] == 1
     assert restored_plans[0]["remaining_amount"] == 9000.0
 
+    # Verify payment transaction_id linkage is preserved
+    restored_paid_payment = restored_plans[0]["payments"][0]
+    assert restored_paid_payment["status"] == "paid"
+    assert restored_paid_payment["transaction_id"] is not None
+
+    # Verify idempotency on restored payment
+    pay_again = other_user.post(
+        f"/installments/{restored_plans[0]['id']}/payments/{restored_paid_payment['id']}/pay"
+    )
+    assert pay_again.status_code == 200
+    assert len(other_user.get("/transactions").json()) == 1
+
 
 def test_installment_edge_cases_1_and_12(client):
     card = _make_card(client)

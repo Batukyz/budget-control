@@ -92,3 +92,28 @@ def test_import_does_not_leak_across_owners(make_authed_client):
 
     assert len(bob.get("/transactions").json()) == 0
     assert len(alice.get("/transactions").json()) == 1
+
+
+def test_import_handles_cp1254_encoding(client):
+    # Test Turkish characters like ş, ğ, ı, ö, ü in Windows-1254 encoding
+    csv_content = (
+        "occurred_on,type,category,note,amount\n"
+        f"{TODAY},expense,Kırtasiye,Defter ve kurşun kalem,75\n"
+    )
+    encoded = csv_content.encode("cp1254")
+    response = client.post(
+        "/transactions/import", files={"file": ("tx.csv", io.BytesIO(encoded), "text/csv")}
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["created"] == 1
+    txs = client.get("/transactions").json()
+    assert any("Kırtasiye" in (t["category"] or "") for t in txs)
+
+
+def test_import_rejects_oversized_file(client):
+    oversized = b"x" * (5 * 1024 * 1024 + 10)
+    response = client.post(
+        "/transactions/import", files={"file": ("large.csv", io.BytesIO(oversized), "text/csv")}
+    )
+    assert response.status_code == 413
