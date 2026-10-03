@@ -409,7 +409,7 @@
   [data-theme="dark"] .card {
     border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
-  label { display: block; font-size: 12.5px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+  label { display: block; font-size: 12.5px; font-weight: 600; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.01em; }
   input, select, textarea {
     width: 100%;
     padding: 10px 12px;
@@ -421,15 +421,25 @@
     font-size: 13.5px;
     margin-bottom: 14px;
     font-family: inherit;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+  }
+  input:hover:not(:focus), select:hover:not(:focus), textarea:hover:not(:focus) {
+    border-color: var(--border-hover);
+  }
+  input::placeholder, textarea::placeholder {
+    color: var(--muted);
+    opacity: 0.65;
+    font-size: 13px;
   }
   input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(47, 143, 111, 0.16);
+    background: var(--card);
+    box-shadow: 0 0 0 3.5px rgba(47, 143, 111, 0.18);
   }
   [data-theme="dark"] input:focus, [data-theme="dark"] select:focus, [data-theme="dark"] textarea:focus {
-    box-shadow: 0 0 0 3px rgba(75, 191, 152, 0.2);
+    background: var(--card);
+    box-shadow: 0 0 0 3.5px rgba(75, 191, 152, 0.22);
   }
   textarea { height: auto; min-height: 60px; resize: vertical; }
   button {
