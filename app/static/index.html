@@ -399,7 +399,15 @@
     padding: 20px;
     margin-bottom: 16px;
     box-shadow: var(--shadow-sm);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+  .card:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-md);
+  }
+  [data-theme="dark"] .card {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
   label { display: block; font-size: 12.5px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
   input, select, textarea {
@@ -536,6 +544,12 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 18px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  .dashboard-hero:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-hover);
   }
   .hero-header {
     display: flex;
@@ -612,7 +626,12 @@
     border-radius: 12px;
     background: var(--input-bg);
     border: 1px solid var(--border);
-    transition: transform 0.15s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .hero-mini-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xs);
+    border-color: var(--border-hover);
   }
   .mini-card-icon-wrap {
     width: 32px;
