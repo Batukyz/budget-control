@@ -557,8 +557,28 @@
   .form-actions-row { display: flex; gap: 8px; align-items: center; }
   .form-actions-row .btn-primary { margin-bottom: 0; }
   .form-actions-row .btn-ghost { flex: none; margin-bottom: 0; }
-  .error { color: var(--danger); font-size: 13px; margin: -6px 0 14px; min-height: 1em; }
-  .empty { color: var(--muted); font-size: 14px; text-align: center; padding: 24px 0; }
+  .error {
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 500;
+    margin: -4px 0 14px;
+    min-height: 1em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .empty {
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    text-align: center;
+    padding: 32px 16px;
+    background: var(--input-bg);
+    border-radius: var(--radius-md, 12px);
+    border: 1px dashed var(--border);
+    margin: 8px 0;
+  }
   #login-view, #app-view { display: none; }
   .stat-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
   .stat-row:last-child { margin-bottom: 0; }
