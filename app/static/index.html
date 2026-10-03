@@ -213,22 +213,35 @@
     border: 1px solid transparent;
     width: 100%;
     text-align: left;
-    transition: all 0.15s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    position: relative;
   }
   .nav-item:hover {
     background: var(--input-bg);
     color: var(--text);
+    transform: translateX(2px);
   }
   .nav-item.active {
     background: var(--gradient);
     color: var(--on-accent);
-    box-shadow: 0 4px 14px rgba(47, 143, 111, 0.25);
+    box-shadow: 0 4px 16px rgba(47, 143, 111, 0.28);
+    transform: none;
+  }
+  [data-theme="dark"] .nav-item.active {
+    box-shadow: 0 4px 20px rgba(75, 191, 152, 0.32);
   }
   .nav-item svg {
     width: 18px;
     height: 18px;
     flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+  .nav-item:hover svg {
+    transform: scale(1.1);
+  }
+  .nav-item.active svg {
+    transform: scale(1.05);
   }
   .sidebar-footer {
     padding: 14px 14px;
@@ -244,6 +257,14 @@
     gap: 8px;
     min-width: 0;
     flex: 1;
+    padding: 5px 8px;
+    border-radius: var(--radius-sm);
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    transition: border-color 0.15s ease;
+  }
+  .sidebar-user-pill:hover {
+    border-color: var(--border-hover);
   }
   .user-avatar-icon { font-size: 14px; }
   .sidebar-user-email {
