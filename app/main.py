@@ -476,6 +476,90 @@ def import_transactions(
     return schemas.TransactionImportResult(created=created, skipped=len(errors), errors=errors)
 
 
+MAX_STATEMENT_PDF_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
+
+
+@app.post("/statements/parse-pdf", response_model=schemas.StatementParseResponse)
+def parse_statement_pdf(
+    file: UploadFile = File(...),
+    current_user: models.User = Depends(get_current_user),
+):
+    fname = (file.filename or "").lower()
+    if not fname.endswith(".pdf") and file.content_type not in ("application/pdf", "application/octet-stream"):
+        raise HTTPException(status_code=400, detail="Lütfen geçerli bir PDF dosyası yükleyin.")
+
+    content = file.file.read(MAX_STATEMENT_PDF_SIZE_BYTES + 1)
+    if len(content) > MAX_STATEMENT_PDF_SIZE_BYTES:
+        raise HTTPException(status_code=413, detail="Dosya boyutu çok büyük (Maksimum 10 MB)")
+
+    if not content.startswith(b"%PDF"):
+        raise HTTPException(status_code=400, detail="Geçersiz PDF formatı.")
+
+    try:
+        from app.services.statement_parser import parse_pdf_statement
+        result = parse_pdf_statement(content)
+    except Exception as exc:
+        logger.warning("PDF statement parsing error: %s", exc)
+        raise HTTPException(status_code=400, detail="PDF ekstre dosyası okunamadı veya biçimi desteklenmiyor.")
+
+    return schemas.StatementParseResponse(
+        bank_name=result["bank_name"],
+        total_found=result["total_found"],
+        transactions=[schemas.ParsedStatementTransaction(**t) for t in result["transactions"]],
+    )
+
+
+@app.post("/statements/confirm-import", response_model=schemas.StatementConfirmResponse)
+def confirm_statement_import(
+    payload: schemas.StatementConfirmRequest,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    if not payload.transactions:
+        raise HTTPException(status_code=400, detail="İçe aktarılacak işlem bulunamadı.")
+
+    card = None
+    if payload.credit_card_id is not None:
+        card = _get_owned_credit_card(payload.credit_card_id, current_user.id, db)
+
+    total_expense = 0.0
+    total_income = 0.0
+    new_txs: list[models.Transaction] = []
+
+    for item in payload.transactions:
+        tx_type = item.type
+        amt = item.amount
+        if tx_type == "expense":
+            total_expense += amt
+            cc_id = card.id if card else None
+        else:
+            total_income += amt
+            cc_id = None
+
+        new_txs.append(
+            models.Transaction(
+                owner_id=current_user.id,
+                amount=amt,
+                type=tx_type,
+                category=item.category,
+                note=item.description,
+                occurred_on=item.occurred_on,
+                credit_card_id=cc_id,
+            )
+        )
+
+    db.add_all(new_txs)
+    db.commit()
+
+    return schemas.StatementConfirmResponse(
+        imported_count=len(new_txs),
+        total_expense=round(total_expense, 2),
+        total_income=round(total_income, 2),
+        credit_card_id=card.id if card else None,
+    )
+
+
+
 @app.get("/transactions/{transaction_id}", response_model=schemas.TransactionOut)
 def get_transaction(
     transaction_id: int,

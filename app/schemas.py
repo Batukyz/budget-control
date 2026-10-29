@@ -484,3 +484,41 @@ class AccountImportResult(BaseModel):
     budgets: int
     installment_plans: Optional[int] = None
     installment_payments: Optional[int] = None
+
+
+class ParsedStatementTransaction(BaseModel):
+    occurred_on: date
+    raw_date: str
+    description: str
+    amount: float = Field(gt=0)
+    type: TransactionType
+    suggested_category: str
+    confidence: float
+    installment_info: Optional[str] = None
+
+
+class StatementParseResponse(BaseModel):
+    bank_name: str
+    total_found: int
+    transactions: list[ParsedStatementTransaction]
+
+
+class StatementConfirmItem(BaseModel):
+    occurred_on: date
+    description: str
+    amount: float = Field(gt=0)
+    type: TransactionType
+    category: Optional[str] = None
+
+
+class StatementConfirmRequest(BaseModel):
+    credit_card_id: Optional[int] = None
+    transactions: list[StatementConfirmItem]
+
+
+class StatementConfirmResponse(BaseModel):
+    imported_count: int
+    total_expense: float
+    total_income: float
+    credit_card_id: Optional[int] = None
+
