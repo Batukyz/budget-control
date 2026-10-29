@@ -1243,6 +1243,29 @@
     color: var(--on-accent);
     filter: brightness(1.06);
   }
+  .pill-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .pill-dot.expense {
+    background: var(--danger);
+    box-shadow: 0 0 6px rgba(225, 29, 72, 0.45);
+  }
+  .pill-dot.income {
+    background: var(--success);
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.45);
+  }
+  .pill-dot.installment {
+    background: var(--info);
+    box-shadow: 0 0 6px rgba(59, 130, 246, 0.45);
+  }
+  .pill-dot.plan {
+    background: var(--warning);
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.45);
+  }
 
   /* Secondary Metrics Grid (4-Column Bento Strip) */
   .dashboard-metrics-grid {
@@ -2369,6 +2392,9 @@
   .tx-tag.card {
     background: var(--info-bg);
     color: var(--info);
+    margin-bottom: 0;
+    border: none;
+    box-shadow: none;
   }
   .tx-tag.recurring {
     background: var(--warning-bg);
@@ -5364,7 +5390,7 @@
                 <span>Gelir Kaydet</span>
               </button>
               <button type="button" class="hero-quick-pill" id="hero-qa-installment">
-                <span class="pill-dot card"></span>
+                <span class="pill-dot installment"></span>
                 <span>Taksitli Harcama</span>
               </button>
               <button type="button" class="hero-quick-pill" id="hero-qa-budget">
