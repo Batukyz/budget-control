@@ -200,11 +200,48 @@ def extract_installment_info(description: str) -> Optional[str]:
     return None
 
 
+def _reconstruct_horizontal_rows(page) -> list[str]:
+    """Group PDF words by vertical Y coordinate to reconstruct table rows across columns."""
+    words = page.get_text("words")  # (x0, y0, x1, y1, "word", block_no, line_no, word_no)
+    if not words:
+        return []
+    # Sort by vertical center (y0) with 3pt tolerance, then horizontal x0
+    buckets: list[tuple[float, list[tuple[float, str]]]] = []
+    for w in words:
+        x0, y0, x1, y1, text = w[0], w[1], w[2], w[3], w[4]
+        y_mid = (y0 + y1) / 2.0
+        placed = False
+        for b_y, items in buckets:
+            if abs(b_y - y_mid) <= 3.5:
+                items.append((x0, text))
+                placed = True
+                break
+        if not placed:
+            buckets.append((y_mid, [(x0, text)]))
+
+    buckets.sort(key=lambda b: b[0])
+    reconstructed: list[str] = []
+    for _, items in buckets:
+        items.sort(key=lambda it: it[0])
+        line_str = " ".join(it[1] for it in items).strip()
+        if line_str:
+            reconstructed.append(line_str)
+    return reconstructed
+
+
+SKIP_SUMMARY_KEYWORDS = (
+    "hesap kesim", "son odeme", "donem borcu", "onceki donem",
+    "asgari odeme", "toplam borc", "kullanilabilir limit", "kart limiti",
+    "devir", "hesap ozeti",
+)
+
+
 def parse_pdf_statement(file_bytes: bytes) -> dict:
     """Extract and parse credit card transactions from PDF statement bytes."""
     doc = pymupdf.open(stream=file_bytes, filetype="pdf")
     all_text = ""
-    lines: list[str] = []
+    raw_lines: list[str] = []
+    coord_lines: list[str] = []
 
     for page in doc:
         page_text = page.get_text("text")
@@ -212,91 +249,114 @@ def parse_pdf_statement(file_bytes: bytes) -> dict:
         for line in page_text.splitlines():
             stripped = line.strip()
             if stripped:
-                lines.append(stripped)
+                raw_lines.append(stripped)
+        coord_lines.extend(_reconstruct_horizontal_rows(page))
 
     bank_name = detect_bank(all_text)
 
-    # Regex patterns for statement rows
-    # Pattern 1: Date at start of line: "14.10.2026 ... 150,00 TL" or "14/10/2026 MİGROS 450,00"
+    # Regex patterns for statement rows:
+    # Matches optional 2nd date (valor/kayit tarihi), description, amount, optional currency/sign
     row_regex = re.compile(
-        r"^(\d{1,2}[./-]\d{1,2}[./-]\d{2,4})\s+(.+?)\s+([+-]?\d{1,3}(?:\.\d{3})*,\d{2}|[+-]?\d+,\d{2}|[+-]?\d+\.\d{2})\s*(TL|TRY|₺)?\s*([+-]|(?:\(?[BAba]\)?))?$",
+        r"^(\d{1,2}[./-]\d{1,2}[./-]\d{2,4})"
+        r"(?:\s+\d{1,2}[./-]\d{1,2}[./-]\d{2,4})?"
+        r"\s+(.+?)\s+"
+        r"([+-]?\d{1,3}(?:\.\d{3})*,\d{2}|[+-]?\d+,\d{2}|[+-]?\d+\.\d{2})"
+        r"\s*(TL|TRY|₺|USD|EUR)?"
+        r"\s*([+-]|(?:\(?[BAba]\)?)|Borç|Alacak)?"
+        r"(?:\s+[+-]?\d+(?:[.,]\d{2})?\s*(?:TL|Puan|Bonus|Mil)?)?$",
         re.IGNORECASE
     )
 
-    transactions: list[dict] = []
-    
-    # Scan through extracted lines
-    for i, line in enumerate(lines):
-        m = row_regex.match(line)
-        if m:
-            date_raw, desc_raw, amt_raw, curr_raw, sign_raw = m.groups()
-            tx_date = parse_turkish_date(date_raw)
-            if not tx_date:
-                continue
+    def _extract_from_lines(candidate_lines: list[str], allow_multiline: bool = True) -> list[dict]:
+        found: list[dict] = []
+        for i, line in enumerate(candidate_lines):
+            m = row_regex.match(line)
+            if m:
+                date_raw, desc_raw, amt_raw, curr_raw, sign_raw = m.groups()
+                tx_date = parse_turkish_date(date_raw)
+                if not tx_date:
+                    continue
 
-            try:
-                amt = parse_turkish_amount(amt_raw)
-            except ValueError:
-                continue
+                desc_clean = re.sub(r"\s+", " ", desc_raw).strip()
+                norm_desc = normalize_text_for_matching(desc_clean)
+                if any(skip_kw in norm_desc for skip_kw in SKIP_SUMMARY_KEYWORDS):
+                    continue
 
-            is_alacak = bool(sign_raw and any(s in sign_raw.upper() for s in ("A", "+")))
-            desc_clean = re.sub(r"\s+", " ", desc_raw).strip()
-            category, conf = guess_category(desc_clean)
-            
-            norm_desc = normalize_text_for_matching(desc_clean)
-            is_payment_desc = category == "Ödeme / Gelir" or any(w in norm_desc for w in ("odeme", "iade", "alacak", "yatirilan"))
-            
-            if is_alacak or is_payment_desc or amt < 0:
-                tx_type = "income"
-                final_amt = abs(amt)
-            else:
-                tx_type = "expense"
-                final_amt = abs(amt)
-
-            if final_amt <= 0:
-                continue
-
-            inst_info = extract_installment_info(desc_clean)
-
-            transactions.append({
-                "occurred_on": tx_date.isoformat(),
-                "raw_date": date_raw,
-                "description": desc_clean,
-                "amount": final_amt,
-                "type": tx_type,
-                "suggested_category": category if tx_type == "expense" else "Gelir",
-                "confidence": conf,
-                "installment_info": inst_info,
-            })
-            continue
-
-        # Pattern 2: Multi-line layout where Date is on line i, Description is line i+1, Amount follows
-        date_only_match = re.match(r"^(\d{1,2}[./-]\d{1,2}[./-]\d{2,4})$", line)
-        if date_only_match and i + 2 < len(lines):
-            cand_date = parse_turkish_date(date_only_match.group(1))
-            cand_desc = lines[i + 1]
-            cand_amt_line = lines[i + 2]
-            amt_match = re.search(r"([+-]?\d{1,3}(?:\.\d{3})*,\d{2}|[+-]?\d+,\d{2})\s*(?:TL|TRY|₺)?", cand_amt_line)
-            if cand_date and amt_match and len(cand_desc) > 2 and not re.match(r"^\d{1,2}[./-]", cand_desc):
                 try:
-                    amt = parse_turkish_amount(amt_match.group(1))
-                    if amt > 0:
-                        desc_clean = cand_desc.strip()
-                        cat, conf = guess_category(desc_clean)
-                        norm_desc = normalize_text_for_matching(desc_clean)
-                        is_payment = cat == "Ödeme / Gelir" or any(w in norm_desc for w in ("odeme", "iade", "alacak"))
-                        transactions.append({
-                            "occurred_on": cand_date.isoformat(),
-                            "raw_date": date_only_match.group(1),
-                            "description": desc_clean,
-                            "amount": abs(amt),
-                            "type": "income" if is_payment else "expense",
-                            "suggested_category": cat if not is_payment else "Gelir",
-                            "confidence": conf,
-                            "installment_info": extract_installment_info(desc_clean),
-                        })
+                    amt = parse_turkish_amount(amt_raw)
                 except ValueError:
-                    pass
+                    continue
+
+                is_alacak = bool(sign_raw and any(s in sign_raw.upper() for s in ("A", "+", "ALACAK")))
+                category, conf = guess_category(desc_clean)
+                is_payment_desc = category == "Ödeme / Gelir" or any(
+                    w in norm_desc for w in ("odeme", "iade", "alacak", "yatirilan")
+                )
+
+                if is_alacak or is_payment_desc or amt < 0:
+                    tx_type = "income"
+                    final_amt = abs(amt)
+                else:
+                    tx_type = "expense"
+                    final_amt = abs(amt)
+
+                if final_amt <= 0:
+                    continue
+
+                inst_info = extract_installment_info(desc_clean)
+
+                found.append({
+                    "occurred_on": tx_date.isoformat(),
+                    "raw_date": date_raw,
+                    "description": desc_clean,
+                    "amount": final_amt,
+                    "type": tx_type,
+                    "suggested_category": category if tx_type == "expense" else "Gelir",
+                    "confidence": conf,
+                    "installment_info": inst_info,
+                })
+                continue
+
+            if allow_multiline:
+                date_only_match = re.match(r"^(\d{1,2}[./-]\d{1,2}[./-]\d{2,4})$", line)
+                if date_only_match and i + 2 < len(candidate_lines):
+                    cand_date = parse_turkish_date(date_only_match.group(1))
+                    cand_desc = candidate_lines[i + 1]
+                    cand_amt_line = candidate_lines[i + 2]
+                    amt_match = re.search(
+                        r"([+-]?\d{1,3}(?:\.\d{3})*,\d{2}|[+-]?\d+,\d{2})\s*(?:TL|TRY|₺)?",
+                        cand_amt_line,
+                    )
+                    if cand_date and amt_match and len(cand_desc) > 2 and not re.match(r"^\d{1,2}[./-]", cand_desc):
+                        try:
+                            amt = parse_turkish_amount(amt_match.group(1))
+                            if amt != 0:
+                                desc_clean = cand_desc.strip()
+                                norm_desc = normalize_text_for_matching(desc_clean)
+                                if any(skip_kw in norm_desc for skip_kw in SKIP_SUMMARY_KEYWORDS):
+                                    continue
+                                cat, conf = guess_category(desc_clean)
+                                is_payment = amt < 0 or cat == "Ödeme / Gelir" or any(
+                                    w in norm_desc for w in ("odeme", "iade", "alacak")
+                                )
+                                found.append({
+                                    "occurred_on": cand_date.isoformat(),
+                                    "raw_date": date_only_match.group(1),
+                                    "description": desc_clean,
+                                    "amount": abs(amt),
+                                    "type": "income" if is_payment else "expense",
+                                    "suggested_category": cat if not is_payment else "Gelir",
+                                    "confidence": conf,
+                                    "installment_info": extract_installment_info(desc_clean),
+                                })
+                        except ValueError:
+                            pass
+        return found
+
+    transactions = _extract_from_lines(raw_lines, allow_multiline=True)
+    coord_transactions = _extract_from_lines(coord_lines, allow_multiline=False)
+    if len(coord_transactions) > len(transactions):
+        transactions = coord_transactions
 
     return {
         "bank_name": bank_name,
