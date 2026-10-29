@@ -3,8 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bütçe Takip</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%B0%3C/text%3E%3C/svg%3E">
+<title>Bütçe Takip · Wealth OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2310b981'/%3E%3Cstop offset='100%25' stop-color='%23059669'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23g)'/%3E%3Cpath d='M20 34l8 8 16-20' stroke='%23fff' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <script>
   (function () {
     if (localStorage.getItem("theme") === "dark") {
@@ -14,44 +17,56 @@
 </script>
 <style>
   :root {
-    --bg: #eef0f7;
-    --card: #ffffff;
-    --input-bg: #f1f2f8;
-    --border: #e1e3ed;
-    --border-hover: #c8cbd9;
-    --text: #23252b;
-    --muted: #7b7e8c;
-    --accent: #2f8f6f;
-    --accent-hover: #267a5e;
+    --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --bg: #f3f6fc;
+    --bg-mesh: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.11) 0px, transparent 48%),
+               radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.09) 0px, transparent 48%),
+               radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.06) 0px, transparent 50%);
+    --card: rgba(255, 255, 255, 0.92);
+    --card-bg: #ffffff;
+    --card-solid: #ffffff;
+    --input-bg: #f1f5f9;
+    --border: #e2e8f0;
+    --border-hover: #cbd5e1;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent: #0d9488;
+    --accent-hover: #0f766e;
+    --accent-glow: rgba(13, 148, 136, 0.25);
     --on-accent: #ffffff;
-    --secondary: #e8114a;
-    --secondary-hover: #c90f3f;
-    --danger: #e8114a;
-    --danger-hover: #c90f3f;
-    --danger-bg: rgba(232, 17, 74, 0.08);
-    --warning: #f59e0b;
-    --warning-hover: #d97706;
+    --indigo: #6366f1;
+    --indigo-bg: rgba(99, 102, 241, 0.10);
+    --secondary: #e11d48;
+    --secondary-hover: #be123c;
+    --danger: #e11d48;
+    --danger-hover: #be123c;
+    --danger-bg: rgba(225, 29, 72, 0.09);
+    --warning: #d97706;
+    --warning-hover: #b45309;
     --warning-bg: rgba(245, 158, 11, 0.12);
-    --success: #4ade80;
-    --success-bg: rgba(74, 222, 128, 0.12);
-    --on-success: #0f3d22;
-    --info: #3b82f6;
-    --info-bg: rgba(59, 130, 246, 0.08);
-    --gradient: linear-gradient(135deg, var(--accent), #3fae8a);
+    --success: #059669;
+    --success-bg: rgba(16, 185, 129, 0.12);
+    --on-success: #064e3b;
+    --info: #2563eb;
+    --info-bg: rgba(37, 99, 235, 0.09);
+    --gradient: linear-gradient(135deg, #0d9488 0%, #10b981 55%, #059669 100%);
+    --hero-gradient: linear-gradient(135deg, rgba(13, 148, 136, 0.07) 0%, rgba(99, 102, 241, 0.05) 100%);
 
     /* Consistent Design Tokens */
-    --radius-xs: 6px;
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 20px;
+    --radius-xs: 8px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 24px;
     --radius-pill: 9999px;
 
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
-    --shadow-xl: 0 20px 48px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
+    --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.03);
+    --shadow-md: 0 8px 28px rgba(15, 23, 42, 0.07), 0 2px 6px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 18px 42px rgba(15, 23, 42, 0.12), 0 4px 10px rgba(15, 23, 42, 0.05);
+    --shadow-xl: 0 24px 60px rgba(15, 23, 42, 0.18), 0 6px 16px rgba(15, 23, 42, 0.06);
 
     --space-1: 4px;
     --space-2: 8px;
@@ -62,46 +77,117 @@
     --space-8: 32px;
   }
   [data-theme="dark"] {
-    --bg: #16171d;
-    --card: #21222c;
-    --input-bg: #1c1d26;
-    --border: #33343f;
-    --border-hover: #4a4c5b;
-    --text: #ededf2;
-    --muted: #9294a3;
-    --accent: #4bbf98;
-    --accent-hover: #5ecca7;
-    --on-accent: #0f1712;
-    --secondary: #ff6b85;
-    --secondary-hover: #ff8299;
-    --danger: #ff6b85;
-    --danger-hover: #ff8299;
-    --danger-bg: rgba(255, 107, 133, 0.12);
+    --bg: #090d16;
+    --bg-mesh: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.14) 0px, transparent 50%),
+               radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+               radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.07) 0px, transparent 50%);
+    --card: rgba(19, 25, 40, 0.88);
+    --card-bg: #131928;
+    --card-solid: #131928;
+    --input-bg: #1a2235;
+    --border: #26314a;
+    --border-hover: #38486b;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --accent: #10b981;
+    --accent-hover: #34d399;
+    --accent-glow: rgba(16, 185, 129, 0.30);
+    --on-accent: #041f18;
+    --indigo: #818cf8;
+    --indigo-bg: rgba(129, 140, 248, 0.14);
+    --secondary: #fb7185;
+    --secondary-hover: #fda4af;
+    --danger: #fb7185;
+    --danger-hover: #fda4af;
+    --danger-bg: rgba(251, 113, 133, 0.14);
     --warning: #fbbf24;
     --warning-hover: #f59e0b;
     --warning-bg: rgba(251, 191, 36, 0.14);
     --success: #34d399;
     --success-bg: rgba(52, 211, 153, 0.14);
-    --on-success: #0f3d22;
+    --on-success: #064e3b;
     --info: #60a5fa;
-    --info-bg: rgba(96, 165, 250, 0.12);
-    --gradient: linear-gradient(135deg, var(--accent), #3fae8a);
+    --info-bg: rgba(96, 165, 250, 0.14);
+    --gradient: linear-gradient(135deg, #10b981 0%, #34d399 60%, #059669 100%);
+    --hero-gradient: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(99, 102, 241, 0.08) 100%);
 
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.25);
-    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.35);
-    --shadow-lg: 0 14px 36px rgba(0, 0, 0, 0.45);
-    --shadow-xl: 0 24px 54px rgba(0, 0, 0, 0.55);
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.30);
+    --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.42);
+    --shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.55);
+    --shadow-xl: 0 28px 64px rgba(0, 0, 0, 0.65);
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
+    font-family: var(--font-sans);
+    background-color: var(--bg);
+    background-image: var(--bg-mesh);
+    background-attachment: fixed;
     color: var(--text);
     min-height: 100vh;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Tabular Monospace Numerals for Financial Precision */
+  .hero-balance-value,
+  .mini-card-value,
+  .metric-value,
+  .activity-row-amount,
+  .recent-tx-amount,
+  .upcoming-item-amount,
+  .planning-summary-val,
+  .wallet-summary-val,
+  .cc-avail-val,
+  .inst-bubble-total,
+  .sub-amount,
+  .recurring-amount,
+  .chart-value,
+  .trend-num,
+  .alert-amount,
+  .wallet-due-amount {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Privacy / Discreet Mode (Tutarları Gizle) */
+  body.privacy-mode .hero-balance-value,
+  body.privacy-mode .mini-card-value,
+  body.privacy-mode .metric-value,
+  body.privacy-mode .activity-row-amount,
+  body.privacy-mode .recent-tx-amount,
+  body.privacy-mode .upcoming-item-amount,
+  body.privacy-mode .planning-summary-val,
+  body.privacy-mode .wallet-summary-val,
+  body.privacy-mode .cc-avail-val,
+  body.privacy-mode .inst-bubble-total,
+  body.privacy-mode .sub-amount,
+  body.privacy-mode .recurring-amount,
+  body.privacy-mode .chart-value,
+  body.privacy-mode .trend-num,
+  body.privacy-mode .alert-amount,
+  body.privacy-mode .wallet-due-amount,
+  body.privacy-mode .ledger-kpi-val {
+    filter: blur(8px);
+    user-select: none;
+    transition: filter 0.22s ease;
+  }
+  body.privacy-mode .hero-balance-value:hover,
+  body.privacy-mode .mini-card-value:hover,
+  body.privacy-mode .metric-value:hover,
+  body.privacy-mode .activity-row-amount:hover,
+  body.privacy-mode .recent-tx-amount:hover,
+  body.privacy-mode .upcoming-item-amount:hover,
+  body.privacy-mode .planning-summary-val:hover,
+  body.privacy-mode .wallet-summary-val:hover,
+  body.privacy-mode .cc-avail-val:hover,
+  body.privacy-mode .inst-bubble-total:hover,
+  body.privacy-mode .sub-amount:hover,
+  body.privacy-mode .recurring-amount:hover,
+  body.privacy-mode .ledger-kpi-val:hover {
+    filter: blur(0);
   }
 
   /* Sleek Modern Scrollbars */
@@ -158,26 +244,159 @@
     border-radius: var(--radius-sm);
   }
   
-  /* Shell & Layout */
+  /* Shell & Split Auth Layout */
   .wrap { width: 100%; margin: 0; padding: 0; }
   #login-view {
-    max-width: 440px;
-    margin: 48px auto;
-    padding: 24px 20px 60px;
+    max-width: 1060px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 36px 24px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .auth-split-shell {
+    display: grid;
+    grid-template-columns: 1.15fr 0.95fr;
+    gap: 32px;
+    width: 100%;
+    align-items: stretch;
+  }
+  .auth-showcase-panel {
+    background: linear-gradient(145deg, #0d1527 0%, #091d1e 55%, #0f172a 100%);
+    color: #f8fafc;
+    border-radius: 28px;
+    padding: 38px 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  }
+  .auth-showcase-panel::before {
+    content: "";
+    position: absolute;
+    width: 340px;
+    height: 340px;
+    right: -100px;
+    top: -100px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .auth-showcase-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.16);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #34d399;
+    font-size: 11.5px;
+    font-weight: 700;
+    width: fit-content;
+    margin-bottom: 18px;
+  }
+  .auth-showcase-title {
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    margin: 0 0 12px;
+    color: #ffffff;
+  }
+  .auth-showcase-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #94a3b8;
+    margin: 0 0 28px;
+  }
+  .auth-bento-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .auth-bento-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+  }
+  .auth-bento-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(16, 185, 129, 0.18);
+    color: #34d399;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .auth-bento-text strong {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #f8fafc;
+    margin-bottom: 2px;
+  }
+  .auth-bento-text span {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  .auth-form-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .auth-mode-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 5px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 18px;
+  }
+  .auth-mode-tab {
+    flex: 1;
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .auth-mode-tab.active {
+    background: var(--card-solid);
+    color: var(--text);
+    box-shadow: var(--shadow-xs);
   }
   #login-view .card { animation: fade-slide-in 0.35s ease; }
   
   .app-shell {
     display: flex;
     min-height: 100vh;
-    background: var(--bg);
+    background: transparent;
   }
 
   /* Desktop Left Sidebar */
   .sidebar {
-    width: 250px;
+    width: 268px;
     flex-shrink: 0;
     background: var(--card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
@@ -188,16 +407,31 @@
     transition: background-color 0.2s ease, border-color 0.2s ease;
   }
   .sidebar-header {
-    padding: 22px 20px 18px;
+    padding: 20px 18px 16px;
     border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
   .sidebar-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 11px;
+  }
+  .brand-emblem {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: var(--gradient);
+    color: var(--on-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px var(--accent-glow);
+    flex-shrink: 0;
   }
   .brand-icon {
-    font-size: 24px;
+    font-size: 22px;
     line-height: 1;
   }
   .brand-text {
@@ -205,21 +439,89 @@
     flex-direction: column;
   }
   .brand-text .brand-title {
-    font-size: 16px;
+    font-size: 16.5px;
     font-weight: 800;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
     line-height: 1.2;
   }
   .brand-text .brand-tag {
     font-size: 11px;
     color: var(--muted);
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .sidebar-cta-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sidebar-quick-add-btn {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--gradient);
+    color: var(--on-accent);
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 14px var(--accent-glow);
+    border: none;
+    cursor: pointer;
+  }
+  .sidebar-quick-add-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .kbd-badge {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.22);
+    color: inherit;
+    line-height: 1.2;
+  }
+  .sidebar-cmd-btn {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 11px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+  .sidebar-cmd-btn:hover {
+    color: var(--text);
+    border-color: var(--border-hover);
+  }
+  .sidebar-cmd-btn .kbd-badge {
+    background: var(--card-solid);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .sidebar-nav-label {
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 4px 12px 2px;
+    opacity: 0.8;
   }
   .sidebar-nav {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding: 16px 12px;
+    padding: 14px 12px;
     flex: 1;
     overflow-y: auto;
   }
@@ -248,11 +550,8 @@
   .nav-item.active {
     background: var(--gradient);
     color: var(--on-accent);
-    box-shadow: 0 4px 16px rgba(47, 143, 111, 0.28);
+    box-shadow: 0 6px 18px var(--accent-glow);
     transform: none;
-  }
-  [data-theme="dark"] .nav-item.active {
-    box-shadow: 0 4px 20px rgba(75, 191, 152, 0.32);
   }
   .nav-item svg {
     width: 18px;
@@ -265,6 +564,22 @@
   }
   .nav-item.active svg {
     transform: scale(1.05);
+  }
+  .nav-live-badge {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--input-bg);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .nav-item.active .nav-live-badge {
+    background: rgba(255, 255, 255, 0.22);
+    color: var(--on-accent);
+    border-color: transparent;
   }
   .sidebar-footer {
     padding: 14px 14px;
@@ -280,7 +595,7 @@
     gap: 8px;
     min-width: 0;
     flex: 1;
-    padding: 5px 8px;
+    padding: 6px 10px;
     border-radius: var(--radius-sm);
     background: var(--input-bg);
     border: 1px solid var(--border);
@@ -309,7 +624,7 @@
     color: var(--muted);
     width: 32px;
     height: 32px;
-    border-radius: 8px;
+    border-radius: 9px;
     padding: 0;
     display: flex;
     align-items: center;
@@ -321,6 +636,11 @@
     color: var(--text);
     border-color: var(--accent);
   }
+  .sidebar-action-btn.active-privacy {
+    background: var(--indigo-bg);
+    color: var(--indigo);
+    border-color: var(--indigo);
+  }
   .sidebar-action-btn.logout-trigger:hover {
     color: var(--danger);
     border-color: var(--danger);
@@ -331,58 +651,131 @@
   .mobile-header { display: none; }
   .bottom-nav { display: none; }
 
-  /* Main Content Area */
+  /* Main Content Area & Sticky Topbar */
   .app-main {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
   }
+  .workspace-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 35;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 36px;
+    background: var(--card);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar-crumb {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .topbar-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--success-bg);
+    color: var(--success);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .topbar-status-pill::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+  }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .topbar-tool-btn {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 12px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+  }
+  .topbar-tool-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .topbar-tool-btn.active-privacy {
+    background: var(--indigo-bg);
+    border-color: var(--indigo);
+    color: var(--indigo);
+  }
   .app-container {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1160px;
     margin: 0 auto;
-    padding: 32px 36px 64px;
+    padding: 28px 36px 72px;
   }
 
   /* Sub Navigation */
   .sub-nav-tabs {
     display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
+    gap: 6px;
+    margin-bottom: 22px;
     background: var(--card);
-    padding: 5px;
-    border-radius: 12px;
+    padding: 6px;
+    border-radius: 14px;
     border: 1px solid var(--border);
     width: fit-content;
+    box-shadow: var(--shadow-xs);
   }
   .sub-tab-btn {
     background: transparent;
     border: none;
     color: var(--muted);
-    border-radius: 8px;
-    padding: 7px 16px;
+    border-radius: 10px;
+    padding: 8px 16px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.18s ease;
   }
   .sub-tab-btn:hover { color: var(--text); }
   .sub-tab-btn.active {
-    background: var(--input-bg);
-    color: var(--accent);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    background: var(--gradient);
+    color: var(--on-accent);
+    box-shadow: 0 3px 10px var(--accent-glow);
   }
   .sub-panel { display: none; }
   .sub-panel.active { display: block; animation: fade-slide-in 0.25s ease; }
 
   /* Typography & Basics */
-  h1 { font-size: 22px; font-weight: 700; margin: 0 0 24px; letter-spacing: -0.01em; }
+  h1 { font-size: 22px; font-weight: 800; margin: 0 0 24px; letter-spacing: -0.02em; }
   .app-icon { font-size: 40px; text-align: center; margin-bottom: 6px; }
   .login-header {
     position: relative;
     text-align: center;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
   .login-header h1 { margin-bottom: 4px; }
   .login-subtitle { color: var(--muted); font-size: 13px; margin: 0; }
@@ -589,49 +982,73 @@
      Dashboard Redesign (Milestone 2) Styles
      ========================================================================== */
   
-  /* Hero Card */
+  /* Hero Card (Executive Wealth Bento) */
   .dashboard-hero {
     position: relative;
-    padding: 22px 24px;
-    margin-bottom: 16px;
+    padding: 26px 28px;
+    margin-bottom: 18px;
     background: var(--card);
+    background-image: var(--hero-gradient);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: var(--shadow-sm);
+    border-radius: 24px;
+    box-shadow: var(--shadow-md);
     transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    overflow: hidden;
+  }
+  .dashboard-hero::after {
+    content: "";
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    right: -90px;
+    top: -110px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
   }
   .dashboard-hero:hover {
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-lg);
     border-color: var(--border-hover);
   }
   .hero-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
     gap: 12px;
+    position: relative;
+    z-index: 2;
   }
   .hero-tag {
-    font-size: 11.5px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted);
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
   .hero-month-title {
     margin: 3px 0 0;
-    font-size: 20px;
+    font-size: 21px;
     font-weight: 800;
     letter-spacing: -0.02em;
     color: var(--text);
+  }
+  .hero-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
   .hero-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: var(--radius-pill, 20px);
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: -0.01em;
     border: 1px solid transparent;
@@ -646,7 +1063,7 @@
   .hero-badge.positive {
     background: var(--success-bg);
     color: var(--success);
-    border-color: rgba(74, 222, 128, 0.25);
+    border-color: rgba(16, 185, 129, 0.28);
   }
   .hero-badge.positive::before {
     background: var(--success);
@@ -655,34 +1072,70 @@
   .hero-badge.negative {
     background: var(--danger-bg);
     color: var(--danger);
-    border-color: rgba(232, 17, 74, 0.25);
+    border-color: rgba(225, 29, 72, 0.28);
   }
   .hero-badge.negative::before {
     background: var(--danger);
     box-shadow: 0 0 6px var(--danger);
   }
 
-  /* Net Balance Spotlight */
+  /* Net Balance Spotlight + Split Layout */
+  .hero-bento-main {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 24px;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
   .hero-balance-spotlight {
-    margin-bottom: 20px;
-    padding: 4px 0 8px;
+    margin-bottom: 0;
+    padding: 2px 0;
   }
   .hero-balance-label {
     display: block;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 12.5px;
+    font-weight: 700;
     color: var(--muted);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
   .hero-balance-value {
-    font-size: 36px;
-    font-weight: 900;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
     color: var(--text);
   }
   .hero-balance-value.positive { color: var(--success); }
   .hero-balance-value.negative { color: var(--danger); }
+
+  /* Cashflow Allocation Bar inside Hero */
+  .hero-allocation-wrap {
+    margin-top: 14px;
+  }
+  .hero-allocation-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .hero-allocation-track {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--input-bg);
+    overflow: hidden;
+    display: flex;
+    gap: 2px;
+    border: 1px solid var(--border);
+  }
+  .hero-alloc-seg {
+    height: 100%;
+    transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hero-alloc-seg.expense { background: var(--danger); }
+  .hero-alloc-seg.savings { background: var(--success); }
 
   /* Income & Expense Split Grid */
   .hero-split-grid {
@@ -694,21 +1147,22 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: var(--input-bg);
+    padding: 15px 16px;
+    border-radius: 16px;
+    background: var(--card-solid);
     border: 1px solid var(--border);
+    box-shadow: var(--shadow-xs);
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
   }
   .hero-mini-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-xs);
+    box-shadow: var(--shadow-sm);
     border-color: var(--border-hover);
   }
   .mini-card-icon-wrap {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -728,11 +1182,12 @@
   }
   .mini-card-label {
     font-size: 11.5px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--muted);
+    margin-bottom: 2px;
   }
   .mini-card-value {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 800;
     letter-spacing: -0.02em;
     white-space: nowrap;
@@ -741,61 +1196,124 @@
   }
   .mini-card-value.positive { color: var(--success); }
   .mini-card-value.negative { color: var(--danger); }
+  .mini-card-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-weight: 500;
+  }
 
-  /* Secondary Metrics Grid */
+  /* Quick Action Strip inside Hero */
+  .hero-quick-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-quick-pill {
+    padding: 7px 13px;
+    border-radius: 999px;
+    background: var(--card-solid);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: var(--shadow-xs);
+  }
+  .hero-quick-pill:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--input-bg);
+  }
+  .hero-quick-pill.primary-pill {
+    background: var(--gradient);
+    color: var(--on-accent);
+    border-color: transparent;
+  }
+  .hero-quick-pill.primary-pill:hover {
+    color: var(--on-accent);
+    filter: brightness(1.06);
+  }
+
+  /* Secondary Metrics Grid (4-Column Bento Strip) */
   .dashboard-metrics-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 18px;
   }
   .metric-card {
     background: var(--card);
+    backdrop-filter: blur(12px);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 16px;
+    border-radius: 18px;
+    padding: 16px 18px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.15s ease;
+    box-shadow: var(--shadow-xs);
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+  .metric-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-sm);
   }
   .metric-header {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
   .metric-icon {
-    font-size: 15px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
     line-height: 1;
   }
   .metric-title {
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--muted);
   }
   .metric-value {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--text);
     letter-spacing: -0.02em;
   }
   .metric-subtext {
-    font-size: 11px;
+    font-size: 11.5px;
     color: var(--muted);
     margin-top: 6px;
+    font-weight: 500;
   }
   .metric-progress-track {
-    height: 5px;
+    height: 6px;
     background: var(--input-bg);
-    border-radius: 3px;
+    border-radius: 999px;
     margin-top: 8px;
     overflow: hidden;
   }
   .metric-progress-fill {
     height: 100%;
-    background: var(--accent);
-    border-radius: 3px;
+    background: var(--gradient);
+    border-radius: 999px;
     transition: width 0.4s ease;
   }
   .metric-progress-fill.warning { background: var(--warning); }
@@ -805,13 +1323,13 @@
   .dashboard-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 18px;
     margin-bottom: 24px;
   }
   .dashboard-column {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
     min-width: 0;
   }
 
@@ -4202,43 +4720,440 @@
     background: var(--accent);
     color: #ffffff;
   }
+
+  /* ==========================================================================
+     Milestone 7: Next-Gen Wealth OS Visuals (Donut Chart, Visual Bars,
+     Ledger Live KPIs, Quick Amount/Category Chips & Command Palette)
+     ========================================================================== */
+
+  /* Interactive SVG Donut Chart Layout */
+  .donut-chart-layout {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+  }
+  .donut-svg-wrap {
+    position: relative;
+    width: 116px;
+    height: 116px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .donut-center-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+  }
+  .donut-center-sub {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .donut-center-val {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text);
+    margin-top: 2px;
+  }
+  .donut-legend-col {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .donut-legend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    gap: 8px;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 6px;
+    transition: background-color 0.15s ease;
+  }
+  .donut-legend-item:hover {
+    background: var(--card-solid);
+  }
+  .donut-legend-left {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+  }
+  .donut-color-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .donut-legend-name {
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .donut-legend-pct {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  /* 6-Month Visual Vertical Bar Chart */
+  .trend-visual-bars {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    align-items: end;
+    height: 110px;
+    padding: 14px 12px 10px;
+    margin-bottom: 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+  .trend-v-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  .trend-v-bars-pair {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 68px;
+    width: 100%;
+    justify-content: center;
+  }
+  .trend-v-bar {
+    width: 10px;
+    border-radius: 4px 4px 2px 2px;
+    transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    min-height: 3px;
+  }
+  .trend-v-bar.inc { background: var(--accent); }
+  .trend-v-bar.exp { background: var(--secondary); }
+  .trend-v-lbl {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* Activity Quick Filter Pills & Live Ledger KPI Strip */
+  .activity-quick-pills {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .quick-filter-pill {
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+  .quick-filter-pill:hover {
+    color: var(--text);
+    border-color: var(--border-hover);
+  }
+  .quick-filter-pill.active {
+    background: var(--gradient);
+    color: var(--on-accent);
+    border-color: transparent;
+    box-shadow: 0 4px 12px var(--accent-glow);
+  }
+  .ledger-kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .ledger-kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 13px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    box-shadow: var(--shadow-xs);
+  }
+  .ledger-kpi-lbl {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+  .ledger-kpi-val {
+    font-family: var(--font-mono);
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .ledger-kpi-val.income { color: var(--success); }
+  .ledger-kpi-val.expense { color: var(--danger); }
+
+  /* Quick Amount & Quick Category Chips inside Transaction Modal */
+  .quick-amount-chips, .quick-cat-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .quick-amt-chip, .quick-cat-chip {
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.14s ease;
+  }
+  .quick-amt-chip {
+    font-family: var(--font-mono);
+  }
+  .quick-amt-chip:hover, .quick-cat-chip:hover, .quick-cat-chip.active {
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
+  }
+
+  /* Command Palette Modal (Ctrl+K) */
+  #cmd-palette-overlay {
+    z-index: 550;
+    align-items: flex-start;
+    padding-top: 10vh;
+  }
+  .cmd-palette-sheet {
+    max-width: 540px;
+    border-radius: 20px;
+    overflow: hidden;
+    padding: 0;
+  }
+  .cmd-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card-solid);
+  }
+  .cmd-search-bar svg {
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .cmd-search-bar input {
+    margin: 0;
+    border: none;
+    background: transparent;
+    height: 28px;
+    padding: 0;
+    font-size: 14.5px;
+    font-weight: 600;
+    box-shadow: none !important;
+  }
+  .cmd-results-list {
+    max-height: 340px;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .cmd-result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 11px;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    color: var(--text);
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+  }
+  .cmd-result-item:hover, .cmd-result-item:focus {
+    background: var(--input-bg);
+  }
+  .cmd-result-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cmd-result-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  .cmd-result-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .cmd-result-sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .cmd-result-tag {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--muted);
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 900px) {
+    .auth-split-shell {
+      grid-template-columns: 1fr;
+    }
+    .auth-showcase-panel {
+      display: none;
+    }
+    .hero-bento-main {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .dashboard-metrics-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .workspace-topbar {
+      display: none;
+    }
+    .ledger-kpi-strip {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .donut-chart-layout {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .donut-svg-wrap {
+      margin: 0 auto;
+    }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <div id="login-view">
-    <div class="login-header">
-      <button type="button" class="login-theme-btn theme-toggle-btn" title="Temayı değiştir">
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-      </button>
-      <div class="app-icon">💰</div>
-      <h1 class="brand-title">Bütçe Takip</h1>
-      <p class="login-subtitle">Gelir, gider ve aboneliklerini tek yerden yönet</p>
-    </div>
-    <div class="card">
-      <form id="login-form">
-        <label>E-posta</label>
-        <input type="email" id="login-email" required autocomplete="username">
-        <label>Şifre</label>
-        <input type="password" id="login-password" required autocomplete="current-password">
-        <div class="error" id="login-error"></div>
-        <button type="submit" class="btn-primary">Giriş yap</button>
-      </form>
-      <div class="toggle" style="text-align:center; margin-top:12px;">
-        <button type="button" class="btn-ghost" id="show-register">Hesabın yok mu? Kayıt ol</button>
-      </div>
-    </div>
+    <div class="auth-split-shell">
+      <div class="auth-showcase-panel">
+        <div class="auth-showcase-top">
+          <div class="auth-showcase-badge">
+            <span>✦</span>
+            <span>Yeni Nesil Kişisel Finans OS</span>
+          </div>
+          <h2 class="auth-showcase-headline">Paranızın tam kontrolü, tek bir akıllı ekranda.</h2>
+          <p class="auth-showcase-lead">Gelir, gider, kredi kartı ekstreleri, taksit planları ve bütçe hedeflerinizi gerçek zamanlı analitiklerle zahmetsizce yönetin.</p>
+        </div>
 
-    <div class="card" id="register-card" style="display:none">
-      <form id="register-form">
-        <label>E-posta</label>
-        <input type="email" id="register-email" required autocomplete="username">
-        <label>Şifre (en az 8 karakter)</label>
-        <input type="password" id="register-password" required minlength="8" autocomplete="new-password">
-        <div class="error" id="register-error"></div>
-        <button type="submit" class="btn-primary">Kayıt ol ve giriş yap</button>
-      </form>
+        <div class="auth-feature-bento">
+          <div class="auth-feature-item">
+            <div class="auth-feature-icon">📊</div>
+            <div>
+              <div class="auth-feature-title">Akıllı Nakit Akışı & Bütçe Takibi</div>
+              <div class="auth-feature-desc">Aylık tasarruf oranınızı, kategori dağılımınızı ve limit uyarılarını anlık izleyin.</div>
+            </div>
+          </div>
+          <div class="auth-feature-item">
+            <div class="auth-feature-icon">💳</div>
+            <div>
+              <div class="auth-feature-title">Kredi Kartı & Taksit Motoru</div>
+              <div class="auth-feature-desc">Hesap kesim günleri, kart limit kullanımı ve gelecek ayların taksit yükünü tek bakışta görün.</div>
+            </div>
+          </div>
+          <div class="auth-feature-item">
+            <div class="auth-feature-icon">⚡</div>
+            <div>
+              <div class="auth-feature-title">Hızlı Komut Paleti (Ctrl+K) & Gizlilik Modu</div>
+              <div class="auth-feature-desc">Klavyeden saniyeler içinde işlem ekleyin, tek tuşla tüm tutarları gizleyin.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-form-column">
+        <div class="login-header">
+          <button type="button" class="login-theme-btn theme-toggle-btn" title="Temayı değiştir">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          </button>
+          <div class="app-icon">💰</div>
+          <h1 class="brand-title">Bütçe Takip</h1>
+          <p class="login-subtitle">Finansal çalışma alanınıza giriş yapın</p>
+        </div>
+
+        <div class="auth-tabs-bar">
+          <button type="button" class="auth-tab-btn active" id="auth-tab-login">Giriş Yap</button>
+          <button type="button" class="auth-tab-btn" id="auth-tab-register">Yeni Hesap Oluştur</button>
+        </div>
+
+        <div class="card" id="login-card">
+          <form id="login-form">
+            <label for="login-email">E-posta Adresi</label>
+            <input type="email" id="login-email" placeholder="ornek@eposta.com" required autocomplete="username">
+            <label for="login-password">Şifre</label>
+            <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+            <div class="error" id="login-error"></div>
+            <button type="submit" class="btn-primary">Giriş Yap →</button>
+          </form>
+          <div class="toggle" style="text-align:center; margin-top:12px;">
+            <button type="button" class="btn-ghost" id="show-register">Hesabın yok mu? Kayıt ol</button>
+          </div>
+        </div>
+
+        <div class="card" id="register-card" style="display:none">
+          <form id="register-form">
+            <label for="register-email">E-posta Adresi</label>
+            <input type="email" id="register-email" placeholder="ornek@eposta.com" required autocomplete="username">
+            <label for="register-password">Şifre (en az 8 karakter)</label>
+            <input type="password" id="register-password" placeholder="En az 8 karakter" required minlength="8" autocomplete="new-password">
+            <div class="error" id="register-error"></div>
+            <button type="submit" class="btn-primary">Kayıt Ol ve Başla →</button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -4247,18 +5162,39 @@
     <aside class="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand">
-          <span class="brand-icon">💰</span>
+          <div class="brand-emblem" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
           <div class="brand-text">
             <span class="brand-title">Bütçe Takip</span>
-            <span class="brand-tag">Budget Control</span>
+            <span class="brand-tag">Wealth & Cashflow OS</span>
           </div>
         </div>
+
+        <button type="button" class="sidebar-quick-add-btn" id="sidebar-quick-add-btn" title="Yeni İşlem Ekle (Kısayol: N)">
+          <span class="sidebar-quick-add-left">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Hızlı İşlem Ekle</span>
+          </span>
+          <span class="kbd-hint">N</span>
+        </button>
+
+        <button type="button" class="sidebar-cmd-btn" id="sidebar-cmd-btn" title="Hızlı Komut & Arama Paleti (Ctrl+K)">
+          <span class="sidebar-cmd-left">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Hızlı Komut & Ara…</span>
+          </span>
+          <span class="kbd-hint">Ctrl K</span>
+        </button>
       </div>
 
       <nav class="sidebar-nav">
         <button type="button" class="nav-item active" data-tab="dashboard">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
           <span>Genel Bakış</span>
+          <span class="nav-live-badge warning" id="nav-badge-dashboard" style="display:none;">0</span>
         </button>
         <button type="button" class="nav-item" data-tab="activity">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="18" cy="18" r="2.5"/></svg>
@@ -4266,11 +5202,13 @@
         </button>
         <button type="button" class="nav-item" data-tab="plan">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>
-          <span>Plan</span>
+          <span>Plan & Bütçe</span>
+          <span class="nav-live-badge" id="nav-badge-plan" style="display:none;">0</span>
         </button>
         <button type="button" class="nav-item" data-tab="wallet">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-          <span>Cüzdan</span>
+          <span>Cüzdan & Kartlar</span>
+          <span class="nav-live-badge danger" id="nav-badge-wallet" style="display:none;">0</span>
         </button>
         <button type="button" class="nav-item" data-tab="settings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -4284,6 +5222,9 @@
           <span class="sidebar-user-email" id="sidebar-user-email">Kullanıcı</span>
         </div>
         <div class="sidebar-actions">
+          <button type="button" class="sidebar-action-btn privacy-toggle-btn" id="sidebar-privacy-btn" title="Gizlilik Modu: Tutarları Gizle/Göster (P)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
           <button type="button" class="sidebar-action-btn theme-toggle-btn" title="Temayı değiştir">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
           </button>
@@ -4301,6 +5242,12 @@
         <span class="brand-title">Bütçe Takip</span>
       </div>
       <div class="mobile-header-actions">
+        <button type="button" class="mobile-icon-btn privacy-toggle-btn" title="Tutarları Gizle/Göster">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button type="button" class="mobile-icon-btn" id="mobile-cmd-btn" title="Komut Paleti">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
         <button type="button" class="mobile-icon-btn theme-toggle-btn" title="Temayı değiştir">
           <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
         </button>
@@ -4312,6 +5259,34 @@
 
     <!-- Main Content Workspace -->
     <main class="app-main">
+      <!-- Sticky Desktop Workspace Header Bar -->
+      <div class="workspace-topbar">
+        <div class="topbar-breadcrumb">
+          <span class="topbar-crumb-root">Finans Merkezi</span>
+          <span class="topbar-crumb-sep">/</span>
+          <span class="topbar-crumb-current" id="topbar-crumb-title">Genel Bakış</span>
+          <div class="topbar-status-pill" title="Verileriniz güncel">
+            <span class="topbar-status-dot"></span>
+            <span id="topbar-live-date">Canlı Senkron</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button type="button" class="topbar-icon-btn" id="topbar-cmd-btn" title="Hızlı Komut & Arama (Ctrl+K)">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Komut Paleti</span>
+            <span class="kbd-hint" style="background:var(--surface-muted);color:var(--muted);border-color:var(--border);">Ctrl K</span>
+          </button>
+          <button type="button" class="topbar-icon-btn privacy-toggle-btn" id="topbar-privacy-btn" title="Gizlilik Modu (Kısayol: P)">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span id="privacy-btn-label">Tutarları Gizle</span>
+          </button>
+          <button type="button" class="topbar-quick-btn" id="topbar-quick-add-btn">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>+ Yeni İşlem</span>
+          </button>
+        </div>
+      </div>
+
       <div class="app-container">
 
         <div class="main-tab-panel active" id="tab-overview" data-tab="dashboard">
@@ -4322,10 +5297,10 @@
               <div class="hero-header-left">
                 <span class="hero-tag">Aylık Finansal Durum</span>
                 <div style="display:flex;align-items:center;gap:10px;margin-top:2px;">
-                  <button type="button" class="btn-icon-subtle" id="overview-prev-month" title="Önceki Ay" style="background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-xs);padding:4px 8px;cursor:pointer;color:var(--text);font-weight:700;">←</button>
+                  <button type="button" class="btn-icon-subtle" id="overview-prev-month" title="Önceki Ay" style="background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-xs);padding:4px 10px;cursor:pointer;color:var(--text);font-weight:700;">←</button>
                   <h2 class="hero-month-title" id="overview-month-title" style="margin:0;">Bu Ay</h2>
-                  <button type="button" class="btn-icon-subtle" id="overview-next-month" title="Sonraki Ay" style="background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-xs);padding:4px 8px;cursor:pointer;color:var(--text);font-weight:700;">→</button>
-                  <button type="button" class="btn-link-action" id="overview-today-btn" style="font-size:11.5px;display:none;margin-left:4px;">Bu Ay</button>
+                  <button type="button" class="btn-icon-subtle" id="overview-next-month" title="Sonraki Ay" style="background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-xs);padding:4px 10px;cursor:pointer;color:var(--text);font-weight:700;">→</button>
+                  <button type="button" class="btn-link-action" id="overview-today-btn" style="font-size:11.5px;display:none;margin-left:4px;">Bu Aya Dön</button>
                 </div>
               </div>
               <div class="hero-header-right">
@@ -4333,37 +5308,73 @@
               </div>
             </div>
 
-            <!-- Net Position Spotlight -->
-            <div class="hero-balance-spotlight">
-              <span class="hero-balance-label">Net Bakiye</span>
-              <div class="hero-balance-value" id="overview-balance">–</div>
+            <div class="hero-bento-main">
+              <!-- Net Position Spotlight -->
+              <div class="hero-balance-spotlight">
+                <span class="hero-balance-label">Net Dönem Bakiyesi</span>
+                <div class="hero-balance-value" id="overview-balance">–</div>
+
+                <!-- Cashflow Allocation Bar -->
+                <div class="hero-allocation-wrap" id="hero-allocation-wrap">
+                  <div class="hero-allocation-labels">
+                    <span id="hero-alloc-label">Gelir / Gider Dağılımı</span>
+                    <span id="hero-alloc-pct">–</span>
+                  </div>
+                  <div class="hero-allocation-track">
+                    <div class="hero-alloc-seg expense" id="hero-alloc-expense" style="width: 0%;"></div>
+                    <div class="hero-alloc-seg savings" id="hero-alloc-savings" style="width: 0%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Income vs Expense Dual Cards -->
+              <div class="hero-split-grid">
+                <div class="hero-mini-card income">
+                  <div class="mini-card-icon-wrap">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                  </div>
+                  <div class="mini-card-content">
+                    <div class="mini-card-label">Toplam Gelir</div>
+                    <div class="mini-card-value positive" id="overview-income">–</div>
+                    <div class="mini-card-sub" id="overview-income-sub">Dönem içi nakit girişi</div>
+                  </div>
+                </div>
+
+                <div class="hero-mini-card expense">
+                  <div class="mini-card-icon-wrap">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 7 17 17 7 17"/></svg>
+                  </div>
+                  <div class="mini-card-content">
+                    <div class="mini-card-label">Toplam Gider</div>
+                    <div class="mini-card-value negative" id="overview-expense">–</div>
+                    <div class="mini-card-sub" id="overview-expense-sub">Dönem içi harcama çıkışı</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- Income vs Expense Dual Cards -->
-            <div class="hero-split-grid">
-              <div class="hero-mini-card income">
-                <div class="mini-card-icon-wrap">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-                </div>
-                <div class="mini-card-content">
-                  <div class="mini-card-label">Toplam Gelir</div>
-                  <div class="mini-card-value positive" id="overview-income">–</div>
-                </div>
-              </div>
-
-              <div class="hero-mini-card expense">
-                <div class="mini-card-icon-wrap">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 7 17 17 7 17"/></svg>
-                </div>
-                <div class="mini-card-content">
-                  <div class="mini-card-label">Toplam Gider</div>
-                  <div class="mini-card-value negative" id="overview-expense">–</div>
-                </div>
-              </div>
+            <!-- Instant Action Strip -->
+            <div class="hero-quick-actions">
+              <button type="button" class="hero-quick-pill" id="hero-qa-expense">
+                <span class="pill-dot expense"></span>
+                <span>Harcama Ekle</span>
+              </button>
+              <button type="button" class="hero-quick-pill" id="hero-qa-income">
+                <span class="pill-dot income"></span>
+                <span>Gelir Kaydet</span>
+              </button>
+              <button type="button" class="hero-quick-pill" id="hero-qa-installment">
+                <span class="pill-dot card"></span>
+                <span>Taksitli Harcama</span>
+              </button>
+              <button type="button" class="hero-quick-pill" id="hero-qa-budget">
+                <span class="pill-dot plan"></span>
+                <span>Bütçe Limiti Belirle</span>
+              </button>
             </div>
           </div>
 
-          <!-- 2. Secondary Metrics Row -->
+          <!-- 2. Secondary Metrics Row (4-Column Bento Strip) -->
           <div class="dashboard-metrics-grid">
             <div class="metric-card">
               <div class="metric-header">
@@ -4391,7 +5402,19 @@
                 <span class="metric-title">7 Günlük Ödemeler</span>
               </div>
               <div class="metric-value" id="overview-upcoming-metric">0 ödeme</div>
-              <div class="metric-subtext">Yaklaşan işlem takvimi</div>
+              <div class="metric-subtext" id="overview-upcoming-sub">Yaklaşan işlem takvimi</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-icon">💳</span>
+                <span class="metric-title">Kart & Taksit Yükü</span>
+              </div>
+              <div class="metric-value" id="overview-wallet-metric">₺0,00</div>
+              <div class="metric-progress-track">
+                <div class="metric-progress-fill" id="overview-wallet-fill" style="width: 0%;"></div>
+              </div>
+              <div class="metric-subtext" id="overview-wallet-sub">Toplam kredi kartı borcu</div>
             </div>
           </div>
 
@@ -4512,6 +5535,14 @@
           </button>
         </div>
 
+        <!-- Instant Quick Type Filter Pills -->
+        <div class="activity-quick-pills" id="activity-quick-pills">
+          <button type="button" class="quick-filter-pill active" data-quick-type="">Tümü</button>
+          <button type="button" class="quick-filter-pill" data-quick-type="expense">↘ Sadece Giderler</button>
+          <button type="button" class="quick-filter-pill" data-quick-type="income">↗ Sadece Gelirler</button>
+          <button type="button" class="quick-filter-pill" data-quick-type="this-month">📅 Bu Ay</button>
+        </div>
+
         <!-- Filter Controls Panel -->
         <div class="activity-filter-panel" id="activity-filter-panel">
           <div class="filter-field-group">
@@ -4565,6 +5596,22 @@
           <span class="chips-title">Aktif filtreler:</span>
           <div class="chips-list" id="chips-list"></div>
           <button type="button" class="chips-clear-all" id="chips-clear-all">Tümünü kaldır</button>
+        </div>
+      </div>
+
+      <!-- Live Filtered Ledger KPI Strip -->
+      <div class="ledger-kpi-strip" id="ledger-kpi-strip">
+        <div class="ledger-kpi-card">
+          <span class="ledger-kpi-label">Listelenen Gelir</span>
+          <span class="ledger-kpi-val income" id="ledger-kpi-income">+₺0,00</span>
+        </div>
+        <div class="ledger-kpi-card">
+          <span class="ledger-kpi-label">Listelenen Gider</span>
+          <span class="ledger-kpi-val expense" id="ledger-kpi-expense">-₺0,00</span>
+        </div>
+        <div class="ledger-kpi-card">
+          <span class="ledger-kpi-label">Net Fark</span>
+          <span class="ledger-kpi-val" id="ledger-kpi-net">₺0,00</span>
         </div>
       </div>
 
@@ -5256,12 +6303,20 @@
               <span class="currency-symbol">₺</span>
               <input type="number" step="0.01" min="0.01" id="tx-amount" placeholder="0,00" inputmode="decimal" required autofocus>
             </div>
+            <div class="quick-amount-chips" id="tx-quick-amounts">
+              <button type="button" class="quick-amt-chip" data-add-amount="100">+100 ₺</button>
+              <button type="button" class="quick-amt-chip" data-add-amount="250">+250 ₺</button>
+              <button type="button" class="quick-amt-chip" data-add-amount="500">+500 ₺</button>
+              <button type="button" class="quick-amt-chip" data-add-amount="1000">+1.000 ₺</button>
+              <button type="button" class="quick-amt-chip" data-add-amount="2500">+2.500 ₺</button>
+            </div>
           </div>
 
           <!-- Category Field -->
           <div class="form-group">
             <label for="tx-category">Kategori</label>
             <input type="text" id="tx-category" list="category-datalist" placeholder="Kategori seçin veya yazın (örn. Market, Ulaşım)">
+            <div class="quick-cat-chips" id="tx-quick-categories"></div>
           </div>
 
           <!-- Date Field -->
@@ -5735,6 +6790,19 @@
     </div>
   </div>
 
+  <!-- Global Command Palette & Quick Action Modal (Ctrl+K) -->
+  <div id="cmd-palette-overlay" style="display:none;" aria-hidden="true">
+    <div class="cmd-palette-backdrop" id="cmd-palette-backdrop"></div>
+    <div class="cmd-palette-sheet" role="dialog" aria-modal="true" aria-label="Hızlı Komut Paleti">
+      <div class="cmd-search-bar">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="cmd-palette-input" placeholder="Komut çalıştır, sekme değiştir veya işlem ara… (Örn: Yeni Gider, Bütçe, Kart)" autocomplete="off">
+        <span class="cmd-esc-hint">ESC</span>
+      </div>
+      <div class="cmd-results-list" id="cmd-results-list"></div>
+    </div>
+  </div>
+
   <!-- Unified Confirmation Dialog Modal (Elevated Stacking Layer) -->
   <div class="tx-modal-overlay" id="confirm-modal-overlay" style="display:none;" aria-hidden="true">
     <div class="tx-modal-backdrop" id="confirm-modal-backdrop"></div>
@@ -6099,6 +7167,27 @@ const themeCardDark = document.getElementById("theme-card-dark");
 if (themeCardDark) {
   themeCardDark.addEventListener("click", () => applyTheme("dark"));
 }
+
+// Privacy Mode (Hide / Blur Sensitive Amounts)
+function applyPrivacyMode(isPrivate) {
+  document.body.classList.toggle("privacy-mode", isPrivate);
+  document.querySelectorAll(".privacy-toggle-btn").forEach((btn) => {
+    btn.classList.toggle("active", isPrivate);
+  });
+  const lbl = document.getElementById("privacy-btn-label");
+  if (lbl) lbl.textContent = isPrivate ? "Tutarları Göster" : "Tutarları Gizle";
+  localStorage.setItem("privacy_mode", isPrivate ? "1" : "0");
+}
+function togglePrivacyMode() {
+  const isPrivate = !document.body.classList.contains("privacy-mode");
+  applyPrivacyMode(isPrivate);
+  showToast(isPrivate ? "Gizlilik modu açıldı: Tutarlar gizlendi." : "Gizlilik modu kapatıldı.", "info");
+}
+applyPrivacyMode(localStorage.getItem("privacy_mode") === "1");
+document.querySelectorAll(".privacy-toggle-btn").forEach((btn) => {
+  btn.addEventListener("click", togglePrivacyMode);
+});
+
 function formatMoney(n) {
   return new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 }
@@ -6127,26 +7216,26 @@ function loadUpcomingPayments() {
 }
 
 const TAB_MAP = {
-  overview: { primary: "dashboard" },
-  dashboard: { primary: "dashboard" },
-  transactions: { primary: "activity" },
-  activity: { primary: "activity" },
-  plan: { primary: "plan" },
-  budgets: { primary: "plan", subpanel: "budgets" },
-  subscriptions: { primary: "plan", subpanel: "subscriptions" },
-  recurring: { primary: "plan", subpanel: "recurring" },
-  installments: { primary: "plan", subpanel: "installments" },
-  wallet: { primary: "wallet" },
-  bank: { primary: "wallet" },
-  cards: { primary: "wallet" },
-  settings: { primary: "settings" },
-  categories: { primary: "settings", subpanel: "categories" },
-  account: { primary: "settings", subpanel: "account" },
-  profile: { primary: "settings", subpanel: "account" },
-  security: { primary: "settings", subpanel: "account" },
-  data: { primary: "settings", subpanel: "data" },
-  backup: { primary: "settings", subpanel: "data" },
-  theme: { primary: "settings", subpanel: "theme" },
+  overview: { primary: "dashboard", label: "Genel Bakış" },
+  dashboard: { primary: "dashboard", label: "Genel Bakış" },
+  transactions: { primary: "activity", label: "İşlemler & Hareketler" },
+  activity: { primary: "activity", label: "İşlemler & Hareketler" },
+  plan: { primary: "plan", label: "Plan & Bütçe" },
+  budgets: { primary: "plan", subpanel: "budgets", label: "Plan · Bütçeler" },
+  subscriptions: { primary: "plan", subpanel: "subscriptions", label: "Plan · Abonelikler" },
+  recurring: { primary: "plan", subpanel: "recurring", label: "Plan · Sabit İşlemler" },
+  installments: { primary: "plan", subpanel: "installments", label: "Plan · Taksitler" },
+  wallet: { primary: "wallet", label: "Cüzdan & Kartlar" },
+  bank: { primary: "wallet", label: "Cüzdan & Kartlar" },
+  cards: { primary: "wallet", label: "Cüzdan & Kartlar" },
+  settings: { primary: "settings", label: "Ayarlar" },
+  categories: { primary: "settings", subpanel: "categories", label: "Ayarlar · Kategoriler" },
+  account: { primary: "settings", subpanel: "account", label: "Ayarlar · Profil & Güvenlik" },
+  profile: { primary: "settings", subpanel: "account", label: "Ayarlar · Profil & Güvenlik" },
+  security: { primary: "settings", subpanel: "account", label: "Ayarlar · Profil & Güvenlik" },
+  data: { primary: "settings", subpanel: "data", label: "Ayarlar · Veri Yönetimi" },
+  backup: { primary: "settings", subpanel: "data", label: "Ayarlar · Veri Yönetimi" },
+  theme: { primary: "settings", subpanel: "theme", label: "Ayarlar · Görünüm" },
 };
 
 function setSubTab(containerId, subtabKey) {
@@ -6161,7 +7250,7 @@ function setSubTab(containerId, subtabKey) {
 }
 
 function setActiveTab(tab) {
-  const target = TAB_MAP[tab] || { primary: tab };
+  const target = TAB_MAP[tab] || { primary: tab, label: "Genel Bakış" };
   const primaryKey = target.primary;
 
   document.querySelectorAll(".nav-item").forEach((btn) => {
@@ -6180,6 +7269,11 @@ function setActiveTab(tab) {
     }
   }
 
+  const crumbTitle = document.getElementById("topbar-crumb-title");
+  if (crumbTitle) {
+    crumbTitle.textContent = target.label || (TAB_MAP[primaryKey] && TAB_MAP[primaryKey].label) || "Genel Bakış";
+  }
+
   window.scrollTo({ top: 0 });
 }
 
@@ -6192,15 +7286,61 @@ document.querySelectorAll(".sub-tab-btn").forEach((btn) => {
     const parentTab = btn.closest(".main-tab-panel");
     if (parentTab) {
       setSubTab(parentTab.id, btn.dataset.subtab);
+      const subMap = TAB_MAP[btn.dataset.subtab];
+      const crumbTitle = document.getElementById("topbar-crumb-title");
+      if (subMap && crumbTitle) crumbTitle.textContent = subMap.label;
     }
   });
 });
 
-const quickAddBtn = document.getElementById("mobile-quick-add-btn");
-if (quickAddBtn) {
-  quickAddBtn.addEventListener("click", () => {
+["mobile-quick-add-btn", "sidebar-quick-add-btn", "topbar-quick-add-btn"].forEach((id) => {
+  const btn = document.getElementById(id);
+  if (btn) {
+    btn.addEventListener("click", () => openTxModal(null));
+  }
+});
+
+// Hero Quick Action Pills
+const heroQaExpense = document.getElementById("hero-qa-expense");
+if (heroQaExpense) {
+  heroQaExpense.addEventListener("click", () => {
     openTxModal(null);
+    setTxType("expense");
   });
+}
+const heroQaIncome = document.getElementById("hero-qa-income");
+if (heroQaIncome) {
+  heroQaIncome.addEventListener("click", () => {
+    openTxModal(null);
+    setTxType("income");
+  });
+}
+const heroQaInstallment = document.getElementById("hero-qa-installment");
+if (heroQaInstallment) {
+  heroQaInstallment.addEventListener("click", () => {
+    openTxModal(null);
+    setTxType("expense");
+    const advFields = document.getElementById("tx-advanced-fields");
+    const advToggle = document.getElementById("tx-advanced-toggle");
+    const advText = document.getElementById("tx-advanced-toggle-text");
+    if (advFields) advFields.style.display = "block";
+    if (advToggle) {
+      advToggle.classList.add("open");
+      advToggle.setAttribute("aria-expanded", "true");
+    }
+    if (advText) advText.textContent = "Daha az seçenek";
+    const ccSelect = document.getElementById("tx-credit-card");
+    if (ccSelect && ccSelect.options.length > 1 && !ccSelect.value) {
+      ccSelect.selectedIndex = 1;
+    }
+    const instSelect = document.getElementById("tx-installments");
+    if (instSelect) instSelect.value = "3";
+    updateInstallmentFieldVisibility();
+  });
+}
+const heroQaBudget = document.getElementById("hero-qa-budget");
+if (heroQaBudget) {
+  heroQaBudget.addEventListener("click", () => openBudgetModal(null));
 }
 
 function showLogin() {
@@ -6502,6 +7642,18 @@ function renderAlerts() {
     }
   }
 
+  const navDashBadge = document.getElementById("nav-badge-dashboard");
+  if (navDashBadge) {
+    if (alerts.length > 0) {
+      navDashBadge.textContent = alerts.length;
+      navDashBadge.style.display = "inline-flex";
+      const hasCritical = alerts.some((a) => a.severity === "critical");
+      navDashBadge.className = "nav-live-badge " + (hasCritical ? "danger" : "warning");
+    } else {
+      navDashBadge.style.display = "none";
+    }
+  }
+
   if (alerts.length === 0) {
     list.innerHTML = `
       <div class="alerts-positive-state">
@@ -6560,6 +7712,23 @@ function renderAlerts() {
 function updateBudgetMetric() {
   const metricEl = document.getElementById("overview-budget-metric");
   const fillEl = document.getElementById("overview-budget-fill");
+  const navPlanBadge = document.getElementById("nav-badge-plan");
+
+  if (navPlanBadge) {
+    const overCount = (cachedBudgets || []).filter((b) => b.is_over_limit).length;
+    if (overCount > 0) {
+      navPlanBadge.textContent = overCount;
+      navPlanBadge.className = "nav-live-badge danger";
+      navPlanBadge.style.display = "inline-flex";
+    } else if ((cachedBudgets || []).length > 0) {
+      navPlanBadge.textContent = cachedBudgets.length;
+      navPlanBadge.className = "nav-live-badge";
+      navPlanBadge.style.display = "inline-flex";
+    } else {
+      navPlanBadge.style.display = "none";
+    }
+  }
+
   if (!metricEl) return;
 
   if (!cachedBudgets || cachedBudgets.length === 0) {
@@ -6585,6 +7754,53 @@ function updateBudgetMetric() {
   } else {
     metricEl.textContent = "Bütçe tanımlı değil";
     if (fillEl) fillEl.style.width = "0%";
+  }
+}
+
+function updateWalletMetric() {
+  const metricEl = document.getElementById("overview-wallet-metric");
+  const fillEl = document.getElementById("overview-wallet-fill");
+  const subEl = document.getElementById("overview-wallet-sub");
+  const navWalletBadge = document.getElementById("nav-badge-wallet");
+
+  const cards = cachedCreditCards || [];
+  const activePlans = (cachedInstallments || []).filter((p) => p.status === "active");
+
+  let totalDebt = 0;
+  let totalLimit = 0;
+  for (const c of cards) {
+    totalDebt += Number(c.current_debt) || 0;
+    totalLimit += Number(c.limit_amount) || 0;
+  }
+
+  if (navWalletBadge) {
+    if (cards.length > 0) {
+      navWalletBadge.textContent = cards.length;
+      navWalletBadge.className = "nav-live-badge" + (totalLimit > 0 && totalDebt / totalLimit >= 0.8 ? " danger" : "");
+      navWalletBadge.style.display = "inline-flex";
+    } else {
+      navWalletBadge.style.display = "none";
+    }
+  }
+
+  if (!metricEl) return;
+  if (cards.length === 0) {
+    metricEl.textContent = "Kart tanımlı değil";
+    if (fillEl) fillEl.style.width = "0%";
+    if (subEl) subEl.textContent = "Kredi kartı eklenmedi";
+    return;
+  }
+
+  const pct = totalLimit > 0 ? Math.min(100, Math.round((totalDebt / totalLimit) * 100)) : 0;
+  metricEl.textContent = formatMoney(totalDebt);
+  if (fillEl) {
+    fillEl.style.width = `${pct}%`;
+    fillEl.className = "metric-progress-fill" + (pct >= 85 ? " danger" : pct >= 65 ? " warning" : "");
+  }
+  if (subEl) {
+    subEl.textContent = activePlans.length > 0
+      ? `%${pct} limit · ${activePlans.length} aktif taksit planı`
+      : `%${pct} limit kullanımı (${cards.length} kart)`;
   }
 }
 
@@ -6691,6 +7907,11 @@ function renderUpcomingPayments() {
 
   if (metricBadge) {
     metricBadge.textContent = `${items.length} ödeme`;
+  }
+  const upcomingSubEl = document.getElementById("overview-upcoming-sub");
+  if (upcomingSubEl) {
+    const totalUpcomingAmt = items.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+    upcomingSubEl.textContent = items.length > 0 ? `Toplam ${formatMoney(totalUpcomingAmt)} yaklaşan` : "Yaklaşan işlem takvimi";
   }
   if (countBadge) {
     countBadge.textContent = items.length ? `${items.length}` : "";
@@ -6824,6 +8045,47 @@ async function loadOverview() {
   balanceEl.textContent = formatMoney(data.net_balance);
   balanceEl.className = "hero-balance-value " + (data.net_balance >= 0 ? "positive" : "negative");
 
+  // Populate daily average subtext & Cashflow Allocation Bar
+  const daysElapsed = isCurrentMonth
+    ? Math.max(1, now.getDate())
+    : new Date(year, selectedOverviewDate.getMonth() + 1, 0).getDate();
+  const incSubEl = document.getElementById("overview-income-sub");
+  const expSubEl = document.getElementById("overview-expense-sub");
+  if (incSubEl) {
+    incSubEl.textContent = data.month_income > 0
+      ? `Günlük ort. +${formatMoney(data.month_income / daysElapsed)}`
+      : "Dönem içi nakit girişi";
+  }
+  if (expSubEl) {
+    expSubEl.textContent = data.month_expense > 0
+      ? `Günlük ort. -${formatMoney(data.month_expense / daysElapsed)}`
+      : "Dönem içi harcama çıkışı";
+  }
+
+  const allocExpEl = document.getElementById("hero-alloc-expense");
+  const allocSavEl = document.getElementById("hero-alloc-savings");
+  const allocPctEl = document.getElementById("hero-alloc-pct");
+  const allocLblEl = document.getElementById("hero-alloc-label");
+  if (allocExpEl && allocSavEl && allocPctEl) {
+    if (data.month_income > 0) {
+      const expRatio = Math.min(100, Math.round((data.month_expense / data.month_income) * 100));
+      const savRatio = Math.max(0, 100 - expRatio);
+      allocExpEl.style.width = `${expRatio}%`;
+      allocSavEl.style.width = `${savRatio}%`;
+      allocPctEl.textContent = `%${expRatio} Harcama · %${savRatio} Tasarruf`;
+      if (allocLblEl) allocLblEl.textContent = "Gelir Kullanım Dağılımı";
+    } else if (data.month_expense > 0) {
+      allocExpEl.style.width = "100%";
+      allocSavEl.style.width = "0%";
+      allocPctEl.textContent = "Gelir kaydı bekleniyor";
+      if (allocLblEl) allocLblEl.textContent = "Harcama Yoğunluğu";
+    } else {
+      allocExpEl.style.width = "0%";
+      allocSavEl.style.width = "0%";
+      allocPctEl.textContent = "Hareket yok";
+    }
+  }
+
   const rateBadge = document.getElementById("overview-savings-rate");
   if (rateBadge) {
     if (data.month_income > 0) {
@@ -6845,6 +8107,7 @@ async function loadOverview() {
   if (subsEl) subsEl.textContent = formatMoney(data.monthly_subscription_cost);
 
   updateBudgetMetric();
+  updateWalletMetric();
 }
 
 const prevMonthBtn = document.getElementById("overview-prev-month");
@@ -7306,7 +8569,17 @@ function renderTransactionsList(transactions) {
     (document.getElementById("tx-filter-to") && document.getElementById("tx-filter-to").value)
   );
 
+  const kpiIncEl = document.getElementById("ledger-kpi-income");
+  const kpiExpEl = document.getElementById("ledger-kpi-expense");
+  const kpiNetEl = document.getElementById("ledger-kpi-net");
+
   if (transactions.length === 0) {
+    if (kpiIncEl) kpiIncEl.textContent = "+0,00";
+    if (kpiExpEl) kpiExpEl.textContent = "-0,00";
+    if (kpiNetEl) {
+      kpiNetEl.textContent = "0,00";
+      kpiNetEl.className = "ledger-kpi-val";
+    }
     if (empty) {
       empty.style.display = "flex";
       const title = isFiltered ? "Filtrelere uygun işlem bulunamadı" : "Henüz işlem yok";
@@ -7345,6 +8618,14 @@ function renderTransactionsList(transactions) {
   for (const t of transactions) {
     if (t.type === "income") totalIncome += t.amount;
     else totalExpense += t.amount;
+  }
+  const netDiff = totalIncome - totalExpense;
+  if (kpiIncEl) kpiIncEl.textContent = `+${formatMoney(totalIncome)}`;
+  if (kpiExpEl) kpiExpEl.textContent = `-${formatMoney(totalExpense)}`;
+  if (kpiNetEl) {
+    const netSign = netDiff > 0 ? "+" : (netDiff < 0 ? "-" : "");
+    kpiNetEl.textContent = `${netSign}${formatMoney(Math.abs(netDiff))}`;
+    kpiNetEl.className = "ledger-kpi-val " + (netDiff >= 0 ? "income" : "expense");
   }
   if (summaryTag) {
     summaryTag.textContent = `Gelir: +${formatMoney(totalIncome)} · Gider: -${formatMoney(totalExpense)}`;
@@ -7514,6 +8795,17 @@ function renderTransactionsList(transactions) {
   }
 }
 
+const DONUT_PALETTE = [
+  "#059669",
+  "#4F46E5",
+  "#E11D48",
+  "#D97706",
+  "#0284C7",
+  "#9333EA",
+  "#0D9488",
+  "#64748B"
+];
+
 async function loadCategoryChart() {
   const card = document.getElementById("category-chart-card");
   const container = document.getElementById("category-chart");
@@ -7525,21 +8817,70 @@ async function loadCategoryChart() {
   card.style.display = "block";
   const total = entries.reduce((acc, e) => acc + e.amount, 0);
   const max = entries[0].amount;
-  container.innerHTML = entries
-    .map(({ category, amount }) => {
+
+  // Build SVG Donut segments (r=48, C=301.59)
+  const radius = 48;
+  const circumference = 2 * Math.PI * radius;
+  let cumulativeFraction = 0;
+
+  const circlesHtml = entries
+    .map(({ category, amount }, idx) => {
+      const color = DONUT_PALETTE[idx % DONUT_PALETTE.length];
+      const fraction = total > 0 ? amount / total : 0;
+      const segLength = Math.max(0, fraction * circumference);
+      const offset = -cumulativeFraction * circumference;
+      cumulativeFraction += fraction;
+      return `<circle cx="64" cy="64" r="${radius}" fill="none" stroke="${color}" stroke-width="16" stroke-dasharray="${segLength.toFixed(2)} ${circumference.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" transform="rotate(-90 64 64)"><title>${escapeHtml(category)}: ${formatMoney(amount)}</title></circle>`;
+    })
+    .join("");
+
+  const rowsHtml = entries
+    .map(({ category, amount }, idx) => {
       const pct = total > 0 ? Math.round((amount / total) * 100) : 0;
+      const color = DONUT_PALETTE[idx % DONUT_PALETTE.length];
       return `
-      <div class="chart-row">
+      <div class="chart-row" data-cat-filter-click="${escapeHtml(category)}" style="cursor:pointer;" title="Bu kategorideki işlemleri filtrele">
         <div class="chart-label-group">
+          <span class="donut-color-dot" style="background:${color};"></span>
           <span class="chart-label" title="${escapeHtml(category)}">${escapeHtml(category)}</span>
           <span class="chart-percent-badge">%${pct}</span>
         </div>
-        <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.max(4, (amount / max) * 100)}%"></div></div>
+        <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.max(4, (amount / max) * 100)}%; background:${color};"></div></div>
         <div class="chart-value">${formatMoney(amount)}</div>
       </div>
     `;
     })
     .join("");
+
+  container.innerHTML = `
+    <div class="donut-chart-layout">
+      <div class="donut-svg-wrap">
+        <svg viewBox="0 0 128 128" width="136" height="136" aria-label="Kategori Dağılımı Grafiği">
+          <circle cx="64" cy="64" r="${radius}" fill="none" stroke="var(--surface-muted)" stroke-width="16"></circle>
+          ${circlesHtml}
+        </svg>
+        <div class="donut-center-label">
+          <span class="donut-center-sub">Toplam</span>
+          <span class="donut-center-val">${formatMoney(total)}</span>
+        </div>
+      </div>
+      <div class="donut-legend-col">
+        ${rowsHtml}
+      </div>
+    </div>
+  `;
+
+  container.querySelectorAll("[data-cat-filter-click]").forEach((rowEl) => {
+    rowEl.addEventListener("click", () => {
+      const cat = rowEl.getAttribute("data-cat-filter-click");
+      const catSelect = document.getElementById("tx-filter-category");
+      if (catSelect && cat) {
+        catSelect.value = cat;
+        setActiveTab("activity");
+        loadTransactions(true);
+      }
+    });
+  });
 }
 
 async function loadTrendChart() {
@@ -7573,7 +8914,27 @@ async function loadTrendChart() {
     if ((d.expense || 0) > maxVal) maxVal = d.expense;
   });
 
-  container.innerHTML = data
+  const visualBarsHtml = data
+    .map((item) => {
+      const parts = (item.month || "").split("-");
+      const shortMonth = parts.length === 2 ? (monthNamesTr[parts[1]] || parts[1]) : item.month;
+      const inc = item.income || 0;
+      const exp = item.expense || 0;
+      const incH = Math.max(inc > 0 ? 8 : 2, Math.round((inc / maxVal) * 100));
+      const expH = Math.max(exp > 0 ? 8 : 2, Math.round((exp / maxVal) * 100));
+      return `
+        <div class="trend-v-col" title="${escapeHtml(shortMonth)}: Gelir +${formatMoney(inc)} / Gider -${formatMoney(exp)}">
+          <div class="trend-v-pair">
+            <div class="trend-v-bar inc" style="height:${incH}%;"></div>
+            <div class="trend-v-bar exp" style="height:${expH}%;"></div>
+          </div>
+          <span class="trend-v-lbl">${escapeHtml(shortMonth)}</span>
+        </div>
+      `;
+    })
+    .join("");
+
+  const rowsHtml = data
     .map((item) => {
       const parts = (item.month || "").split("-");
       const monthLabel = parts.length === 2 ? `${monthNamesTr[parts[1]] || parts[1]} ${parts[0]}` : item.month;
@@ -7607,18 +8968,81 @@ async function loadTrendChart() {
       `;
     })
     .join("");
+
+  container.innerHTML = `
+    <div class="trend-visual-bars">${visualBarsHtml}</div>
+    ${rowsHtml}
+  `;
 }
 
 function populateCategoryFilter(categories) {
   const select = document.getElementById("tx-filter-category");
-  if (!select) return;
-  const current = select.value;
   const names = categories.map((c) => c.name).sort();
-  select.innerHTML =
-    '<option value="">Tüm kategoriler</option>' +
-    names.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
-  select.value = names.includes(current) ? current : "";
+  if (select) {
+    const current = select.value;
+    select.innerHTML =
+      '<option value="">Tüm kategoriler</option>' +
+      names.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+    select.value = names.includes(current) ? current : "";
+  }
+
+  // Also render quick category chips inside the Transaction Modal
+  const quickCatWrap = document.getElementById("tx-quick-categories");
+  if (quickCatWrap) {
+    const topNames = names.slice(0, 7);
+    quickCatWrap.innerHTML = topNames
+      .map((name) => `<button type="button" class="quick-cat-chip" data-quick-cat="${escapeHtml(name)}">${escapeHtml(name)}</button>`)
+      .join("");
+    quickCatWrap.querySelectorAll(".quick-cat-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const catInput = document.getElementById("tx-category");
+        if (catInput) {
+          catInput.value = chip.getAttribute("data-quick-cat") || "";
+          quickCatWrap.querySelectorAll(".quick-cat-chip").forEach((c) => c.classList.remove("selected"));
+          chip.classList.add("selected");
+        }
+      });
+    });
+  }
 }
+
+// Wire Quick Amount Preset Chips in Transaction Modal
+document.querySelectorAll(".quick-amt-chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    const addVal = parseFloat(chip.getAttribute("data-add-amount") || "0");
+    const amtInput = document.getElementById("tx-amount");
+    if (amtInput && addVal > 0) {
+      const current = parseFloat(amtInput.value || "0") || 0;
+      amtInput.value = (current + addVal).toFixed(2).replace(/\.00$/, "");
+      updateInstallmentFieldVisibility();
+    }
+  });
+});
+
+// Wire Activity Quick Filter Pills
+document.querySelectorAll(".quick-filter-pill").forEach((pill) => {
+  pill.addEventListener("click", () => {
+    document.querySelectorAll(".quick-filter-pill").forEach((p) => p.classList.remove("active"));
+    pill.classList.add("active");
+    const qType = pill.getAttribute("data-quick-type") || "";
+    const typeSelect = document.getElementById("tx-filter-type");
+    const fromInput = document.getElementById("tx-filter-from");
+    const toInput = document.getElementById("tx-filter-to");
+
+    if (qType === "this-month") {
+      const now = new Date();
+      const firstDay = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+      if (fromInput) fromInput.value = firstDay;
+      if (toInput) toInput.value = todayIsoDate();
+      if (typeSelect) typeSelect.value = "";
+    } else {
+      if (typeSelect) typeSelect.value = qType;
+      if (fromInput) fromInput.value = "";
+      if (toInput) toInput.value = "";
+    }
+    loadTransactions(true);
+  });
+});
 
 function updateActiveFilterBadges() {
   const category = document.getElementById("tx-filter-category") ? document.getElementById("tx-filter-category").value : "";
@@ -8849,6 +10273,7 @@ async function loadCards() {
   cachedCreditCards = cards;
   renderAlerts();
   renderUpcomingPayments();
+  updateWalletMetric();
   populateCreditCardSelect(cards);
 
   const list = document.getElementById("cards-list");
@@ -9663,6 +11088,7 @@ async function loadInstallments() {
   renderWalletInstallments();
   renderUpcomingPayments();
   renderAlerts();
+  updateWalletMetric();
 }
 
 function renderPlanInstallments() {
@@ -10258,7 +11684,14 @@ document.getElementById("delete-account-form").addEventListener("submit", async 
   const password = document.getElementById("delete-account-password-input").value;
   const errorEl = document.getElementById("delete-account-error");
   errorEl.textContent = "";
-  if (!confirm("Hesabınızı ve TÜM verilerinizi kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!")) {
+  const confirmed = await showConfirmDialog({
+    title: "Hesabı Kalıcı Olarak Sil",
+    message: "Hesabınızı ve tüm finansal verilerinizi kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!",
+    confirmText: "Hesabımı Kalıcı Sil",
+    cancelText: "Vazgeç",
+    danger: true,
+  });
+  if (!confirmed) {
     return;
   }
   const submitBtn = document.getElementById("delete-account-submit-btn");
@@ -10283,9 +11716,29 @@ document.getElementById("delete-account-form").addEventListener("submit", async 
   }
 });
 
+// Split Auth Tabs & Toggle
+function setAuthMode(mode) {
+  const loginCard = document.getElementById("login-card");
+  const registerCard = document.getElementById("register-card");
+  const tabLogin = document.getElementById("auth-tab-login");
+  const tabRegister = document.getElementById("auth-tab-register");
+  const isRegister = mode === "register";
+
+  if (loginCard) loginCard.style.display = isRegister ? "none" : "block";
+  if (registerCard) registerCard.style.display = isRegister ? "block" : "none";
+  if (tabLogin) tabLogin.classList.toggle("active", !isRegister);
+  if (tabRegister) tabRegister.classList.toggle("active", isRegister);
+}
+
+const authTabLogin = document.getElementById("auth-tab-login");
+if (authTabLogin) authTabLogin.addEventListener("click", () => setAuthMode("login"));
+const authTabRegister = document.getElementById("auth-tab-register");
+if (authTabRegister) authTabRegister.addEventListener("click", () => setAuthMode("register"));
+
 document.getElementById("show-register").addEventListener("click", () => {
   const card = document.getElementById("register-card");
-  card.style.display = card.style.display === "none" ? "block" : "none";
+  const willShow = card.style.display === "none";
+  setAuthMode(willShow ? "register" : "login");
 });
 
 document.getElementById("login-form").addEventListener("submit", async (e) => {
@@ -10340,6 +11793,295 @@ async function handleLogout() {
 }
 document.querySelectorAll(".logout-trigger").forEach((btn) => {
   btn.addEventListener("click", handleLogout);
+});
+
+// ==========================================================================
+// Global Command Palette (Ctrl+K) & Power-User Keyboard Shortcuts
+// ==========================================================================
+let cmdActiveIndex = 0;
+let currentCmdItems = [];
+
+function getCommandPaletteCatalog(query = "") {
+  const q = query.trim().toLowerCase();
+  const baseCommands = [
+    {
+      group: "Hızlı İşlemler",
+      icon: "💸",
+      title: "Yeni Gider / Harcama Ekle",
+      sub: "Hızlı harcama penceresini aç",
+      shortcut: "N",
+      action: () => {
+        openTxModal(null);
+        setTxType("expense");
+      },
+    },
+    {
+      group: "Hızlı İşlemler",
+      icon: "💰",
+      title: "Yeni Gelir Kaydet",
+      sub: "Gelir giriş penceresini aç",
+      shortcut: "",
+      action: () => {
+        openTxModal(null);
+        setTxType("income");
+      },
+    },
+    {
+      group: "Hızlı İşlemler",
+      icon: "🎯",
+      title: "Yeni Bütçe Limiti Belirle",
+      sub: "Kategori veya genel aylık bütçe ekle",
+      shortcut: "",
+      action: () => openBudgetModal(null),
+    },
+    {
+      group: "Hızlı İşlemler",
+      icon: "💳",
+      title: "Yeni Kredi Kartı Ekle",
+      sub: "Kart limiti ve hesap kesim günü tanımla",
+      shortcut: "",
+      action: () => openCardModal(null),
+    },
+    {
+      group: "Hızlı İşlemler",
+      icon: "🔁",
+      title: "Yeni Abonelik Ekle",
+      sub: "Düzenli dijital servis aboneliği tanımla",
+      shortcut: "",
+      action: () => openSubModal(null),
+    },
+    {
+      group: "Görünüm & Araçlar",
+      icon: "👁️",
+      title: "Gizlilik Modunu Aç / Kapat",
+      sub: "Ekrandaki tüm parasal tutarları bulanıklaştır",
+      shortcut: "P",
+      action: () => togglePrivacyMode(),
+    },
+    {
+      group: "Görünüm & Araçlar",
+      icon: "🌓",
+      title: "Temayı Değiştir (Aydınlık / Karanlık)",
+      sub: "Görünüm modunu anında değiştir",
+      shortcut: "",
+      action: () => {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        applyTheme(isDark ? "soft" : "dark");
+      },
+    },
+    {
+      group: "Sayfalar & Navigasyon",
+      icon: "📊",
+      title: "Genel Bakış (Dashboard)",
+      sub: "Aylık özet, bildirimler ve grafikler",
+      shortcut: "",
+      action: () => setActiveTab("dashboard"),
+    },
+    {
+      group: "Sayfalar & Navigasyon",
+      icon: "📋",
+      title: "İşlemler & Hesap Hareketleri",
+      sub: "Tüm gelir ve gider kayıtlarını filtrele",
+      shortcut: "",
+      action: () => setActiveTab("activity"),
+    },
+    {
+      group: "Sayfalar & Navigasyon",
+      icon: "🎯",
+      title: "Plan · Bütçeler & Taksitler",
+      sub: "Bütçe hedefleri, abonelikler ve taksit takvimi",
+      shortcut: "",
+      action: () => setActiveTab("plan"),
+    },
+    {
+      group: "Sayfalar & Navigasyon",
+      icon: "💳",
+      title: "Cüzdan & Kredi Kartlarım",
+      sub: "Kart limitleri, borç ödeme ve ekstre takvimi",
+      shortcut: "",
+      action: () => setActiveTab("wallet"),
+    },
+    {
+      group: "Sayfalar & Navigasyon",
+      icon: "⚙️",
+      title: "Ayarlar & Veri Yedekleme",
+      sub: "Kategoriler, JSON yedekleme ve hesap güvenliği",
+      shortcut: "",
+      action: () => setActiveTab("settings"),
+    },
+  ];
+
+  // Dynamic Credit Cards
+  for (const card of (cachedCreditCards || [])) {
+    const title = card.card_name ? `${card.bank_name} · ${card.card_name}` : card.bank_name;
+    baseCommands.push({
+      group: "Kredi Kartlarım",
+      icon: "💳",
+      title: `${title} Harcamaları`,
+      sub: `Güncel Borç: ${formatMoney(card.current_debt)} · Limit: ${formatMoney(card.limit_amount)}`,
+      shortcut: "Kart",
+      action: () => openCardTxsModal(card),
+    });
+  }
+
+  // Dynamic Recent Transactions when searching
+  if (q.length >= 2) {
+    for (const tx of (allTransactions || []).slice(0, 25)) {
+      const label = tx.note || tx.category || (tx.type === "income" ? "Gelir" : "Gider");
+      const hay = `${label} ${tx.category || ""} ${tx.occurred_on || ""}`.toLowerCase();
+      if (hay.includes(q)) {
+        baseCommands.push({
+          group: "Eşleşen İşlemler",
+          icon: tx.type === "income" ? "↗" : "↘",
+          title: `${label} (${tx.type === "income" ? "+" : "-"}${formatMoney(tx.amount)})`,
+          sub: `${formatDateTr(tx.occurred_on)} · ${tx.category || "Kategorisiz"}`,
+          shortcut: "Düzenle",
+          action: () => openTxModal(tx),
+        });
+      }
+    }
+  }
+
+  if (!q) return baseCommands;
+  return baseCommands.filter((item) => {
+    const hay = `${item.title} ${item.sub} ${item.group}`.toLowerCase();
+    return hay.includes(q);
+  });
+}
+
+function renderCmdResults(query = "") {
+  const listEl = document.getElementById("cmd-results-list");
+  if (!listEl) return;
+  currentCmdItems = getCommandPaletteCatalog(query);
+  cmdActiveIndex = 0;
+
+  if (currentCmdItems.length === 0) {
+    listEl.innerHTML = `<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px;">Aramanızla eşleşen komut veya işlem bulunamadı.</div>`;
+    return;
+  }
+
+  let html = "";
+  let lastGroup = "";
+  currentCmdItems.forEach((item, idx) => {
+    if (item.group !== lastGroup) {
+      lastGroup = item.group;
+      html += `<div class="cmd-group-label">${escapeHtml(lastGroup)}</div>`;
+    }
+    html += `
+      <button type="button" class="cmd-result-item${idx === 0 ? " active" : ""}" data-cmd-idx="${idx}">
+        <div class="cmd-result-left">
+          <div class="cmd-result-icon">${item.icon}</div>
+          <div>
+            <div class="cmd-result-title">${escapeHtml(item.title)}</div>
+            <div class="cmd-result-sub">${escapeHtml(item.sub)}</div>
+          </div>
+        </div>
+        ${item.shortcut ? `<span class="cmd-result-shortcut">${escapeHtml(item.shortcut)}</span>` : ""}
+      </button>
+    `;
+  });
+
+  listEl.innerHTML = html;
+  listEl.querySelectorAll(".cmd-result-item").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const idx = parseInt(btn.getAttribute("data-cmd-idx") || "0", 10);
+      const chosen = currentCmdItems[idx];
+      closeCmdPalette();
+      if (chosen && typeof chosen.action === "function") chosen.action();
+    });
+  });
+}
+
+function openCmdPalette() {
+  const appView = document.getElementById("app-view");
+  if (!appView || appView.style.display === "none") return;
+  const overlay = document.getElementById("cmd-palette-overlay");
+  const input = document.getElementById("cmd-palette-input");
+  if (!overlay) return;
+  overlay.style.display = "flex";
+  overlay.setAttribute("aria-hidden", "false");
+  if (input) {
+    input.value = "";
+    renderCmdResults("");
+    setTimeout(() => input.focus(), 40);
+  }
+}
+
+function closeCmdPalette() {
+  const overlay = document.getElementById("cmd-palette-overlay");
+  if (!overlay) return;
+  overlay.style.display = "none";
+  overlay.setAttribute("aria-hidden", "true");
+}
+
+["sidebar-cmd-btn", "topbar-cmd-btn", "mobile-cmd-btn"].forEach((id) => {
+  const btn = document.getElementById(id);
+  if (btn) btn.addEventListener("click", openCmdPalette);
+});
+
+const cmdBackdrop = document.getElementById("cmd-palette-backdrop");
+if (cmdBackdrop) cmdBackdrop.addEventListener("click", closeCmdPalette);
+
+const cmdInput = document.getElementById("cmd-palette-input");
+if (cmdInput) {
+  cmdInput.addEventListener("input", () => renderCmdResults(cmdInput.value));
+  cmdInput.addEventListener("keydown", (e) => {
+    const listEl = document.getElementById("cmd-results-list");
+    const buttons = listEl ? Array.from(listEl.querySelectorAll(".cmd-result-item")) : [];
+    if (e.key === "ArrowDown" && buttons.length > 0) {
+      e.preventDefault();
+      cmdActiveIndex = (cmdActiveIndex + 1) % buttons.length;
+      buttons.forEach((b, i) => b.classList.toggle("active", i === cmdActiveIndex));
+      buttons[cmdActiveIndex].scrollIntoView({ block: "nearest" });
+    } else if (e.key === "ArrowUp" && buttons.length > 0) {
+      e.preventDefault();
+      cmdActiveIndex = (cmdActiveIndex - 1 + buttons.length) % buttons.length;
+      buttons.forEach((b, i) => b.classList.toggle("active", i === cmdActiveIndex));
+      buttons[cmdActiveIndex].scrollIntoView({ block: "nearest" });
+    } else if (e.key === "Enter" && currentCmdItems[cmdActiveIndex]) {
+      e.preventDefault();
+      const chosen = currentCmdItems[cmdActiveIndex];
+      closeCmdPalette();
+      if (chosen && typeof chosen.action === "function") chosen.action();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      closeCmdPalette();
+    }
+  });
+}
+
+document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+    e.preventDefault();
+    const overlay = document.getElementById("cmd-palette-overlay");
+    if (overlay && overlay.style.display === "flex") {
+      closeCmdPalette();
+    } else {
+      openCmdPalette();
+    }
+    return;
+  }
+
+  // Ignore single-key shortcuts when typing in an input/textarea/select or when a modal is open
+  const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
+  if (tag === "input" || tag === "textarea" || tag === "select" || (e.target && e.target.isContentEditable)) {
+    return;
+  }
+  const appView = document.getElementById("app-view");
+  if (!appView || appView.style.display === "none") return;
+
+  const anyModalOpen = Array.from(document.querySelectorAll(".tx-modal-overlay, #cmd-palette-overlay")).some(
+    (el) => el.style.display && el.style.display !== "none"
+  );
+  if (anyModalOpen) return;
+
+  if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.toLowerCase() === "n") {
+    e.preventDefault();
+    openTxModal(null);
+  } else if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.toLowerCase() === "p") {
+    e.preventDefault();
+    togglePrivacyMode();
+  }
 });
 
 (async function init() {
