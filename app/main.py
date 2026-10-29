@@ -482,6 +482,8 @@ MAX_STATEMENT_PDF_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
 @app.post("/statements/parse-pdf", response_model=schemas.StatementParseResponse)
 def parse_statement_pdf(
     file: UploadFile = File(...),
+    credit_card_id: Optional[int] = Query(None),
+    db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
     fname = (file.filename or "").lower()
@@ -496,16 +498,82 @@ def parse_statement_pdf(
         raise HTTPException(status_code=400, detail="Geçersiz PDF formatı.")
 
     try:
-        from app.services.statement_parser import parse_pdf_statement
+        from app.services.statement_parser import (
+            build_statement_summary,
+            normalize_text_for_matching,
+            parse_pdf_statement,
+        )
         result = parse_pdf_statement(content)
     except Exception as exc:
         logger.warning("PDF statement parsing error: %s", exc)
         raise HTTPException(status_code=400, detail="PDF ekstre dosyası okunamadı veya biçimi desteklenmiyor.")
 
+    tx_list = result["transactions"]
+    fingerprint = result.get("statement_fingerprint", "")
+
+    # Check if this exact statement fingerprint was already imported
+    already_imported_stmt = False
+    if fingerprint:
+        already_imported_stmt = (
+            db.query(models.BackupImport)
+            .filter(
+                models.BackupImport.owner_id == current_user.id,
+                models.BackupImport.fingerprint == fingerprint,
+            )
+            .first()
+            is not None
+        )
+
+    # Query user's existing transactions to detect potential duplicates safely
+    existing_txs = (
+        db.query(models.Transaction)
+        .filter(models.Transaction.owner_id == current_user.id)
+        .all()
+    )
+    existing_counts: dict[tuple[str, float, str], int] = {}
+    for etx in existing_txs:
+        if credit_card_id is not None and etx.credit_card_id not in (None, credit_card_id):
+            continue
+        k = (
+            etx.occurred_on.isoformat() if etx.occurred_on else "",
+            round(float(etx.amount), 2),
+            normalize_text_for_matching(etx.note or ""),
+        )
+        existing_counts[k] = existing_counts.get(k, 0) + 1
+
+    seen_in_pdf: dict[tuple[str, float, str], int] = {}
+    for t in tx_list:
+        norm_desc = normalize_text_for_matching(t.get("description") or "")
+        k = (t.get("occurred_on") or "", round(float(t.get("amount", 0)), 2), norm_desc)
+        seen_in_pdf[k] = seen_in_pdf.get(k, 0) + 1
+
+        if seen_in_pdf[k] <= existing_counts.get(k, 0) or already_imported_stmt:
+            t["is_duplicate"] = True
+            t["needs_review"] = True
+            t["selected_by_default"] = False
+            t["duplicate_reason"] = "Bu işlem (aynı tarih, tutar ve açıklama) hesabınızda zaten kayıtlı görünüyor."
+            dup_msg = "Olası mükerrer kayıt: Bu işlem daha önce içe aktarılmış olabilir."
+            if dup_msg not in t["warnings"]:
+                t["warnings"].append(dup_msg)
+        elif seen_in_pdf[k] > 1:
+            # Legitimate repeated transaction within the same PDF (e.g. toll or second purchase on same day):
+            # Keep selected_by_default = True, but flag for review so user is informed
+            t["needs_review"] = True
+            rep_msg = "Aynı gün, tutar ve açıklamada birden fazla işlem var (meşru tekrarlayan harcama veya geçiş ücreti olabilir)."
+            if rep_msg not in t["warnings"]:
+                t["warnings"].append(rep_msg)
+
+    summary = build_statement_summary(tx_list)
+
     return schemas.StatementParseResponse(
         bank_name=result["bank_name"],
-        total_found=result["total_found"],
-        transactions=[schemas.ParsedStatementTransaction(**t) for t in result["transactions"]],
+        card_last4=result.get("card_last4"),
+        statement_date=result.get("statement_date"),
+        currency=result.get("currency", "TRY"),
+        statement_fingerprint=fingerprint,
+        already_imported_statement=already_imported_stmt,
+        **summary,
+        transactions=[schemas.ParsedStatementTransaction(**t) for t in tx_list],
     )
 
 
@@ -518,42 +586,140 @@ def confirm_statement_import(
     if not payload.transactions:
         raise HTTPException(status_code=400, detail="İçe aktarılacak işlem bulunamadı.")
 
+    from app.services.statement_parser import (
+        is_card_repayment,
+        is_merchant_refund,
+        normalize_text_for_matching,
+    )
+
     card = None
     if payload.credit_card_id is not None:
         card = _get_owned_credit_card(payload.credit_card_id, current_user.id, db)
 
+    # Snapshot existing DB transactions BEFORE inserting this batch so that:
+    # 1) Legitimate repeated transactions within the same statement batch are all preserved and saved.
+    # 2) Re-importing an already-saved statement transaction is skipped unless force_duplicate=True.
+    existing_txs = (
+        db.query(models.Transaction)
+        .filter(models.Transaction.owner_id == current_user.id)
+        .all()
+    )
+    existing_db_counts: dict[tuple[str, float, str], int] = {}
+    for etx in existing_txs:
+        k = (
+            etx.occurred_on.isoformat() if etx.occurred_on else "",
+            round(float(etx.amount), 2),
+            normalize_text_for_matching(etx.note or ""),
+        )
+        existing_db_counts[k] = existing_db_counts.get(k, 0) + 1
+
+    matched_existing: dict[tuple[str, float, str], int] = {}
+
     total_expense = 0.0
+    total_refund = 0.0
+    total_payment = 0.0
     total_income = 0.0
+    expense_count = 0
+    refund_count = 0
+    payment_count = 0
+    skipped_duplicates = 0
     new_txs: list[models.Transaction] = []
 
     for item in payload.transactions:
-        tx_type = item.type
-        amt = item.amount
-        if tx_type == "expense":
+        amt = round(float(item.amount), 2)
+        desc_clean = item.description.strip()
+        norm_desc = normalize_text_for_matching(desc_clean)
+        orig_norm_desc = normalize_text_for_matching(item.original_description or desc_clean)
+
+        k_curr = (item.occurred_on.isoformat(), amt, norm_desc)
+        k_orig = (item.occurred_on.isoformat(), amt, orig_norm_desc)
+        db_existing_for_item = max(existing_db_counts.get(k_curr, 0), existing_db_counts.get(k_orig, 0))
+        used_count = max(matched_existing.get(k_curr, 0), matched_existing.get(k_orig, 0))
+
+        if not item.force_duplicate and used_count < db_existing_for_item:
+            matched_existing[k_curr] = used_count + 1
+            matched_existing[k_orig] = used_count + 1
+            skipped_duplicates += 1
+            continue
+
+        # Determine effective transaction kind
+        kind = item.transaction_kind
+        if kind is None:
+            if item.type == "income":
+                kind = "credit_card_payment" if is_card_repayment(desc_clean) else "refund"
+            else:
+                if is_card_repayment(desc_clean):
+                    kind = "credit_card_payment"
+                elif is_merchant_refund(desc_clean):
+                    kind = "refund"
+                else:
+                    kind = "expense"
+
+        if kind == "expense":
+            db_type = "expense"
             total_expense += amt
+            expense_count += 1
             cc_id = card.id if card else None
-        else:
+            cat = item.category
+        elif kind == "credit_card_payment":
+            db_type = "income"
+            total_payment += amt
             total_income += amt
+            payment_count += 1
             cc_id = None
+            cat = item.category or "Kredi Kartı Ödemesi"
+        else:
+            # refund
+            db_type = "income"
+            total_refund += amt
+            total_income += amt
+            refund_count += 1
+            cc_id = None
+            cat = item.category or "İade / Alacak"
 
         new_txs.append(
             models.Transaction(
                 owner_id=current_user.id,
                 amount=amt,
-                type=tx_type,
-                category=item.category,
-                note=item.description,
+                type=db_type,
+                category=cat,
+                note=desc_clean,
                 occurred_on=item.occurred_on,
                 credit_card_id=cc_id,
             )
         )
 
-    db.add_all(new_txs)
+    if new_txs:
+        db.add_all(new_txs)
+
+    if payload.statement_fingerprint and new_txs:
+        existing_fp = (
+            db.query(models.BackupImport)
+            .filter(
+                models.BackupImport.owner_id == current_user.id,
+                models.BackupImport.fingerprint == payload.statement_fingerprint,
+            )
+            .first()
+        )
+        if existing_fp is None:
+            db.add(
+                models.BackupImport(
+                    owner_id=current_user.id,
+                    fingerprint=payload.statement_fingerprint[:64],
+                )
+            )
+
     db.commit()
 
     return schemas.StatementConfirmResponse(
         imported_count=len(new_txs),
+        skipped_duplicates=skipped_duplicates,
+        expense_count=expense_count,
+        refund_count=refund_count,
+        payment_count=payment_count,
         total_expense=round(total_expense, 2),
+        total_refund=round(total_refund, 2),
+        total_payment=round(total_payment, 2),
         total_income=round(total_income, 2),
         credit_card_id=card.id if card else None,
     )

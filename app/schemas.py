@@ -486,39 +486,84 @@ class AccountImportResult(BaseModel):
     installment_payments: Optional[int] = None
 
 
+StatementTransactionKind = Literal["expense", "refund", "credit_card_payment"]
+
+
 class ParsedStatementTransaction(BaseModel):
-    occurred_on: date
+    row_id: int = 0
+    occurred_on: Optional[date] = None
+    original_date: Optional[date] = None
     raw_date: str
+    merchant: str = ""
     description: str
+    original_description: str = ""
     amount: float = Field(gt=0)
+    signed_amount: float = 0.0
+    currency: str = "TRY"
     type: TransactionType
+    transaction_kind: StatementTransactionKind = "expense"
+    affects_expense_total: bool = True
     suggested_category: str
     confidence: float
     installment_info: Optional[str] = None
+    needs_review: bool = False
+    warnings: list[str] = []
+    is_duplicate: bool = False
+    duplicate_reason: Optional[str] = None
+    selected_by_default: bool = True
 
 
 class StatementParseResponse(BaseModel):
     bank_name: str
+    card_last4: Optional[str] = None
+    statement_date: Optional[date] = None
+    currency: str = "TRY"
+    statement_fingerprint: str = ""
+    already_imported_statement: bool = False
     total_found: int
+    selected_count: int = 0
+    excluded_count: int = 0
+    expense_count: int = 0
+    refund_count: int = 0
+    payment_count: int = 0
+    review_count: int = 0
+    duplicate_count: int = 0
+    total_expenses: float = 0.0
+    total_refunds: float = 0.0
+    total_payments: float = 0.0
+    signed_total_payments: float = 0.0
+    net_movement: float = 0.0
     transactions: list[ParsedStatementTransaction]
 
 
 class StatementConfirmItem(BaseModel):
     occurred_on: date
-    description: str
+    description: str = Field(min_length=1, max_length=500)
     amount: float = Field(gt=0)
-    type: TransactionType
+    currency: str = "TRY"
+    type: TransactionType = "expense"
+    transaction_kind: Optional[StatementTransactionKind] = None
     category: Optional[str] = None
+    original_date: Optional[date] = None
+    original_description: Optional[str] = None
+    force_duplicate: bool = False
 
 
 class StatementConfirmRequest(BaseModel):
     credit_card_id: Optional[int] = None
+    statement_fingerprint: Optional[str] = None
     transactions: list[StatementConfirmItem]
 
 
 class StatementConfirmResponse(BaseModel):
     imported_count: int
+    skipped_duplicates: int = 0
+    expense_count: int = 0
+    refund_count: int = 0
+    payment_count: int = 0
     total_expense: float
+    total_refund: float = 0.0
+    total_payment: float = 0.0
     total_income: float
     credit_card_id: Optional[int] = None
 
