@@ -5259,6 +5259,63 @@
     width: fit-content;
   }
 
+  /* Mobile Pull-to-Refresh (Aşağı Çekerek Yenileme) */
+  .ptr-indicator {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translate(-50%, -90px) scale(0.92);
+    z-index: 450;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    background: var(--card-solid);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    color: var(--text);
+    font-size: 12.5px;
+    font-weight: 700;
+    pointer-events: none;
+    opacity: 0;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    will-change: transform, opacity;
+  }
+  .ptr-indicator.pulling {
+    transition: opacity 0.12s ease, border-color 0.15s ease;
+  }
+  .ptr-indicator.ready {
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px var(--accent-glow);
+    color: var(--accent);
+  }
+  .ptr-indicator.refreshing {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .ptr-icon-wrap {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--input-bg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    flex-shrink: 0;
+    transition: transform 0.15s ease, background-color 0.2s ease;
+  }
+  .ptr-indicator.ready .ptr-icon-wrap {
+    background: var(--accent-soft);
+  }
+  .ptr-indicator.refreshing .ptr-icon-wrap svg {
+    animation: spin-kf 0.65s linear infinite;
+  }
+  .app-main.ptr-releasing {
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
   @media (max-width: 900px) {
     .auth-split-shell {
       grid-template-columns: 1fr;
@@ -5458,6 +5515,9 @@
         <span class="brand-title">Bütçe Takip</span>
       </div>
       <div class="mobile-header-actions">
+        <button type="button" class="mobile-icon-btn" id="mobile-refresh-btn" title="Verileri Yenile">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
         <button type="button" class="mobile-icon-btn privacy-toggle-btn" title="Tutarları Gizle/Göster">
           <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
@@ -5473,8 +5533,19 @@
       </div>
     </header>
 
+    <!-- Mobile Pull-to-Refresh Indicator -->
+    <div class="ptr-indicator" id="ptr-indicator" aria-live="polite">
+      <span class="ptr-icon-wrap" id="ptr-icon-wrap">
+        <svg id="ptr-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+      </span>
+      <span id="ptr-text">Yenilemek için aşağı çekin</span>
+    </div>
+
     <!-- Main Content Workspace -->
-    <main class="app-main">
+    <main class="app-main" id="app-main-workspace">
       <!-- Sticky Desktop Workspace Header Bar -->
       <div class="workspace-topbar">
         <div class="topbar-breadcrumb">
@@ -12765,6 +12836,175 @@ document.addEventListener("keydown", (e) => {
     togglePrivacyMode();
   }
 });
+
+// ==========================================================================
+// Mobile Pull-to-Refresh (Aşağı Çekerek Yenileme) & Manual Refresh
+// ==========================================================================
+const PTR_ARROW_SVG = '<line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline>';
+const PTR_SPINNER_SVG = '<path d="M21 12a9 9 0 1 1-6.219-8.56"></path>';
+const PTR_CHECK_SVG = '<polyline points="20 6 9 17 4 12"></polyline>';
+
+let ptrStartY = 0;
+let ptrPullDistance = 0;
+let ptrIsDragging = false;
+let ptrIsRefreshing = false;
+let ptrHapticTriggered = false;
+
+async function triggerFullDataRefresh() {
+  if (ptrIsRefreshing) return;
+  ptrIsRefreshing = true;
+
+  const indicator = document.getElementById("ptr-indicator");
+  const iconWrap = document.getElementById("ptr-icon-wrap");
+  const svgEl = document.getElementById("ptr-svg");
+  const textEl = document.getElementById("ptr-text");
+  const mainEl = document.getElementById("app-main-workspace");
+
+  if (indicator) {
+    indicator.classList.remove("pulling", "ready");
+    indicator.classList.add("refreshing");
+    indicator.style.opacity = "1";
+    indicator.style.transform = "translate(-50%, 54px) scale(1)";
+  }
+  if (iconWrap) iconWrap.style.transform = "rotate(0deg)";
+  if (svgEl) svgEl.innerHTML = PTR_SPINNER_SVG;
+  if (textEl) textEl.textContent = "Veriler güncelleniyor…";
+  if (mainEl) {
+    mainEl.classList.add("ptr-releasing");
+    mainEl.style.transform = "translateY(38px)";
+  }
+
+  if (navigator.vibrate) {
+    try { navigator.vibrate(18); } catch (_) {}
+  }
+
+  try {
+    await Promise.all([
+      loadOverview(),
+      loadTransactions(true),
+      loadSubscriptions(),
+      loadRecurring(),
+      loadCards(),
+      loadCategories(),
+      loadCategoryChart(),
+      loadTrendChart(),
+      loadBudgets(),
+      loadInstallments(),
+    ]);
+  } catch (_) {}
+
+  if (svgEl) svgEl.innerHTML = PTR_CHECK_SVG;
+  if (textEl) textEl.textContent = "Güncellendi";
+
+  setTimeout(() => {
+    if (indicator) {
+      indicator.classList.remove("refreshing");
+      indicator.style.opacity = "0";
+      indicator.style.transform = "translate(-50%, -90px) scale(0.92)";
+    }
+    if (mainEl) {
+      mainEl.style.transform = "";
+      setTimeout(() => mainEl.classList.remove("ptr-releasing"), 320);
+    }
+    if (svgEl) svgEl.innerHTML = PTR_ARROW_SVG;
+    ptrIsRefreshing = false;
+  }, 550);
+}
+
+const mobileRefreshBtn = document.getElementById("mobile-refresh-btn");
+if (mobileRefreshBtn) {
+  mobileRefreshBtn.addEventListener("click", () => triggerFullDataRefresh());
+}
+
+window.addEventListener("touchstart", (e) => {
+  if (ptrIsRefreshing) return;
+  const appView = document.getElementById("app-view");
+  if (!appView || appView.style.display === "none") return;
+  const anyModalOpen = Array.from(document.querySelectorAll(".tx-modal-overlay, #cmd-palette-overlay")).some(
+    (el) => el.style.display && el.style.display !== "none"
+  );
+  if (anyModalOpen) return;
+  if (window.scrollY > 2) return;
+
+  ptrStartY = e.touches[0].clientY;
+  ptrPullDistance = 0;
+  ptrIsDragging = true;
+  ptrHapticTriggered = false;
+}, { passive: true });
+
+window.addEventListener("touchmove", (e) => {
+  if (!ptrIsDragging || ptrIsRefreshing) return;
+  if (window.scrollY > 2) {
+    ptrIsDragging = false;
+    return;
+  }
+
+  const currentY = e.touches[0].clientY;
+  const rawDelta = currentY - ptrStartY;
+  if (rawDelta <= 6) return;
+
+  ptrPullDistance = Math.min(115, Math.pow(rawDelta - 6, 0.8) * 2.2);
+  const threshold = 64;
+  const isReady = ptrPullDistance >= threshold;
+
+  const indicator = document.getElementById("ptr-indicator");
+  const iconWrap = document.getElementById("ptr-icon-wrap");
+  const textEl = document.getElementById("ptr-text");
+  const mainEl = document.getElementById("app-main-workspace");
+
+  if (indicator) {
+    indicator.classList.add("pulling");
+    indicator.classList.toggle("ready", isReady);
+    const yPos = Math.min(62, ptrPullDistance - 24);
+    const progress = Math.min(1, ptrPullDistance / threshold);
+    indicator.style.opacity = String(Math.min(1, progress * 1.15));
+    indicator.style.transform = `translate(-50%, ${yPos}px) scale(${0.92 + progress * 0.08})`;
+  }
+  if (iconWrap) {
+    const deg = isReady ? 180 : Math.min(180, Math.round((ptrPullDistance / threshold) * 180));
+    iconWrap.style.transform = `rotate(${deg}deg)`;
+  }
+  if (textEl) {
+    textEl.textContent = isReady ? "Bırakın, yenilensin" : "Yenilemek için aşağı çekin";
+  }
+  if (mainEl) {
+    mainEl.classList.remove("ptr-releasing");
+    mainEl.style.transform = `translateY(${Math.round(ptrPullDistance * 0.48)}px)`;
+  }
+
+  if (isReady && !ptrHapticTriggered) {
+    ptrHapticTriggered = true;
+    if (navigator.vibrate) {
+      try { navigator.vibrate(12); } catch (_) {}
+    }
+  } else if (!isReady && ptrHapticTriggered) {
+    ptrHapticTriggered = false;
+  }
+}, { passive: true });
+
+window.addEventListener("touchend", () => {
+  if (!ptrIsDragging || ptrIsRefreshing) return;
+  ptrIsDragging = false;
+
+  const threshold = 64;
+  if (ptrPullDistance >= threshold) {
+    triggerFullDataRefresh();
+  } else {
+    const indicator = document.getElementById("ptr-indicator");
+    const mainEl = document.getElementById("app-main-workspace");
+    if (indicator) {
+      indicator.classList.remove("pulling", "ready");
+      indicator.style.opacity = "0";
+      indicator.style.transform = "translate(-50%, -90px) scale(0.92)";
+    }
+    if (mainEl) {
+      mainEl.classList.add("ptr-releasing");
+      mainEl.style.transform = "";
+      setTimeout(() => mainEl.classList.remove("ptr-releasing"), 320);
+    }
+  }
+  ptrPullDistance = 0;
+}, { passive: true });
 
 (async function init() {
   const response = await fetch(API + "/me", { credentials: "same-origin" });
