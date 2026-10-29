@@ -5069,6 +5069,196 @@
     border-radius: 6px;
   }
 
+  /* Bank Statement PDF Parser Modal */
+  .statement-modal-sheet {
+    max-width: 680px;
+    width: 95%;
+  }
+  .statement-dropzone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-lg, 16px);
+    padding: 36px 20px;
+    text-align: center;
+    background: var(--input-bg);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .statement-dropzone:hover, .statement-dropzone.drag-over {
+    border-color: var(--accent);
+    background: var(--card-solid);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+  }
+  .dropzone-icon {
+    font-size: 38px;
+    margin-bottom: 8px;
+  }
+  .dropzone-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .dropzone-desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .supported-banks-strip {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .supported-banks-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .bank-pills-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .bank-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .statement-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: spin-kf 0.7s linear infinite;
+  }
+  @keyframes spin-kf {
+    to { transform: rotate(360deg); }
+  }
+  .statement-detected-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .statement-bank-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    color: var(--text);
+  }
+  .statement-card-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .statement-summary-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .statement-stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .statement-stat-lbl {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .statement-stat-val {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: var(--text);
+    font-feature-settings: "tnum";
+  }
+  .statement-stat-val.expense { color: var(--danger); }
+  .statement-stat-val.income { color: var(--success); }
+  .statement-table-wrap {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--card);
+  }
+  .statement-table-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--input-bg);
+    border-bottom: 1px solid var(--border);
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .statement-rows-list {
+    max-height: 280px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .statement-row-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    transition: background 0.12s ease;
+  }
+  .statement-row-item:last-child {
+    border-bottom: none;
+  }
+  .statement-row-item:hover {
+    background: var(--input-bg);
+  }
+  .statement-row-item.excluded {
+    opacity: 0.45;
+  }
+  .statement-row-desc {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .statement-row-text {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text);
+  }
+  .statement-row-inst-badge {
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--info-bg);
+    color: var(--info);
+    padding: 1px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    width: fit-content;
+  }
+
   @media (max-width: 900px) {
     .auth-split-shell {
       grid-template-columns: 1fr;
@@ -5700,6 +5890,9 @@
                 ⬆️ İçe aktar
                 <input type="file" id="import-csv-input" accept=".csv" style="display:none;">
               </label>
+              <button type="button" class="btn-primary btn-small open-statement-modal-btn" style="margin:0; width:auto;">
+                📄 Ekstre Yükle (PDF)
+              </button>
             </div>
           </div>
         </div>
@@ -5900,10 +6093,15 @@
           <h2 class="wallet-title">Cüzdan & Kartlarım</h2>
           <p class="wallet-subtitle">Kredi kartı limitleri, borç dağılımı ve ekstre ödeme takvimi</p>
         </div>
-        <button type="button" class="btn-primary wallet-action-btn" id="open-card-modal-btn">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span>Yeni Kart Ekle</span>
-        </button>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button type="button" class="btn-ghost wallet-action-btn open-statement-modal-btn" style="border-color:var(--border);">
+            📄 Ekstre Yükle (PDF)
+          </button>
+          <button type="button" class="btn-primary wallet-action-btn" id="open-card-modal-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Yeni Kart Ekle</span>
+          </button>
+        </div>
       </div>
 
       <!-- Wallet Summary (Prompt 8B) -->
@@ -6811,6 +7009,117 @@
 
         <div class="modal-actions-row" style="margin-top: 20px;">
           <button type="button" class="btn-primary" id="card-txs-close-btn">Kapat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bank Statement (PDF) Upload & Auto-Categorization Modal -->
+  <div class="tx-modal-overlay" id="statement-modal-overlay" style="display:none;" aria-hidden="true">
+    <div class="tx-modal-backdrop" id="statement-modal-backdrop"></div>
+    <div class="tx-modal-sheet statement-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="statement-form-title">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="tx-modal-header">
+        <div class="tx-modal-title-group">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:20px;">📄</span>
+            <h3 class="tx-modal-title" id="statement-form-title">Banka Ekstresi Yükle (PDF)</h3>
+          </div>
+          <p class="tx-modal-subtitle">Kart ekstrenizi yükleyin; harcamalar otomatik okunup kategorize edilsin</p>
+        </div>
+        <button type="button" class="tx-modal-close" id="statement-modal-close-btn" aria-label="Pencereyi kapat">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="tx-modal-body">
+        <!-- Step 1: Upload Dropzone Area -->
+        <div id="statement-upload-step">
+          <div class="statement-dropzone" id="statement-dropzone">
+            <input type="file" id="statement-file-input" accept=".pdf" style="display:none;">
+            <div class="dropzone-icon">📥</div>
+            <div class="dropzone-title">PDF Ekstrenizi Sürükleyin veya Seçin</div>
+            <div class="dropzone-desc">Garanti BBVA, İş Bankası, Yapı Kredi, Akbank, Enpara, QNB, Ziraat vb.</div>
+            <button type="button" class="btn-primary btn-small" id="statement-browse-btn" style="width:auto; margin-top:12px;">
+              Dosya Seç (.pdf)
+            </button>
+          </div>
+
+          <div class="supported-banks-strip">
+            <span class="supported-banks-title">Uyumlu Bankalar:</span>
+            <div class="bank-pills-row">
+              <span class="bank-pill">Garanti BBVA</span>
+              <span class="bank-pill">İş Bankası</span>
+              <span class="bank-pill">Yapı Kredi</span>
+              <span class="bank-pill">Akbank</span>
+              <span class="bank-pill">Enpara</span>
+              <span class="bank-pill">QNB</span>
+              <span class="bank-pill">Ziraat</span>
+              <span class="bank-pill">+ Diğer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="statement-loading-step" style="display:none; text-align:center; padding:36px 16px;">
+          <div class="statement-spinner"></div>
+          <div style="font-weight:700; margin-top:14px; font-size:14px;" id="statement-loading-text">Ekstre taranıyor ve harcamalar kategorize ediliyor…</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">Lütfen bekleyin</div>
+        </div>
+
+        <!-- Step 2: Preview & Confirmation Step -->
+        <div id="statement-preview-step" style="display:none;">
+          <div class="statement-detected-bar">
+            <div class="statement-bank-tag">
+              <span>🏦</span>
+              <strong id="statement-detected-bank">Banka</strong>
+            </div>
+            <div class="statement-card-select-wrap">
+              <label for="statement-card-select" style="margin:0; font-size:11.5px;">Kart ile eşle:</label>
+              <select id="statement-card-select" style="margin:0; height:32px; font-size:12px; padding:4px 8px;">
+                <option value="">Karta bağlama (Genel)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Summary Strip -->
+          <div class="statement-summary-strip">
+            <div class="statement-stat">
+              <span class="statement-stat-lbl">İşlem Sayısı</span>
+              <span class="statement-stat-val" id="statement-stat-count">0</span>
+            </div>
+            <div class="statement-stat">
+              <span class="statement-stat-lbl">Toplam Harcama</span>
+              <span class="statement-stat-val expense" id="statement-stat-expense">0,00 ₺</span>
+            </div>
+            <div class="statement-stat">
+              <span class="statement-stat-lbl">Toplam Ödeme / İade</span>
+              <span class="statement-stat-val income" id="statement-stat-income">0,00 ₺</span>
+            </div>
+          </div>
+
+          <!-- Parsed Rows Scroll Area -->
+          <div class="statement-table-wrap">
+            <div class="statement-table-header">
+              <span style="width:30px;"><input type="checkbox" id="statement-select-all" checked title="Tümünü seç / kaldır"></span>
+              <span style="width:80px;">Tarih</span>
+              <span style="flex:1;">Açıklama &amp; Taksit</span>
+              <span style="width:130px;">Kategori</span>
+              <span style="width:90px; text-align:right;">Tutar</span>
+            </div>
+            <div id="statement-rows-list" class="statement-rows-list"></div>
+          </div>
+
+          <!-- Actions -->
+          <div class="modal-actions-row" style="margin-top:16px;">
+            <button type="button" class="btn-ghost" id="statement-back-btn">Farklı Dosya Seç</button>
+            <button type="button" class="btn-primary" id="statement-confirm-btn">
+              Seçilenleri İçe Aktar
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -11822,6 +12131,345 @@ document.querySelectorAll(".logout-trigger").forEach((btn) => {
 });
 
 // ==========================================================================
+// Bank Statement PDF Parser & Auto-Categorization Modal
+// ==========================================================================
+let parsedStatementData = null;
+
+function openStatementModal() {
+  const overlay = document.getElementById("statement-modal-overlay");
+  if (!overlay) return;
+
+  const uploadStep = document.getElementById("statement-upload-step");
+  const loadingStep = document.getElementById("statement-loading-step");
+  const previewStep = document.getElementById("statement-preview-step");
+  const fileInput = document.getElementById("statement-file-input");
+
+  if (uploadStep) uploadStep.style.display = "block";
+  if (loadingStep) loadingStep.style.display = "none";
+  if (previewStep) previewStep.style.display = "none";
+  if (fileInput) fileInput.value = "";
+  parsedStatementData = null;
+
+  const cardSelect = document.getElementById("statement-card-select");
+  if (cardSelect) {
+    let opts = '<option value="">Karta bağlama (Genel)</option>';
+    (cachedCreditCards || []).forEach((c) => {
+      const title = c.card_name ? `${c.bank_name} · ${c.card_name}` : c.bank_name;
+      opts += `<option value="${c.id}">${escapeHtml(title)}</option>`;
+    });
+    cardSelect.innerHTML = opts;
+  }
+
+  overlay.style.display = "flex";
+  overlay.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeStatementModal() {
+  const overlay = document.getElementById("statement-modal-overlay");
+  if (overlay) {
+    overlay.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
+    const otherModalOpen = Array.from(document.querySelectorAll(".tx-modal-overlay")).some(
+      (el) => el.id !== "statement-modal-overlay" && el.style.display && el.style.display !== "none"
+    );
+    if (!otherModalOpen) document.body.style.overflow = "";
+  }
+}
+
+document.querySelectorAll(".open-statement-modal-btn").forEach((btn) => {
+  btn.addEventListener("click", openStatementModal);
+});
+
+const stmtCloseBtn = document.getElementById("statement-modal-close-btn");
+if (stmtCloseBtn) stmtCloseBtn.addEventListener("click", closeStatementModal);
+const stmtBackdrop = document.getElementById("statement-modal-backdrop");
+if (stmtBackdrop) stmtBackdrop.addEventListener("click", closeStatementModal);
+
+const stmtBackBtn = document.getElementById("statement-back-btn");
+if (stmtBackBtn) {
+  stmtBackBtn.addEventListener("click", () => {
+    document.getElementById("statement-upload-step").style.display = "block";
+    document.getElementById("statement-preview-step").style.display = "none";
+  });
+}
+
+const stmtBrowseBtn = document.getElementById("statement-browse-btn");
+const stmtFileInput = document.getElementById("statement-file-input");
+const stmtDropzone = document.getElementById("statement-dropzone");
+
+if (stmtBrowseBtn && stmtFileInput) {
+  stmtBrowseBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    stmtFileInput.click();
+  });
+}
+if (stmtDropzone && stmtFileInput) {
+  stmtDropzone.addEventListener("click", () => stmtFileInput.click());
+  stmtDropzone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    stmtDropzone.classList.add("drag-over");
+  });
+  stmtDropzone.addEventListener("dragleave", () => stmtDropzone.classList.remove("drag-over"));
+  stmtDropzone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    stmtDropzone.classList.remove("drag-over");
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleStatementFile(e.dataTransfer.files[0]);
+    }
+  });
+}
+
+if (stmtFileInput) {
+  stmtFileInput.addEventListener("change", () => {
+    if (stmtFileInput.files && stmtFileInput.files.length > 0) {
+      handleStatementFile(stmtFileInput.files[0]);
+    }
+  });
+}
+
+async function handleStatementFile(file) {
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith(".pdf")) {
+    showToast("Lütfen sadece .PDF formatında ekstre dosyası seçin.", "warning");
+    return;
+  }
+
+  const uploadStep = document.getElementById("statement-upload-step");
+  const loadingStep = document.getElementById("statement-loading-step");
+  const previewStep = document.getElementById("statement-preview-step");
+  if (uploadStep) uploadStep.style.display = "none";
+  if (loadingStep) loadingStep.style.display = "block";
+  if (previewStep) previewStep.style.display = "none";
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await apiFetch("/statements/parse-pdf", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      showToast(err.detail || "Ekstre okunamadı. Lütfen geçerli bir PDF ekstresi yükleyin.", "error");
+      if (uploadStep) uploadStep.style.display = "block";
+      if (loadingStep) loadingStep.style.display = "none";
+      return;
+    }
+
+    const data = await response.json();
+    parsedStatementData = data;
+    renderStatementPreview(data);
+  } catch (err) {
+    showToast("Bağlantı hatası: " + (err.message || "Ekstre yüklenemedi"), "error");
+    if (uploadStep) uploadStep.style.display = "block";
+    if (loadingStep) loadingStep.style.display = "none";
+  }
+}
+
+function renderStatementPreview(data) {
+  const uploadStep = document.getElementById("statement-upload-step");
+  const loadingStep = document.getElementById("statement-loading-step");
+  const previewStep = document.getElementById("statement-preview-step");
+  if (uploadStep) uploadStep.style.display = "none";
+  if (loadingStep) loadingStep.style.display = "none";
+  if (previewStep) previewStep.style.display = "block";
+
+  const bankEl = document.getElementById("statement-detected-bank");
+  if (bankEl) bankEl.textContent = data.bank_name || "Banka Ekstresi";
+
+  const cardSelect = document.getElementById("statement-card-select");
+  if (cardSelect && data.bank_name) {
+    const normBank = data.bank_name.toLowerCase();
+    const matched = (cachedCreditCards || []).find((c) =>
+      c.bank_name && (normBank.includes(c.bank_name.toLowerCase()) || c.bank_name.toLowerCase().includes(normBank))
+    );
+    if (matched) cardSelect.value = String(matched.id);
+  }
+
+  const rowsList = document.getElementById("statement-rows-list");
+  if (!rowsList) return;
+
+  if (!data.transactions || data.transactions.length === 0) {
+    rowsList.innerHTML = `<div style="padding:24px; text-align:center; color:var(--muted); font-size:13px;">Bu PDF belgesinde okunabilir ekstre satırı tespit edilemedi.</div>`;
+    updateStatementSummaryStats();
+    return;
+  }
+
+  const standardCategories = [
+    "Market", "Yeme & İçme", "Ulaşım & Akaryakıt", "Abonelikler",
+    "Faturalar", "Alışveriş & Giyim", "Teknoloji & Elektronik",
+    "Sağlık & Kozmetik", "Eğitim", "Eğlence & Sosyal", "Gelir", "Diğer"
+  ];
+  const userCatNames = (cachedCategories || []).map((c) => c.name);
+  const allCats = Array.from(new Set([...userCatNames, ...standardCategories]));
+
+  let html = "";
+  data.transactions.forEach((tx, idx) => {
+    const isInc = tx.type === "income";
+    const amtColor = isInc ? "var(--success)" : "var(--danger)";
+    const amtSign = isInc ? "+" : "-";
+    const instBadge = tx.installment_info
+      ? `<span class="statement-row-inst-badge">💳 Taksit: ${escapeHtml(tx.installment_info)}</span>`
+      : "";
+
+    let catOpts = "";
+    allCats.forEach((c) => {
+      const isSel = c === tx.suggested_category;
+      catOpts += `<option value="${escapeHtml(c)}"${isSel ? " selected" : ""}>${escapeHtml(c)}</option>`;
+    });
+
+    html += `
+      <div class="statement-row-item" data-idx="${idx}">
+        <span style="width:30px;">
+          <input type="checkbox" class="stmt-tx-check" data-idx="${idx}" checked>
+        </span>
+        <span style="width:80px; font-weight:600; color:var(--muted);">${escapeHtml(formatDateTr(tx.occurred_on))}</span>
+        <div style="flex:1;" class="statement-row-desc">
+          <span class="statement-row-text" title="${escapeHtml(tx.description)}">${escapeHtml(tx.description)}</span>
+          ${instBadge}
+        </div>
+        <span style="width:130px;">
+          <select class="stmt-tx-cat" data-idx="${idx}" style="margin:0; height:28px; font-size:11.5px; padding:2px 6px;">
+            ${catOpts}
+          </select>
+        </span>
+        <span style="width:90px; text-align:right; font-weight:700; color:${amtColor}; font-feature-settings:'tnum';">
+          ${amtSign}${formatMoney(tx.amount)}
+        </span>
+      </div>
+    `;
+  });
+
+  rowsList.innerHTML = html;
+
+  rowsList.querySelectorAll(".stmt-tx-check").forEach((chk) => {
+    chk.addEventListener("change", () => {
+      const row = chk.closest(".statement-row-item");
+      if (row) row.classList.toggle("excluded", !chk.checked);
+      updateStatementSummaryStats();
+    });
+  });
+
+  const selectAll = document.getElementById("statement-select-all");
+  if (selectAll) {
+    selectAll.checked = true;
+    selectAll.onchange = () => {
+      rowsList.querySelectorAll(".stmt-tx-check").forEach((chk) => {
+        chk.checked = selectAll.checked;
+        const row = chk.closest(".statement-row-item");
+        if (row) row.classList.toggle("excluded", !chk.checked);
+      });
+      updateStatementSummaryStats();
+    };
+  }
+
+  updateStatementSummaryStats();
+}
+
+function updateStatementSummaryStats() {
+  if (!parsedStatementData || !parsedStatementData.transactions) return;
+  const rowsList = document.getElementById("statement-rows-list");
+  if (!rowsList) return;
+
+  const checkboxes = Array.from(rowsList.querySelectorAll(".stmt-tx-check"));
+  let activeCount = 0;
+  let totalExpense = 0;
+  let totalIncome = 0;
+
+  checkboxes.forEach((chk) => {
+    if (chk.checked) {
+      activeCount++;
+      const idx = parseInt(chk.getAttribute("data-idx") || "0", 10);
+      const tx = parsedStatementData.transactions[idx];
+      if (tx) {
+        if (tx.type === "expense") totalExpense += tx.amount;
+        else totalIncome += tx.amount;
+      }
+    }
+  });
+
+  const countEl = document.getElementById("statement-stat-count");
+  const expEl = document.getElementById("statement-stat-expense");
+  const incEl = document.getElementById("statement-stat-income");
+  const confirmBtn = document.getElementById("statement-confirm-btn");
+
+  if (countEl) countEl.textContent = `${activeCount} / ${parsedStatementData.transactions.length}`;
+  if (expEl) expEl.textContent = `-${formatMoney(totalExpense)} ₺`;
+  if (incEl) incEl.textContent = `+${formatMoney(totalIncome)} ₺`;
+  if (confirmBtn) {
+    confirmBtn.disabled = activeCount === 0;
+    confirmBtn.textContent = activeCount > 0 ? `${activeCount} İşlemi Hesaba Aktar` : "Seçili İşlem Yok";
+  }
+}
+
+const stmtConfirmBtn = document.getElementById("statement-confirm-btn");
+if (stmtConfirmBtn) {
+  stmtConfirmBtn.addEventListener("click", async () => {
+    if (!parsedStatementData || !parsedStatementData.transactions) return;
+    const rowsList = document.getElementById("statement-rows-list");
+    if (!rowsList) return;
+
+    const selectedTransactions = [];
+    rowsList.querySelectorAll(".stmt-tx-check").forEach((chk) => {
+      if (chk.checked) {
+        const idx = parseInt(chk.getAttribute("data-idx") || "0", 10);
+        const tx = parsedStatementData.transactions[idx];
+        const catSelect = rowsList.querySelector(`.stmt-tx-cat[data-idx="${idx}"]`);
+        const cat = catSelect ? catSelect.value : tx.suggested_category;
+        if (tx) {
+          selectedTransactions.push({
+            occurred_on: tx.occurred_on,
+            description: tx.description,
+            amount: tx.amount,
+            type: tx.type,
+            category: cat || null,
+          });
+        }
+      }
+    });
+
+    if (selectedTransactions.length === 0) {
+      showToast("Lütfen içe aktarmak için en az bir işlem seçin.", "warning");
+      return;
+    }
+
+    const cardSelect = document.getElementById("statement-card-select");
+    const creditCardId = cardSelect && cardSelect.value ? parseInt(cardSelect.value, 10) : null;
+
+    stmtConfirmBtn.disabled = true;
+    stmtConfirmBtn.textContent = "Kaydediliyor…";
+
+    const ok = await apiWrite(
+      "/statements/confirm-import",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          credit_card_id: creditCardId,
+          transactions: selectedTransactions,
+        }),
+      },
+      `${selectedTransactions.length} ekstre işlemi başarıyla hesabınıza kaydedildi!`
+    );
+
+    stmtConfirmBtn.disabled = false;
+    if (ok) {
+      closeStatementModal();
+      loadOverview();
+      loadTransactions(true);
+      loadCards();
+      loadCategoryChart();
+      loadTrendChart();
+    } else {
+      stmtConfirmBtn.textContent = "Tekrar Dene";
+    }
+  });
+}
+
+// ==========================================================================
 // Global Command Palette (Ctrl+K) & Power-User Keyboard Shortcuts
 // ==========================================================================
 let cmdActiveIndex = 0;
@@ -11875,6 +12523,14 @@ function getCommandPaletteCatalog(query = "") {
       sub: "Düzenli dijital servis aboneliği tanımla",
       shortcut: "",
       action: () => openSubModal(null),
+    },
+    {
+      group: "Hızlı İşlemler",
+      icon: "📄",
+      title: "Banka Ekstresi Yükle (PDF)",
+      sub: "Kredi kartı ekstresini otomatik tara ve aktar",
+      shortcut: "PDF",
+      action: () => openStatementModal(),
     },
     {
       group: "Görünüm & Araçlar",
