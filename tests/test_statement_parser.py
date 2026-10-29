@@ -98,3 +98,44 @@ def test_parse_pdf_statement_in_memory():
 
     # Payment row
     assert txs[4]["type"] == "income"
+
+
+def test_parse_pdf_statement_multiline_and_payment_processors():
+    doc = pymupdf.open()
+    page = doc.new_page()
+
+    # Simulate complex statement rows:
+    # 1. Payment processor expense (PAYTR ODEME / IYZICO / FATURA ODEME) must stay 'expense'
+    # 2. Multi-line wrapped description (Date on line 1, Desc on line 2 & 3, Amount on line 4)
+    # 3. Trailing bonus/points column after amount
+    text_lines = [
+        "YAPI VE KREDI WORLDCARD HESAP OZETI",
+        "03.10.2026 PAYTR ODEME HIZMETLERI ISTANBUL 1.850,00 TL",
+        "06.10.2026 IYZICO / AMAZON.COM.TR 2.400,00 TL 12,00 Puan",
+        "09.10.2026 OTOMATIK FATURA ODEME TURKCELL 450,00 TL",
+        "11.10.2026",
+        "12.10.2026",
+        "BOYNER BUYUK MAGAZACILIK",
+        "ISTANBUL TR (2/6)",
+        "1.750,00 TL",
+    ]
+
+    y = 40
+    for line in text_lines:
+        page.insert_text((45, y), line, fontsize=10)
+        y += 22
+
+    pdf_bytes = doc.write()
+    doc.close()
+
+    result = parse_pdf_statement(pdf_bytes)
+    assert result["bank_name"] == "Yapı Kredi"
+    assert result["total_found"] == 4
+
+    txs = result["transactions"]
+    # All 4 should be expenses, none misclassified as income!
+    assert all(t["type"] == "expense" for t in txs)
+    total_exp = sum(t["amount"] for t in txs)
+    assert total_exp == pytest.approx(1850.0 + 2400.0 + 450.0 + 1750.0)
+    assert txs[3]["installment_info"] == "2/6"
+
