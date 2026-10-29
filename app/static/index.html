@@ -12303,7 +12303,7 @@ function renderStatementPreview(data) {
     "Faturalar", "Alışveriş & Giyim", "Teknoloji & Elektronik",
     "Sağlık & Kozmetik", "Eğitim", "Eğlence & Sosyal", "Gelir", "Diğer"
   ];
-  const userCatNames = (cachedCategories || []).map((c) => c.name);
+  const userCatNames = (typeof cachedCategoriesList !== "undefined" ? cachedCategoriesList : []).map((c) => c.name);
   const allCats = Array.from(new Set([...userCatNames, ...standardCategories]));
 
   let html = "";
