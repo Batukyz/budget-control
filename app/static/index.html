@@ -169,7 +169,20 @@
   body.privacy-mode .trend-num,
   body.privacy-mode .alert-amount,
   body.privacy-mode .wallet-due-amount,
-  body.privacy-mode .ledger-kpi-val {
+  body.privacy-mode .ledger-kpi-val,
+  body.privacy-mode .donut-center-val,
+  body.privacy-mode .date-header-summary,
+  body.privacy-mode .budget-metric .metric-val,
+  body.privacy-mode .budget-diff-label,
+  body.privacy-mode .inst-metric-item .val,
+  body.privacy-mode .cc-meta-val,
+  body.privacy-mode .cc-progress-labels,
+  body.privacy-mode .card-tx-amount,
+  body.privacy-mode #card-txs-debt-val,
+  body.privacy-mode #card-txs-avail-val,
+  body.privacy-mode #pay-debt-current-debt,
+  body.privacy-mode .installment-detail-cell-val,
+  body.privacy-mode .installment-schedule-amount {
     filter: blur(8px);
     user-select: none;
     transition: filter 0.22s ease;
@@ -186,8 +199,101 @@
   body.privacy-mode .inst-bubble-total:hover,
   body.privacy-mode .sub-amount:hover,
   body.privacy-mode .recurring-amount:hover,
-  body.privacy-mode .ledger-kpi-val:hover {
+  body.privacy-mode .ledger-kpi-val:hover,
+  body.privacy-mode .donut-center-val:hover,
+  body.privacy-mode .date-header-summary:hover,
+  body.privacy-mode .budget-metric .metric-val:hover,
+  body.privacy-mode .budget-diff-label:hover,
+  body.privacy-mode .inst-metric-item .val:hover,
+  body.privacy-mode .cc-meta-val:hover,
+  body.privacy-mode .cc-progress-labels:hover,
+  body.privacy-mode .card-tx-amount:hover,
+  body.privacy-mode #card-txs-debt-val:hover,
+  body.privacy-mode #card-txs-avail-val:hover,
+  body.privacy-mode #pay-debt-current-debt:hover,
+  body.privacy-mode .installment-detail-cell-val:hover,
+  body.privacy-mode .installment-schedule-amount:hover {
     filter: blur(0);
+  }
+
+  /* Password Show/Hide Input Wrapper & Chart Type Toggle */
+  .password-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .password-input-wrap input {
+    width: 100%;
+    padding-right: 42px !important;
+  }
+  .password-toggle-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent !important;
+    border: none !important;
+    color: var(--muted);
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: none !important;
+    transition: color 0.15s ease, background-color 0.15s ease;
+  }
+  .password-toggle-btn:hover {
+    color: var(--text);
+    background: rgba(100, 116, 139, 0.12) !important;
+    transform: translateY(-50%) !important;
+  }
+  .chart-header-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chart-type-toggle {
+    display: inline-flex;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px;
+    gap: 2px;
+  }
+  .chart-type-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    cursor: pointer;
+    height: 22px;
+    margin: 0;
+    width: auto;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .chart-type-btn.active {
+    background: var(--card-solid);
+    color: var(--text);
+    box-shadow: var(--shadow-xs);
+  }
+  .metric-card[role="button"] {
+    cursor: pointer;
+    user-select: none;
+  }
+  .topbar-status-pill {
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+  .topbar-status-pill:hover {
+    filter: brightness(0.96);
+    transform: translateY(-1px);
   }
 
   /* Sleek Modern Scrollbars */
@@ -5531,9 +5637,12 @@
             <label for="login-email">E-posta Adresi</label>
             <input type="email" id="login-email" placeholder="ornek@eposta.com" required autocomplete="username">
             <label for="login-password">Şifre</label>
-            <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+            <span class="password-input-wrap">
+              <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+              <button type="button" class="password-toggle-btn" data-toggle-password="login-password" aria-label="Şifreyi göster/gizle" title="Şifreyi göster/gizle">👁️</button>
+            </span>
             <div class="error" id="login-error"></div>
-            <button type="submit" class="btn-primary">Giriş Yap →</button>
+            <button type="submit" class="btn-primary" id="login-submit-btn">Giriş Yap →</button>
           </form>
           <div class="toggle" style="text-align:center; margin-top:12px;">
             <button type="button" class="btn-ghost" id="show-register">Hesabın yok mu? Kayıt ol</button>
@@ -5545,10 +5654,16 @@
             <label for="register-email">E-posta Adresi</label>
             <input type="email" id="register-email" placeholder="ornek@eposta.com" required autocomplete="username">
             <label for="register-password">Şifre (en az 8 karakter)</label>
-            <input type="password" id="register-password" placeholder="En az 8 karakter" required minlength="8" autocomplete="new-password">
+            <span class="password-input-wrap">
+              <input type="password" id="register-password" placeholder="En az 8 karakter" required minlength="8" autocomplete="new-password">
+              <button type="button" class="password-toggle-btn" data-toggle-password="register-password" aria-label="Şifreyi göster/gizle" title="Şifreyi göster/gizle">👁️</button>
+            </span>
             <div class="error" id="register-error"></div>
-            <button type="submit" class="btn-primary">Kayıt Ol ve Başla →</button>
+            <button type="submit" class="btn-primary" id="register-submit-btn">Kayıt Ol ve Başla →</button>
           </form>
+          <div class="toggle" style="text-align:center; margin-top:12px;">
+            <button type="button" class="btn-ghost" id="show-login">Zaten hesabın var mı? Giriş yap</button>
+          </div>
         </div>
       </div>
     </div>
@@ -5676,7 +5791,7 @@
           <span class="topbar-crumb-root">Finans Merkezi</span>
           <span class="topbar-crumb-sep">/</span>
           <span class="topbar-crumb-current" id="topbar-crumb-title">Genel Bakış</span>
-          <div class="topbar-status-pill" title="Verileriniz güncel">
+          <div class="topbar-status-pill" id="topbar-status-pill" role="button" tabindex="0" title="Verileriniz güncel · Yenilemek için tıklayın">
             <span class="topbar-status-dot"></span>
             <span id="topbar-live-date">Canlı Senkron</span>
           </div>
@@ -5787,16 +5902,16 @@
 
           <!-- 2. Secondary Metrics Row (4-Column Bento Strip) -->
           <div class="dashboard-metrics-grid">
-            <div class="metric-card">
+            <div class="metric-card" id="metric-card-subs" role="button" tabindex="0" title="Abonelikleri yönetmek için tıklayın">
               <div class="metric-header">
                 <span class="metric-icon">🔁</span>
                 <span class="metric-title">Aylık Sabit Taahhüt</span>
               </div>
               <div class="metric-value" id="overview-subs">–</div>
-              <div class="metric-subtext">Aktif abonelik yükü</div>
+              <div class="metric-subtext">Aktif abonelik yükü →</div>
             </div>
 
-            <div class="metric-card">
+            <div class="metric-card" id="metric-card-budgets" role="button" tabindex="0" title="Bütçe limitlerini görüntülemek için tıklayın">
               <div class="metric-header">
                 <span class="metric-icon">🎯</span>
                 <span class="metric-title">Bütçe Durumu</span>
@@ -5807,7 +5922,7 @@
               </div>
             </div>
 
-            <div class="metric-card">
+            <div class="metric-card" id="metric-card-upcoming" role="button" tabindex="0" title="Yaklaşan ödemeleri görmek için tıklayın">
               <div class="metric-header">
                 <span class="metric-icon">⏰</span>
                 <span class="metric-title">7 Günlük Ödemeler</span>
@@ -5816,7 +5931,7 @@
               <div class="metric-subtext" id="overview-upcoming-sub">Yaklaşan işlem takvimi</div>
             </div>
 
-            <div class="metric-card">
+            <div class="metric-card" id="metric-card-wallet" role="button" tabindex="0" title="Cüzdan ve kartları açmak için tıklayın">
               <div class="metric-header">
                 <span class="metric-icon">💳</span>
                 <span class="metric-title">Kart & Taksit Yükü</span>
@@ -5886,7 +6001,13 @@
                     <span class="section-icon">📊</span>
                     <h3 class="section-title">Kategori Dağılımı</h3>
                   </div>
-                  <span class="chart-subtitle">Bu Ay</span>
+                  <span class="chart-header-controls">
+                    <span class="chart-type-toggle" role="group" aria-label="Kategori grafik türü">
+                      <button type="button" class="chart-type-btn active" id="cat-chart-type-expense" data-chart-type="expense">Gider</button>
+                      <button type="button" class="chart-type-btn" id="cat-chart-type-income" data-chart-type="income">Gelir</button>
+                    </span>
+                    <span class="chart-subtitle" id="category-chart-subtitle">Bu Ay</span>
+                  </span>
                 </div>
                 <div id="category-chart"></div>
               </div>
@@ -6249,6 +6370,10 @@
             <h3 class="subpanel-title">Taksitli Harcamalar</h3>
             <p class="subpanel-desc">Kredi kartı taksit planları, kalan borçlar ve ödeme takvimi</p>
           </div>
+          <button type="button" class="btn-primary plan-action-btn" id="open-plan-installment-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Yeni Taksitli Harcama</span>
+          </button>
         </div>
 
         <div class="planning-summary-grid" id="installment-summary-banner">
@@ -6457,7 +6582,10 @@
               </div>
               <div class="form-group">
                 <label for="account-password-input">Yeni Şifre</label>
-                <input type="password" id="account-password-input" minlength="8" placeholder="Değiştirmek istemiyorsanız boş bırakın" autocomplete="new-password">
+                <span class="password-input-wrap">
+                  <input type="password" id="account-password-input" minlength="8" placeholder="Değiştirmek istemiyorsanız boş bırakın" autocomplete="new-password">
+                  <button type="button" class="password-toggle-btn" data-toggle-password="account-password-input" aria-label="Şifreyi göster/gizle" title="Şifreyi göster/gizle">👁️</button>
+                </span>
                 <div class="form-hint">En az 8 karakter olmalıdır.</div>
               </div>
               <div class="error" id="account-error"></div>
@@ -6496,7 +6624,10 @@
             <form id="delete-account-form" class="settings-form">
               <div class="form-group">
                 <label for="delete-account-password-input">Onaylamak İçin Şifrenizi Girin</label>
-                <input type="password" id="delete-account-password-input" required placeholder="Mevcut şifreniz" autocomplete="current-password">
+                <span class="password-input-wrap">
+                  <input type="password" id="delete-account-password-input" required placeholder="Mevcut şifreniz" autocomplete="current-password">
+                  <button type="button" class="password-toggle-btn" data-toggle-password="delete-account-password-input" aria-label="Şifreyi göster/gizle" title="Şifreyi göster/gizle">👁️</button>
+                </span>
                 <div class="form-hint" style="color: var(--danger); font-weight: 500;">Bu işlem geri alınamaz!</div>
               </div>
               <div class="error" id="delete-account-error"></div>
@@ -7886,32 +8017,84 @@ if (heroQaIncome) {
     setTxType("income");
   });
 }
-const heroQaInstallment = document.getElementById("hero-qa-installment");
-if (heroQaInstallment) {
-  heroQaInstallment.addEventListener("click", () => {
-    openTxModal(null);
-    setTxType("expense");
-    const advFields = document.getElementById("tx-advanced-fields");
-    const advToggle = document.getElementById("tx-advanced-toggle");
-    const advText = document.getElementById("tx-advanced-toggle-text");
-    if (advFields) advFields.style.display = "block";
-    if (advToggle) {
-      advToggle.classList.add("open");
-      advToggle.setAttribute("aria-expanded", "true");
-    }
-    if (advText) advText.textContent = "Daha az seçenek";
-    const ccSelect = document.getElementById("tx-credit-card");
-    if (ccSelect && ccSelect.options.length > 1 && !ccSelect.value) {
+function openInstallmentQuickAddModal(preselectedCardId = null) {
+  openTxModal(null);
+  setTxType("expense");
+  const advFields = document.getElementById("tx-advanced-fields");
+  const advToggle = document.getElementById("tx-advanced-toggle");
+  const advText = document.getElementById("tx-advanced-toggle-text");
+  if (advFields) advFields.style.display = "block";
+  if (advToggle) {
+    advToggle.classList.add("open");
+    advToggle.setAttribute("aria-expanded", "true");
+  }
+  if (advText) advText.textContent = "Daha az seçenek";
+  const ccSelect = document.getElementById("tx-credit-card");
+  if (ccSelect) {
+    if (preselectedCardId) {
+      ccSelect.value = String(preselectedCardId);
+    } else if (ccSelect.options.length > 1 && !ccSelect.value) {
       ccSelect.selectedIndex = 1;
     }
-    const instSelect = document.getElementById("tx-installments");
-    if (instSelect) instSelect.value = "3";
-    updateInstallmentFieldVisibility();
-  });
+  }
+  const instSelect = document.getElementById("tx-installments");
+  if (instSelect) instSelect.value = "3";
+  updateInstallmentFieldVisibility();
+}
+
+const heroQaInstallment = document.getElementById("hero-qa-installment");
+if (heroQaInstallment) {
+  heroQaInstallment.addEventListener("click", () => openInstallmentQuickAddModal());
+}
+const openPlanInstBtn = document.getElementById("open-plan-installment-btn");
+if (openPlanInstBtn) {
+  openPlanInstBtn.addEventListener("click", () => openInstallmentQuickAddModal());
 }
 const heroQaBudget = document.getElementById("hero-qa-budget");
 if (heroQaBudget) {
   heroQaBudget.addEventListener("click", () => openBudgetModal(null));
+}
+
+// Interactive Dashboard Metric Cards (4-Column Bento Strip)
+function bindMetricCardAction(id, actionFn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener("click", actionFn);
+  el.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      actionFn();
+    }
+  });
+}
+bindMetricCardAction("metric-card-subs", () => setActiveTab("subscriptions"));
+bindMetricCardAction("metric-card-budgets", () => setActiveTab("budgets"));
+bindMetricCardAction("metric-card-upcoming", () => {
+  const upcomingCard = document.getElementById("upcoming-card");
+  if (upcomingCard) upcomingCard.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+bindMetricCardAction("metric-card-wallet", () => setActiveTab("wallet"));
+
+function updateLiveSyncTimestamp() {
+  const liveDateEl = document.getElementById("topbar-live-date");
+  if (!liveDateEl) return;
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+  liveDateEl.textContent = `Canlı · ${hh}:${mm}`;
+}
+
+const topbarStatusPill = document.getElementById("topbar-status-pill");
+if (topbarStatusPill) {
+  topbarStatusPill.addEventListener("click", () => {
+    if (typeof triggerFullDataRefresh === "function") triggerFullDataRefresh();
+  });
+  topbarStatusPill.addEventListener("keydown", (e) => {
+    if ((e.key === "Enter" || e.key === " ") && typeof triggerFullDataRefresh === "function") {
+      e.preventDefault();
+      triggerFullDataRefresh();
+    }
+  });
 }
 
 function showLogin() {
@@ -8387,8 +8570,10 @@ function renderUpcomingPayments() {
   const items = [];
 
   for (const sub of cachedSubscriptions) {
-    if (!sub.is_active || sub.is_paid_this_cycle) continue;
-    const daysUntil = Math.round((new Date(sub.next_due_date) - today) / 86400000);
+    if (!sub.is_active || sub.is_paid_this_cycle || !sub.next_due_date) continue;
+    const subDate = parseDateOnly(sub.next_due_date);
+    if (!subDate) continue;
+    const daysUntil = Math.round((subDate - today) / 86400000);
     if (daysUntil <= 7) {
       items.push({
         title: sub.name,
@@ -8407,7 +8592,8 @@ function renderUpcomingPayments() {
 
     // 1. Kredi Kartı Son Ödeme Tarihi
     if (card.next_due_date) {
-      const daysUntil = Math.round((new Date(card.next_due_date) - today) / 86400000);
+      const cardDue = parseDateOnly(card.next_due_date);
+      const daysUntil = cardDue ? Math.round((cardDue - today) / 86400000) : 999;
       if (daysUntil <= 7) {
         items.push({
           title: `${cardTitle} (Son Ödeme)`,
@@ -8423,7 +8609,8 @@ function renderUpcomingPayments() {
 
     // 2. Kredi Kartı Ekstre Kesim Tarihi
     if (card.next_statement_date) {
-      const stmtDays = Math.round((new Date(card.next_statement_date) - today) / 86400000);
+      const cardStmt = parseDateOnly(card.next_statement_date);
+      const stmtDays = cardStmt ? Math.round((cardStmt - today) / 86400000) : 999;
       if (stmtDays >= 0 && stmtDays <= 7) {
         items.push({
           title: `${cardTitle} (Ekstre Kesimi)`,
@@ -8440,7 +8627,9 @@ function renderUpcomingPayments() {
 
   for (const r of cachedRecurring) {
     if (!r.is_active || !r.next_due_date || r.type !== "expense") continue;
-    const daysUntil = Math.round((new Date(r.next_due_date) - today) / 86400000);
+    const recDate = parseDateOnly(r.next_due_date);
+    if (!recDate) continue;
+    const daysUntil = Math.round((recDate - today) / 86400000);
     if (daysUntil <= 7) {
       items.push({
         title: r.name,
@@ -8458,7 +8647,9 @@ function renderUpcomingPayments() {
     if (plan.status !== "active" || !plan.payments) continue;
     for (const p of plan.payments) {
       if (p.status !== "pending" || !p.due_date) continue;
-      const daysUntil = Math.round((new Date(p.due_date) - today) / 86400000);
+      const instDate = parseDateOnly(p.due_date);
+      if (!instDate) continue;
+      const daysUntil = Math.round((instDate - today) / 86400000);
       if (daysUntil <= 7) {
         items.push({
           title: `${plan.description} (${p.installment_number}/${plan.installment_count} Taksit)`,
@@ -8592,15 +8783,21 @@ if (recentViewAllBtn) {
 
 let selectedOverviewDate = new Date();
 
+function getSelectedOverviewMonthParam() {
+  const year = selectedOverviewDate.getFullYear();
+  const monthStr = String(selectedOverviewDate.getMonth() + 1).padStart(2, "0");
+  return `${year}-${monthStr}`;
+}
+
 async function loadOverview() {
   const now = new Date();
   const isCurrentMonth = selectedOverviewDate.getFullYear() === now.getFullYear() && selectedOverviewDate.getMonth() === now.getMonth();
   const year = selectedOverviewDate.getFullYear();
-  const monthStr = String(selectedOverviewDate.getMonth() + 1).padStart(2, "0");
-  const monthParam = `${year}-${monthStr}`;
+  const monthParam = getSelectedOverviewMonthParam();
 
   const data = await apiRead(`/overview?month=${monthParam}`);
   if (!data) return;
+  updateLiveSyncTimestamp();
 
   const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
   const currentMonthName = `${monthNames[selectedOverviewDate.getMonth()]} ${selectedOverviewDate.getFullYear()}`;
@@ -8686,6 +8883,8 @@ if (prevMonthBtn) {
   prevMonthBtn.addEventListener("click", () => {
     selectedOverviewDate.setMonth(selectedOverviewDate.getMonth() - 1);
     loadOverview();
+    loadCategoryChart();
+    loadBudgets(getSelectedOverviewMonthParam());
   });
 }
 const nextMonthBtn = document.getElementById("overview-next-month");
@@ -8693,6 +8892,8 @@ if (nextMonthBtn) {
   nextMonthBtn.addEventListener("click", () => {
     selectedOverviewDate.setMonth(selectedOverviewDate.getMonth() + 1);
     loadOverview();
+    loadCategoryChart();
+    loadBudgets(getSelectedOverviewMonthParam());
   });
 }
 const todayMonthBtn = document.getElementById("overview-today-btn");
@@ -8700,6 +8901,8 @@ if (todayMonthBtn) {
   todayMonthBtn.addEventListener("click", () => {
     selectedOverviewDate = new Date();
     loadOverview();
+    loadCategoryChart();
+    loadBudgets();
   });
 }
 
@@ -8849,7 +9052,12 @@ function closeTxModal() {
   if (overlay) {
     overlay.style.display = "none";
     overlay.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
+    const otherModalOpen = Array.from(document.querySelectorAll(".tx-modal-overlay, #cmd-palette-overlay")).some(
+      (el) => el.id !== "tx-modal-overlay" && el.style.display && el.style.display !== "none"
+    );
+    if (!otherModalOpen) {
+      document.body.style.overflow = "";
+    }
   }
   setTxFormMode(null);
 }
@@ -9377,12 +9585,41 @@ const DONUT_PALETTE = [
   "#64748B"
 ];
 
+let currentCategoryChartType = "expense";
+
 async function loadCategoryChart() {
   const card = document.getElementById("category-chart-card");
   const container = document.getElementById("category-chart");
-  const entries = await apiRead("/reports/category-breakdown");
+  const subtitleEl = document.getElementById("category-chart-subtitle");
+  if (!card || !container) return;
+
+  const monthParam = getSelectedOverviewMonthParam();
+  const params = new URLSearchParams({ type: currentCategoryChartType });
+  if (monthParam) params.set("month", monthParam);
+
+  if (subtitleEl) {
+    const labelText = currentCategoryChartType === "income" ? "Gelir kategorileri analizi" : "Harcama kategorileri analizi";
+    subtitleEl.textContent = monthParam ? `${labelText} (${formatMonthYearTr(selectedOverviewDate)})` : `${labelText} (Tüm zamanlar)`;
+  }
+
+  let entries = await apiRead(`/reports/category-breakdown?${params.toString()}`);
+  let isFallbackAllTime = false;
+  if ((!entries || entries.length === 0) && monthParam) {
+    const fallbackEntries = await apiRead(`/reports/category-breakdown?type=${encodeURIComponent(currentCategoryChartType)}`);
+    if (fallbackEntries && fallbackEntries.length > 0) {
+      entries = fallbackEntries;
+      isFallbackAllTime = true;
+      if (subtitleEl) {
+        const labelText = currentCategoryChartType === "income" ? "Gelir kategorileri analizi" : "Harcama kategorileri analizi";
+        subtitleEl.textContent = `${labelText} (Seçili ayda kayıt yok · Tüm zamanlar)`;
+      }
+    }
+  }
+
   if (!entries || entries.length === 0) {
-    card.style.display = "none";
+    card.style.display = "block";
+    const emptyTypeLabel = currentCategoryChartType === "income" ? "gelir" : "gider";
+    container.innerHTML = `<div style="padding:28px 16px;text-align:center;color:var(--muted);font-size:13px;">Kategorilere göre gösterilecek ${emptyTypeLabel} kaydı bulunmuyor.</div>`;
     return;
   }
   card.style.display = "block";
@@ -9431,7 +9668,7 @@ async function loadCategoryChart() {
           ${circlesHtml}
         </svg>
         <div class="donut-center-label">
-          <span class="donut-center-sub">Toplam</span>
+          <span class="donut-center-sub">${isFallbackAllTime ? "Toplam (Tümü)" : "Toplam"}</span>
           <span class="donut-center-val">${formatMoney(total)}</span>
         </div>
       </div>
@@ -9445,12 +9682,31 @@ async function loadCategoryChart() {
     rowEl.addEventListener("click", () => {
       const cat = rowEl.getAttribute("data-cat-filter-click");
       const catSelect = document.getElementById("tx-filter-category");
+      const typeSelect = document.getElementById("tx-filter-type");
       if (catSelect && cat) {
         catSelect.value = cat;
+        if (typeSelect) typeSelect.value = currentCategoryChartType;
         setActiveTab("activity");
         loadTransactions(true);
       }
     });
+  });
+}
+
+const catChartExpenseBtn = document.getElementById("cat-chart-type-expense");
+const catChartIncomeBtn = document.getElementById("cat-chart-type-income");
+if (catChartExpenseBtn && catChartIncomeBtn) {
+  catChartExpenseBtn.addEventListener("click", () => {
+    currentCategoryChartType = "expense";
+    catChartExpenseBtn.classList.add("active");
+    catChartIncomeBtn.classList.remove("active");
+    loadCategoryChart();
+  });
+  catChartIncomeBtn.addEventListener("click", () => {
+    currentCategoryChartType = "income";
+    catChartIncomeBtn.classList.add("active");
+    catChartExpenseBtn.classList.remove("active");
+    loadCategoryChart();
   });
 }
 
@@ -9731,6 +9987,21 @@ function updateActiveFilterBadges() {
       chipsWrapper.style.display = "none";
     }
   }
+
+  // Sync quick filter pills with current filter state
+  const now = new Date();
+  const firstDayOfMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+  const isThisMonthRange = fromDate === firstDayOfMonth && toDate === todayIsoDate() && !type;
+  document.querySelectorAll(".quick-filter-pill").forEach((pill) => {
+    const qType = pill.getAttribute("data-quick-type") || "";
+    if (qType === "this-month") {
+      pill.classList.toggle("active", isThisMonthRange);
+    } else if (qType === "") {
+      pill.classList.toggle("active", !type && !fromDate && !toDate);
+    } else {
+      pill.classList.toggle("active", type === qType && !fromDate && !toDate);
+    }
+  });
 }
 
 function clearAllFilters() {
@@ -9938,7 +10209,12 @@ function closeModal(overlayId) {
   if (overlay) {
     overlay.style.display = "none";
     overlay.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
+    const otherModalOpen = Array.from(document.querySelectorAll(".tx-modal-overlay, #cmd-palette-overlay")).some(
+      (el) => el.id !== overlayId && el.style.display && el.style.display !== "none"
+    );
+    if (!otherModalOpen) {
+      document.body.style.overflow = "";
+    }
   }
 }
 
@@ -9983,7 +10259,7 @@ function openPayDebtModal(card) {
     amountInput.value = card.current_debt;
     amountInput.max = card.current_debt;
   }
-  if (dateInput) dateInput.value = new Date().toISOString().split("T")[0];
+  if (dateInput) dateInput.value = todayIsoDate();
   if (noteInput) noteInput.value = `${cardTitle} Borç Ödemesi`;
 
   openModal("pay-debt-modal-overlay", "pay-debt-amount");
@@ -10059,10 +10335,13 @@ document.addEventListener("keydown", (e) => {
     closeTxModal();
     closeSubModal();
     closeCardModal();
+    closePayDebtModal();
     closeCategoryModal();
     closeBudgetModal();
     if (typeof closeInstallmentModal === "function") closeInstallmentModal();
     if (typeof closeCardTxsModal === "function") closeCardTxsModal();
+    if (typeof closeStatementModal === "function") closeStatementModal();
+    if (typeof closeCmdPalette === "function") closeCmdPalette();
   }
 });
 
@@ -10406,8 +10685,8 @@ async function loadSubscriptions() {
       else if (sub.billing_cycle === "weekly") m = (sub.amount * 52) / 12;
       totalMonthly += m;
 
-      const due = new Date(sub.next_due_date);
-      const diffDays = Math.round((due - today) / 86400000);
+      const due = parseDateOnly(sub.next_due_date);
+      const diffDays = due ? Math.round((due - today) / 86400000) : 0;
       if (!sub.is_paid_this_cycle) {
         upcomingSubs.push({ sub, diffDays });
       }
@@ -10443,8 +10722,8 @@ async function loadSubscriptions() {
     const card = document.createElement("div");
     card.className = `sub-card${!sub.is_active ? " sub-inactive" : ""}`;
 
-    const dueDate = new Date(sub.next_due_date);
-    const daysUntil = Math.round((dueDate - today) / 86400000);
+    const dueDate = parseDateOnly(sub.next_due_date);
+    const daysUntil = dueDate ? Math.round((dueDate - today) / 86400000) : 0;
     const paid = sub.is_active && sub.is_paid_this_cycle;
     const dueSoon = sub.is_active && !paid && daysUntil >= 0 && daysUntil <= 7;
     const overdue = sub.is_active && !paid && daysUntil < 0;
@@ -10872,8 +11151,8 @@ async function loadCards() {
     totalDebt += card.current_debt;
     totalAvailable += card.available_limit;
 
-    const dueDate = new Date(card.next_due_date);
-    const daysUntilDue = Math.round((dueDate - today) / 86400000);
+    const dueDate = parseDateOnly(card.next_due_date);
+    const daysUntilDue = dueDate ? Math.round((dueDate - today) / 86400000) : 0;
     if (daysUntilDue >= 0 && daysUntilDue <= 7 && card.current_debt > 0) {
       upcomingDebtSum += card.current_debt;
       dueSoonCount++;
@@ -10908,8 +11187,8 @@ async function loadCards() {
     const themeClass = cardThemes[idx % cardThemes.length];
     const usagePct = card.limit_amount > 0 ? Math.min(100, Math.round((card.current_debt / card.limit_amount) * 100)) : 0;
     const highUsage = usagePct >= 80;
-    const dueDate = new Date(card.next_due_date);
-    const daysUntilDue = Math.round((dueDate - today) / 86400000);
+    const dueDate = parseDateOnly(card.next_due_date);
+    const daysUntilDue = dueDate ? Math.round((dueDate - today) / 86400000) : 0;
     const dueSoon = daysUntilDue >= 0 && daysUntilDue <= 7;
     const overdue = daysUntilDue < 0;
 
@@ -11041,10 +11320,10 @@ async function loadCards() {
 
   // 3. Render Due Dates Schedule (Prompt 8C)
   if (dueGrid) {
-    const sortedCards = [...cards].sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date));
+    const sortedCards = [...cards].sort((a, b) => (parseDateOnly(a.next_due_date) || 0) - (parseDateOnly(b.next_due_date) || 0));
     for (const card of sortedCards) {
-      const dueDate = new Date(card.next_due_date);
-      const daysUntilDue = Math.round((dueDate - today) / 86400000);
+      const dueDate = parseDateOnly(card.next_due_date);
+      const daysUntilDue = dueDate ? Math.round((dueDate - today) / 86400000) : 0;
       const dueSoon = daysUntilDue >= 0 && daysUntilDue <= 7;
       const overdue = daysUntilDue < 0;
 
@@ -11688,8 +11967,8 @@ function renderPlanInstallments() {
     if (plan.status === "active" && plan.payments) {
       for (const p of plan.payments) {
         if (p.status === "pending" && p.due_date) {
-          const d = new Date(p.due_date);
-          if (d.getFullYear() === curYear && d.getMonth() === curMonth) {
+          const d = parseDateOnly(p.due_date);
+          if (d && d.getFullYear() === curYear && d.getMonth() === curMonth) {
             thisMonthBurden += p.amount;
             thisMonthDueCount++;
           }
@@ -11807,12 +12086,7 @@ function renderWalletInstallments() {
     const addBtn = list.querySelector(".inst-add-plan-action-btn");
     if (addBtn) {
       addBtn.addEventListener("click", () => {
-        openTxModal(null);
-        setTxType("expense");
-        const advFields = document.getElementById("tx-advanced-fields");
-        if (advFields) advFields.style.display = "block";
-        const instContainer = document.getElementById("tx-installment-container");
-        if (instContainer) instContainer.style.display = "block";
+        openInstallmentQuickAddModal();
       });
     }
     return;
@@ -12208,7 +12482,9 @@ const instBackdrop = document.getElementById("installment-modal-backdrop");
 if (instBackdrop) instBackdrop.addEventListener("click", closeInstallmentModal);
 
 const planEmptyBtn = document.getElementById("plan-empty-add-tx-btn");
-if (planEmptyBtn) planEmptyBtn.addEventListener("click", () => openTxModal(null));
+if (planEmptyBtn) planEmptyBtn.addEventListener("click", () => openInstallmentQuickAddModal());
+const openPlanInstBtn = document.getElementById("open-plan-installment-btn");
+if (openPlanInstBtn) openPlanInstBtn.addEventListener("click", () => openInstallmentQuickAddModal());
 
 async function loadAccount() {
   const me = await apiRead("/me");
@@ -12312,50 +12588,90 @@ document.getElementById("show-register").addEventListener("click", () => {
   setAuthMode(willShow ? "register" : "login");
 });
 
+const showLoginBtn = document.getElementById("show-login");
+if (showLoginBtn) {
+  showLoginBtn.addEventListener("click", () => setAuthMode("login"));
+}
+
+// Wire Password Visibility Toggle Buttons across Login, Register, and Settings
+document.querySelectorAll(".password-toggle-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const targetId = btn.getAttribute("data-toggle-password") || btn.getAttribute("data-target-input");
+    const input = targetId ? document.getElementById(targetId) : null;
+    if (!input) return;
+    const isHidden = input.type === "password";
+    input.type = isHidden ? "text" : "password";
+    btn.textContent = isHidden ? "🙈" : "👁️";
+    btn.setAttribute("aria-label", isHidden ? "Şifreyi gizle" : "Şifreyi göster");
+    btn.title = isHidden ? "Şifreyi gizle" : "Şifreyi göster";
+  });
+});
+
 document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const email = document.getElementById("login-email").value;
+  const email = document.getElementById("login-email").value.trim();
   const password = document.getElementById("login-password").value;
   const errorEl = document.getElementById("login-error");
+  const submitBtn = e.target.querySelector('button[type="submit"]');
   errorEl.textContent = "";
-  const response = await fetch(API + "/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ username: email, password }),
-  });
-  if (!response.ok) {
-    errorEl.textContent = "E-posta veya şifre hatalı.";
-    return;
+  if (submitBtn) submitBtn.disabled = true;
+  try {
+    const response = await fetch(API + "/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ username: email, password }),
+    });
+    if (!response.ok) {
+      errorEl.textContent = "E-posta veya şifre hatalı.";
+      return;
+    }
+    const data = await response.json();
+    setTokens(data.access_token, data.refresh_token);
+    showApp();
+  } catch (err) {
+    errorEl.textContent = "Sunucuya bağlanılamadı. Lütfen tekrar deneyin.";
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
-  const data = await response.json();
-  setTokens(data.access_token, data.refresh_token);
-  showApp();
 });
 
 document.getElementById("register-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const email = document.getElementById("register-email").value;
+  const email = document.getElementById("register-email").value.trim();
   const password = document.getElementById("register-password").value;
   const errorEl = document.getElementById("register-error");
+  const submitBtn = e.target.querySelector('button[type="submit"]');
   errorEl.textContent = "";
-  const response = await fetch(API + "/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    errorEl.textContent = err.detail || "Kayıt olunamadı.";
-    return;
+  if (submitBtn) submitBtn.disabled = true;
+  try {
+    const response = await fetch(API + "/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      errorEl.textContent = err.detail || "Kayıt olunamadı.";
+      return;
+    }
+    const loginResponse = await fetch(API + "/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ username: email, password }),
+    });
+    if (!loginResponse.ok) {
+      setAuthMode("login");
+      showToast("Kayıt başarılı! Lütfen giriş yapın.", "success");
+      return;
+    }
+    const data = await loginResponse.json();
+    setTokens(data.access_token, data.refresh_token);
+    showApp();
+  } catch (err) {
+    errorEl.textContent = "Sunucuya bağlanılamadı. Lütfen tekrar deneyin.";
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
-  const loginResponse = await fetch(API + "/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ username: email, password }),
-  });
-  const data = await loginResponse.json();
-  setTokens(data.access_token, data.refresh_token);
-  showApp();
 });
 
 async function handleLogout() {
@@ -13054,6 +13370,22 @@ function getCommandPaletteCatalog(query = "") {
     },
     {
       group: "Hızlı İşlemler",
+      icon: "📅",
+      title: "Yeni Taksitli Harcama Ekle",
+      sub: "Kredi kartı ile taksitli alışveriş planı oluştur",
+      shortcut: "",
+      action: () => openInstallmentQuickAddModal(),
+    },
+    {
+      group: "Hızlı İşlemler",
+      icon: "📌",
+      title: "Yeni Sabit İşlem Ekle",
+      sub: "Maaş, kira veya düzenli aidat tanımla",
+      shortcut: "",
+      action: () => openRecurringModal(null),
+    },
+    {
+      group: "Hızlı İşlemler",
       icon: "📄",
       title: "Banka Ekstresi Yükle (PDF)",
       sub: "Kredi kartı ekstresini otomatik tara ve aktar",
@@ -13134,8 +13466,50 @@ function getCommandPaletteCatalog(query = "") {
     });
   }
 
-  // Dynamic Recent Transactions when searching
+  // Dynamic Installment Plans, Subscriptions, Budgets, and Recent Transactions when searching
   if (q.length >= 2) {
+    for (const plan of (cachedInstallments || [])) {
+      const hay = `${plan.description || ""} ${plan.category || ""}`.toLowerCase();
+      if (hay.includes(q)) {
+        baseCommands.push({
+          group: "Taksit Planları",
+          icon: "💳",
+          title: `${plan.description} (${plan.completed_installments}/${plan.installment_count})`,
+          sub: `Kalan: ${formatMoney(plan.remaining_amount)} · Toplam: ${formatMoney(plan.total_amount)}`,
+          shortcut: "Taksit",
+          action: () => openInstallmentDetailModal(plan),
+        });
+      }
+    }
+
+    for (const sub of (cachedSubscriptions || [])) {
+      const hay = `${sub.name || ""} ${sub.category || ""}`.toLowerCase();
+      if (hay.includes(q)) {
+        baseCommands.push({
+          group: "Abonelikler",
+          icon: "🔁",
+          title: `${sub.name} (${formatMoney(sub.amount)})`,
+          sub: `Sonraki ödeme: ${formatDateTr(sub.next_due_date)}`,
+          shortcut: "Düzenle",
+          action: () => openSubModal(sub),
+        });
+      }
+    }
+
+    for (const budget of (cachedBudgets || [])) {
+      const bTitle = budget.category || "Genel Bütçe";
+      if (bTitle.toLowerCase().includes(q)) {
+        baseCommands.push({
+          group: "Bütçeler",
+          icon: "🎯",
+          title: `${bTitle} (${formatMoney(budget.spent_this_month)} / ${formatMoney(budget.monthly_limit)})`,
+          sub: `Kalan: ${formatMoney(budget.remaining)}`,
+          shortcut: "Düzenle",
+          action: () => openBudgetModal(budget),
+        });
+      }
+    }
+
     for (const tx of (allTransactions || []).slice(0, 25)) {
       const label = tx.note || tx.category || (tx.type === "income" ? "Gelir" : "Gider");
       const hay = `${label} ${tx.category || ""} ${tx.occurred_on || ""}`.toLowerCase();

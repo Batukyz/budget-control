@@ -132,3 +132,64 @@ def test_account_reset_frontend_elements_and_modal_structure():
     cat_opens = len(re.findall(r"<div[\s>]", cat_chunk, re.IGNORECASE))
     cat_closes = len(re.findall(r"</div>", cat_chunk, re.IGNORECASE))
     assert cat_closes >= cat_opens, "confirm-modal-overlay is erroneously nested inside category-modal-overlay"
+
+
+def test_ui_ux_enhancements_and_frontend_integrity(client):
+    from pathlib import Path
+
+    html_path = Path("app/static/index.html")
+    content = html_path.read_text(encoding="utf-8")
+
+    # 1. Auth & Password Visibility Toggles
+    assert 'id="show-login"' in content
+    assert 'class="password-toggle-btn"' in content
+    assert 'data-toggle-password="login-password"' in content
+    assert 'data-toggle-password="register-password"' in content
+    assert 'data-toggle-password="account-password-input"' in content
+    assert 'data-toggle-password="delete-account-password-input"' in content
+
+    # 2. Dashboard Interactive Bento Metric Cards & Chart Controls
+    assert 'id="topbar-status-pill"' in content
+    assert 'id="cat-chart-type-expense"' in content
+    assert 'id="cat-chart-type-income"' in content
+    assert 'id="category-chart-subtitle"' in content
+    assert 'id="open-plan-installment-btn"' in content
+    assert "openInstallmentQuickAddModal" in content
+    assert "bindMetricCardAction" in content
+    assert "getSelectedOverviewMonthParam" in content
+
+    # 3. Timezone-safe date parsing (no UTC date drift)
+    assert 'new Date().toISOString().split("T")[0]' not in content
+    assert "new Date(sub.next_due_date)" not in content
+    assert "new Date(card.next_due_date)" not in content
+    assert "new Date(p.due_date)" not in content
+
+    # 4. Escape key closes all modals & palettes
+    assert "closePayDebtModal();" in content
+    assert "closeStatementModal()" in content
+    assert "closeCmdPalette()" in content
+
+    # 5. Category breakdown API supports month + type (expense & income) used by chart toggle
+    client.post(
+        "/transactions",
+        json={"type": "expense", "amount": 450.0, "occurred_on": "2026-04-10", "category": "Market"},
+    )
+    client.post(
+        "/transactions",
+        json={"type": "income", "amount": 15000.0, "occurred_on": "2026-04-05", "category": "Maaş"},
+    )
+
+    exp_res = client.get("/reports/category-breakdown?month=2026-04&type=expense")
+    assert exp_res.status_code == 200
+    exp_data = exp_res.json()
+    assert len(exp_data) == 1
+    assert exp_data[0]["category"] == "Market"
+    assert exp_data[0]["amount"] == 450.0
+
+    inc_res = client.get("/reports/category-breakdown?month=2026-04&type=income")
+    assert inc_res.status_code == 200
+    inc_data = inc_res.json()
+    assert len(inc_data) == 1
+    assert inc_data[0]["category"] == "Maaş"
+    assert inc_data[0]["amount"] == 15000.0
+
