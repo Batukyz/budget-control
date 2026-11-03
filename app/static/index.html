@@ -12483,8 +12483,6 @@ if (instBackdrop) instBackdrop.addEventListener("click", closeInstallmentModal);
 
 const planEmptyBtn = document.getElementById("plan-empty-add-tx-btn");
 if (planEmptyBtn) planEmptyBtn.addEventListener("click", () => openInstallmentQuickAddModal());
-const openPlanInstBtn = document.getElementById("open-plan-installment-btn");
-if (openPlanInstBtn) openPlanInstBtn.addEventListener("click", () => openInstallmentQuickAddModal());
 
 async function loadAccount() {
   const me = await apiRead("/me");
