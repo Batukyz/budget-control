@@ -5712,6 +5712,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="18" cy="18" r="2.5"/></svg>
           <span>İşlemler</span>
         </button>
+        <button type="button" class="nav-item" data-tab="analytics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Analiz & Rapor</span>
+        </button>
         <button type="button" class="nav-item" data-tab="plan">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>
           <span>Plan & Bütçe</span>
@@ -5880,71 +5884,19 @@
             </div>
 
             <!-- Instant Action Strip -->
-            <div class="hero-quick-actions">
-              <button type="button" class="hero-quick-pill" id="hero-qa-expense">
-                <span class="pill-dot expense"></span>
+            <div class="hero-quick-actions" style="display:flex;gap:10px;margin-top:16px;">
+              <button type="button" class="btn-primary" id="hero-qa-expense" style="flex:1;justify-content:center;padding:12px 18px;border-radius:14px;font-size:14px;box-shadow:0 4px 14px rgba(239,68,68,0.25);background:linear-gradient(135deg,#ef4444,#dc2626);border:none;">
+                <span style="font-size:16px;">↘</span>
                 <span>Harcama Ekle</span>
               </button>
-              <button type="button" class="hero-quick-pill" id="hero-qa-income">
-                <span class="pill-dot income"></span>
+              <button type="button" class="btn-primary" id="hero-qa-income" style="flex:1;justify-content:center;padding:12px 18px;border-radius:14px;font-size:14px;box-shadow:0 4px 14px rgba(16,185,129,0.25);background:var(--gradient);border:none;">
+                <span style="font-size:16px;">↗</span>
                 <span>Gelir Kaydet</span>
               </button>
-              <button type="button" class="hero-quick-pill" id="hero-qa-installment">
-                <span class="pill-dot installment"></span>
-                <span>Taksitli Harcama</span>
-              </button>
-              <button type="button" class="hero-quick-pill" id="hero-qa-budget">
-                <span class="pill-dot plan"></span>
-                <span>Bütçe Limiti Belirle</span>
-              </button>
             </div>
           </div>
 
-          <!-- 2. Secondary Metrics Row (4-Column Bento Strip) -->
-          <div class="dashboard-metrics-grid">
-            <div class="metric-card" id="metric-card-subs" role="button" tabindex="0" title="Abonelikleri yönetmek için tıklayın">
-              <div class="metric-header">
-                <span class="metric-icon">🔁</span>
-                <span class="metric-title">Aylık Sabit Taahhüt</span>
-              </div>
-              <div class="metric-value" id="overview-subs">–</div>
-              <div class="metric-subtext">Aktif abonelik yükü →</div>
-            </div>
-
-            <div class="metric-card" id="metric-card-budgets" role="button" tabindex="0" title="Bütçe limitlerini görüntülemek için tıklayın">
-              <div class="metric-header">
-                <span class="metric-icon">🎯</span>
-                <span class="metric-title">Bütçe Durumu</span>
-              </div>
-              <div class="metric-value" id="overview-budget-metric">Hesaplanıyor…</div>
-              <div class="metric-progress-track">
-                <div class="metric-progress-fill" id="overview-budget-fill" style="width: 0%;"></div>
-              </div>
-            </div>
-
-            <div class="metric-card" id="metric-card-upcoming" role="button" tabindex="0" title="Yaklaşan ödemeleri görmek için tıklayın">
-              <div class="metric-header">
-                <span class="metric-icon">⏰</span>
-                <span class="metric-title">7 Günlük Ödemeler</span>
-              </div>
-              <div class="metric-value" id="overview-upcoming-metric">0 ödeme</div>
-              <div class="metric-subtext" id="overview-upcoming-sub">Yaklaşan işlem takvimi</div>
-            </div>
-
-            <div class="metric-card" id="metric-card-wallet" role="button" tabindex="0" title="Cüzdan ve kartları açmak için tıklayın">
-              <div class="metric-header">
-                <span class="metric-icon">💳</span>
-                <span class="metric-title">Kart & Taksit Yükü</span>
-              </div>
-              <div class="metric-value" id="overview-wallet-metric">₺0,00</div>
-              <div class="metric-progress-track">
-                <div class="metric-progress-fill" id="overview-wallet-fill" style="width: 0%;"></div>
-              </div>
-              <div class="metric-subtext" id="overview-wallet-sub">Toplam kredi kartı borcu</div>
-            </div>
-          </div>
-
-          <!-- 3. Two-Column Workspace Grid -->
+          <!-- 2. Two-Column Clean Dashboard Grid (Alerts/Upcoming & Recent Transactions) -->
           <div class="dashboard-grid">
             
             <!-- Left Column: Alerts + Upcoming Payments -->
@@ -5977,7 +5929,7 @@
               </div>
             </div>
 
-            <!-- Right Column: Recent Activity + Category Spending Breakdown -->
+            <!-- Right Column: Recent Activity & Quick Health -->
             <div class="dashboard-column">
               <!-- Recent Activity -->
               <div class="card" id="recent-activity-card">
@@ -5994,37 +5946,90 @@
                 </div>
               </div>
 
-              <!-- Category Spending Breakdown -->
-              <div class="card" id="category-chart-card" style="display:none">
-                <div class="section-header-row">
-                  <div class="section-title-wrap">
-                    <span class="section-icon">📊</span>
-                    <h3 class="section-title">Kategori Dağılımı</h3>
+              <!-- Quick Navigation Bento Strip to other tabs -->
+              <div class="dashboard-metrics-grid" style="grid-template-columns:1fr 1fr;gap:12px;margin-top:0;">
+                <div class="metric-card" id="metric-card-subs" role="button" tabindex="0" title="Abonelikleri yönetmek için tıklayın">
+                  <div class="metric-header">
+                    <span class="metric-icon">🔁</span>
+                    <span class="metric-title">Abonelikler</span>
                   </div>
-                  <span class="chart-header-controls">
-                    <span class="chart-type-toggle" role="group" aria-label="Kategori grafik türü">
-                      <button type="button" class="chart-type-btn active" id="cat-chart-type-expense" data-chart-type="expense">Gider</button>
-                      <button type="button" class="chart-type-btn" id="cat-chart-type-income" data-chart-type="income">Gelir</button>
-                    </span>
-                    <span class="chart-subtitle" id="category-chart-subtitle">Bu Ay</span>
-                  </span>
+                  <div class="metric-value" id="overview-subs" style="font-size:16px;">–</div>
+                  <div class="metric-subtext">Aylık sabit taahhüt →</div>
                 </div>
-                <div id="category-chart"></div>
-              </div>
 
-              <!-- Monthly Trend -->
-              <div class="card" id="monthly-trend-card" style="display:none">
-                <div class="section-header-row">
-                  <div class="section-title-wrap">
-                    <span class="section-icon">📈</span>
-                    <h3 class="section-title">6 Aylık Gelir & Gider Trendi</h3>
+                <div class="metric-card" id="metric-card-budgets" role="button" tabindex="0" title="Bütçe limitlerini görüntülemek için tıklayın">
+                  <div class="metric-header">
+                    <span class="metric-icon">🎯</span>
+                    <span class="metric-title">Bütçe</span>
                   </div>
-                  <span class="chart-subtitle">Son 6 Ay</span>
+                  <div class="metric-value" id="overview-budget-metric" style="font-size:16px;">Hesaplanıyor…</div>
+                  <div class="metric-progress-track">
+                    <div class="metric-progress-fill" id="overview-budget-fill" style="width: 0%;"></div>
+                  </div>
                 </div>
-                <div id="monthly-trend-chart"></div>
+
+                <div class="metric-card" id="metric-card-upcoming" role="button" tabindex="0" title="Yaklaşan ödemeleri görmek için tıklayın">
+                  <div class="metric-header">
+                    <span class="metric-icon">⏰</span>
+                    <span class="metric-title">Ödemeler</span>
+                  </div>
+                  <div class="metric-value" id="overview-upcoming-metric" style="font-size:16px;">0 ödeme</div>
+                  <div class="metric-subtext" id="overview-upcoming-sub">7 günlük takvim →</div>
+                </div>
+
+                <div class="metric-card" id="metric-card-wallet" role="button" tabindex="0" title="Cüzdan ve kartları açmak için tıklayın">
+                  <div class="metric-header">
+                    <span class="metric-icon">💳</span>
+                    <span class="metric-title">Kredi Kartı</span>
+                  </div>
+                  <div class="metric-value" id="overview-wallet-metric" style="font-size:16px;">₺0,00</div>
+                  <div class="metric-subtext" id="overview-wallet-sub">Toplam borç yükü →</div>
+                </div>
               </div>
             </div>
 
+          </div>
+        </div>
+
+        <!-- NEW ANALYTICS & REPORTS TAB PANEL -->
+        <div class="main-tab-panel" id="tab-analytics" data-tab="analytics">
+          <div class="activity-top-bar">
+            <div class="activity-title-wrap">
+              <h1 class="activity-title">Analiz & Raporlar</h1>
+              <p class="activity-subtitle">Harcama kategorileriniz ve dönemsel gelir-gider trendleriniz</p>
+            </div>
+          </div>
+
+          <div class="analytics-cards-stack" style="display:flex;flex-direction:column;gap:20px;">
+            <!-- Category Spending Breakdown -->
+            <div class="card" id="category-chart-card">
+              <div class="section-header-row">
+                <div class="section-title-wrap">
+                  <span class="section-icon">📊</span>
+                  <h3 class="section-title">Kategori Dağılımı</h3>
+                </div>
+                <span class="chart-header-controls">
+                  <span class="chart-type-toggle" role="group" aria-label="Kategori grafik türü">
+                    <button type="button" class="chart-type-btn active" id="cat-chart-type-expense" data-chart-type="expense">Gider</button>
+                    <button type="button" class="chart-type-btn" id="cat-chart-type-income" data-chart-type="income">Gelir</button>
+                  </span>
+                  <span class="chart-subtitle" id="category-chart-subtitle">Bu Ay</span>
+                </span>
+              </div>
+              <div id="category-chart"></div>
+            </div>
+
+            <!-- Monthly Trend -->
+            <div class="card" id="monthly-trend-card">
+              <div class="section-header-row">
+                <div class="section-title-wrap">
+                  <span class="section-icon">📈</span>
+                  <h3 class="section-title">6 Aylık Gelir & Gider Trendi</h3>
+                </div>
+                <span class="chart-subtitle">Son 6 Ay</span>
+              </div>
+              <div id="monthly-trend-chart"></div>
+            </div>
           </div>
         </div>
 
@@ -6788,6 +6793,10 @@
       </button>
       <button type="button" class="quick-add-btn" id="mobile-quick-add-btn" title="Hızlı Ekle" aria-label="İşlem Ekle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button type="button" class="nav-item" data-tab="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Rapor</span>
       </button>
       <button type="button" class="nav-item" data-tab="plan">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>
@@ -7922,6 +7931,8 @@ const TAB_MAP = {
   dashboard: { primary: "dashboard", label: "Genel Bakış" },
   transactions: { primary: "activity", label: "İşlemler & Hareketler" },
   activity: { primary: "activity", label: "İşlemler & Hareketler" },
+  analytics: { primary: "analytics", label: "Analiz & Raporlar" },
+  reports: { primary: "analytics", label: "Analiz & Raporlar" },
   plan: { primary: "plan", label: "Plan & Bütçe" },
   budgets: { primary: "plan", subpanel: "budgets", label: "Plan · Bütçeler" },
   subscriptions: { primary: "plan", subpanel: "subscriptions", label: "Plan · Abonelikler" },
@@ -13424,6 +13435,14 @@ function getCommandPaletteCatalog(query = "") {
       sub: "Tüm gelir ve gider kayıtlarını filtrele",
       shortcut: "",
       action: () => setActiveTab("activity"),
+    },
+    {
+      group: "Sayfalar & Navigasyon",
+      icon: "📊",
+      title: "Analiz & Kategori Raporları",
+      sub: "Kategori dağılım grafiği ve 6 aylık trendler",
+      shortcut: "",
+      action: () => setActiveTab("analytics"),
     },
     {
       group: "Sayfalar & Navigasyon",
